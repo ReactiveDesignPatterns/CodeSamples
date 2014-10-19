@@ -10,19 +10,18 @@ class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
     "Result in the supervisor returning a reference to that actor" in {
       implicit val system = ActorSystem()
       val testProbe = TestProbe()
-			val parent = system.actorOf(Props(new StepParent(testProbe.ref)), "stepParent")
+			val parent = system.actorOf(Props[StepParent], "stepParent")
 			parent.tell(Props[MyActor], testProbe.ref)
 			val child = testProbe.expectMsgType[ActorRef]
-      child ! TestMessage
     }
   }
 }
 
 case object TestMessage
 
-class StepParent(target: ActorRef) extends Actor {
+class StepParent extends Actor {
    override val supervisorStrategy = OneForOneStrategy() {
-     case thr: Throwable => target ! thr; Restart
+     case thr => Restart
    }
    def receive = {
      case p: Props => 
