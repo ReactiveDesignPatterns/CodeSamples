@@ -3,7 +3,6 @@ package com.reactivedesignpatterns.chapter4
 import scala.concurrent.duration.{ DurationInt, FiniteDuration }
 import scala.util.Try
 import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
-import com.reactivedesignpatterns.Scoped.scoped
 import com.reactivedesignpatterns.Defaults._
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props, actorRef2Scala }
 import akka.testkit.TestProbe
@@ -39,16 +38,13 @@ object EchoServiceSpec {
                 timings: List[FiniteDuration]): Receive = {
       case TimedResponse(Response(r), d) =>
         val start = outstanding(r)
-        scoped(
-          outstanding - r + sendRequest(echo, receiver),
-          (d - start) :: timings,
-          remaining - 1
-        ) { (outstanding, timings, remaining) =>
-            if (remaining > 0)
-              context.become(running(reportTo, echo, remaining, receiver, outstanding, timings))
-            else
-              context.become(finishing(reportTo, outstanding, timings))
-          }
+        val newOutstanding = outstanding - r + sendRequest(echo, receiver)
+        val newTimings = (d - start) :: timings
+        val newRemaining = remaining - 1
+        if (newRemaining > 0)
+          context.become(running(reportTo, echo, newRemaining, receiver, newOutstanding, newTimings))
+        else
+          context.become(finishing(reportTo, newOutstanding, newTimings))
       case AbortSLATest =>
         context.stop(self)
         reportTo ! SLAResponse(timings, outstanding)
@@ -57,12 +53,12 @@ object EchoServiceSpec {
     def finishing(reportTo: ActorRef, outstanding: Map[String, Timestamp], timings: List[FiniteDuration]): Receive = {
       case TimedResponse(Response(r), d) =>
         val start = outstanding(r)
-        scoped(outstanding - r, (d - start) :: timings) { (outstanding, timings) =>
-          if (outstanding.isEmpty) {
-            context.stop(self)
-            reportTo ! SLAResponse(timings, outstanding)
-          } else context.become(finishing(reportTo, outstanding, timings))
-        }
+        val newOutstanding = outstanding - r
+        val newTimings = (d - start) :: timings
+        if (newOutstanding.isEmpty) {
+          context.stop(self)
+          reportTo ! SLAResponse(newTimings, newOutstanding)
+        } else context.become(finishing(reportTo, newOutstanding, newTimings))
       case AbortSLATest =>
         context.stop(self)
         reportTo ! SLAResponse(timings, outstanding)
@@ -191,9 +187,9 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
     }
 
   }
-  
+
   "An EchoService (with LatencyTestSupport)" should {
-    
+
     "keep its SLA" in {
       implicit val timeout = Timeout(5.seconds)
       import system.dispatcher
@@ -208,7 +204,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       lat.failureCount should be(0)
       lat.quantile(0.99) should be < 10.milliseconds
     }
-    
+
   }
 
 }
