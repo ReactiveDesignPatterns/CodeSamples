@@ -6,15 +6,20 @@ import akka.actor.SupervisorStrategy.Stop
 import akka.testkit.TestProbe
 
 class FailureParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
-	"Using a FailureParent" must {
+  implicit val system = ActorSystem()
+
+  "Using a FailureParent" must {
 	  "Result in failures being collected and returned" in {
-		  implicit val system = ActorSystem()
 		  val failures = TestProbe()
 			val failureParent = system.actorOf(Props(new FailureParent(failures.ref)))
 			failureParent ! TestFailureParentMessage
 			failures.expectMsgType[NullPointerException]
 	  }
 	}
+
+  override def afterAll(): Unit = {
+    system.shutdown()
+  }
 }
 
 case object TestFailureParentMessage 
