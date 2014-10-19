@@ -1,0 +1,7 @@
+package com.reactivedesignpatterns
+
+object Scoped {
+  [1..12#def scoped[[#T1#], U]([#v1: T1#])(f: ([#T1#]) => U): U =
+    f([#v1#])#
+  ]
+}
