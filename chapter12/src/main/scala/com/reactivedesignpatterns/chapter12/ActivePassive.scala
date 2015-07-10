@@ -109,36 +109,51 @@ object ActivePassive {
   private case class GetFull(replyTo: ActorRef)
   private case object DoConsolidate
 
-  class Passive(askAroundCount: Int, askAroundInterval: FiniteDuration) extends Actor with ActorLogging {
-    private var theStore: Map[String, JsValue] = _
-    private var expectedSeq: Int = 0
+  class Passive(askAroundCount: Int, askAroundInterval: FiniteDuration, maxLag: Int) extends Actor with ActorLogging {
     private val applied = Queue.empty[Replicate]
-    private var waiting = TreeMap.empty[Int, Replicate]
+    private var awaitingInitialState = Option.empty[ActorRef]
 
     val name = Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
     val cluster = Cluster(context.system)
     val random = new Random
 
-    readPersisted(name) match {
-      case Database(s, kv) =>
-        theStore = kv
-        expectedSeq = s + 1
+    private var tickTask = Option.empty[Cancellable]
+    def scheduleTick() = {
+      tickTask foreach (_.cancel())
+      tickTask = Some(context.system.scheduler.scheduleOnce(askAroundInterval, self, DoConsolidate)(context.dispatcher))
     }
-    log.info("started at sequence {}", expectedSeq)
+
+    def receive = readPersisted(name) match {
+      case Database(s, kv) =>
+        log.info("started at sequence {}", s)
+        upToDate(kv, s + 1)
+    }
 
     override def postStop(): Unit = {
-      log.info("stopped at sequence {}", expectedSeq)
+      log.info("stopped")
     }
 
-    def receive = {
+    def caughtUp(theStore: Map[String, JsValue], expectedSeq: Int): Unit = {
+      awaitingInitialState foreach (_ ! InitialState(theStore, expectedSeq))
+      awaitingInitialState = None
+      context.become(upToDate(theStore, expectedSeq))
+    }
+
+    def upToDate(theStore: Map[String, JsValue], expectedSeq: Int): Receive = {
       case TakeOver(active) =>
         log.info("active replica starting at sequence {}", expectedSeq)
         active ! InitialState(theStore, expectedSeq)
-      case Replicate(s, _, _, replyTo) if s < expectedSeq =>
+      case Replicate(s, _, _, replyTo) if s - expectedSeq < 0 =>
         replyTo ! Replicated(s)
+      case r: Replicate if r.seq == expectedSeq =>
+        r.replyTo ! Replicated(r.seq)
+        applied.enqueue(r)
+        context.become(upToDate(theStore + (r.key -> r.value), r.seq + 1))
       case r: Replicate =>
-        waiting += r.seq -> r
-        consolidate()
+        if (r.seq - expectedSeq > maxLag)
+          fallBehind(expectedSeq, TreeMap(r.seq -> r))
+        else
+          missingSomeUpdates(theStore, expectedSeq, Set.empty, TreeMap(r.seq -> r))
       case GetSingle(s, replyTo) =>
         log.info("GetSingle from {}", replyTo)
         if (applied.nonEmpty && applied.head.seq <= s && applied.last.seq >= s)
@@ -147,46 +162,83 @@ object ActivePassive {
       case GetFull(replyTo) =>
         log.info("sending full info to {}", replyTo)
         replyTo ! InitialState(theStore, expectedSeq)
-      case InitialState(m, s) if s > expectedSeq =>
-        log.info("received newer state at sequence {} (was at {})", s, expectedSeq)
-        theStore = m
-        expectedSeq = s + 1
-        persist(name, s, m)
-        waiting.to(s).valuesIterator foreach (r => r.replyTo ! Replicated(r.seq))
-        waiting = waiting.from(expectedSeq)
-        consolidate()
-      case DoConsolidate =>
-        // this is scheduled when asking around for state so that eventually we
-        // will get all updates
-        consolidate()
     }
 
-    private def consolidate(): Unit = {
+    def missingSomeUpdates(theStore: Map[String, JsValue], expectedSeq: Int, prevOutstanding: Set[Int], waiting: TreeMap[Int, Replicate]): Unit = {
+      val askFor = (expectedSeq to waiting.lastKey).iterator
+        .filterNot(seq => waiting.contains(seq) || prevOutstanding.contains(seq)).toList
+      askFor foreach askAround
+      if (prevOutstanding.isEmpty) scheduleTick()
+      val outstanding = prevOutstanding ++ askFor
+      context.become {
+        case Replicate(s, _, _, replyTo) if s < expectedSeq =>
+          replyTo ! Replicated(s)
+        case r: Replicate =>
+          consolidate(theStore, expectedSeq, outstanding - r.seq, waiting + (r.seq -> r))
+        case TakeOver(active) =>
+          log.info("delaying active replica takeOver, at seq {} while highest is {}", expectedSeq, waiting.lastKey)
+          awaitingInitialState = Some(active)
+        case GetSingle(s, replyTo) =>
+          log.info("GetSingle from {}", replyTo)
+          if (applied.nonEmpty && applied.head.seq <= s && applied.last.seq >= s)
+            replyTo ! applied.find(_.seq == s).get
+          else if (s < expectedSeq) replyTo ! InitialState(theStore, expectedSeq)
+        case GetFull(replyTo) =>
+          log.info("sending full info to {}", replyTo)
+          replyTo ! InitialState(theStore, expectedSeq)
+        case DoConsolidate =>
+          outstanding foreach askAround
+          scheduleTick()
+      }
+    }
+
+    def fallBehind(expectedSeq: Int, _waiting: TreeMap[Int, Replicate]): Unit = {
+      askAroundFullState()
+      scheduleTick()
+      var waiting = _waiting
+      context.become {
+        case Replicate(s, _, _, replyTo) if s < expectedSeq =>
+          replyTo ! Replicated(s)
+        case r: Replicate =>
+          waiting += (r.seq -> r)
+        case TakeOver(active) =>
+          log.info("delaying active replica takeOver, at seq {} while highest is {}", expectedSeq, waiting.lastKey)
+          awaitingInitialState = Some(active)
+        case InitialState(m, s) if s > expectedSeq =>
+          log.info("received newer state at sequence {} (was at {})", s, expectedSeq)
+          persist(name, s, m)
+          waiting.to(s).valuesIterator foreach (r => r.replyTo ! Replicated(r.seq))
+          val nextWaiting = waiting.from(expectedSeq)
+          consolidate(m, s + 1, Set.empty, nextWaiting)
+        case DoConsolidate =>
+          askAroundFullState()
+          scheduleTick()
+      }
+    }
+
+    private val matches = (p: (Int, Int)) => p._1 == p._2
+
+    private def consolidate(theStore: Map[String, JsValue], expectedSeq: Int, askedFor: Set[Int], waiting: TreeMap[Int, Replicate]): Unit = {
       // calculate applicable prefix length
-      def matches(p: (Int, Int)) = p._1 == p._2
       val prefix = waiting.keysIterator.zip(Iterator from expectedSeq).takeWhile(matches).size
 
-      if (prefix > 0) {
-        waiting.valuesIterator.take(prefix) foreach { replicate =>
-          theStore += replicate.key -> replicate.value
-          expectedSeq = replicate.seq + 1
-          persist(name, replicate.seq, theStore)
-          replicate.replyTo ! Replicated(replicate.seq)
-          applied.enqueue(replicate)
-        }
-        waiting = waiting.drop(prefix)
+      val nextStore = waiting.valuesIterator.take(prefix).foldLeft(theStore) { (store, replicate) =>
+        persist(name, replicate.seq, theStore)
+        replicate.replyTo ! Replicated(replicate.seq)
+        applied.enqueue(replicate)
+        store + (replicate.key -> replicate.value)
       }
+      val nextWaiting = waiting.drop(prefix)
+      val nextExpectedSeq = expectedSeq + prefix
 
       // cap the size of the applied buffer
-      applied.drop(Math.max(0, applied.size - 10))
+      applied.drop(Math.max(0, applied.size - maxLag))
 
-      // check if we fell behind by too much
-      if (waiting.nonEmpty && (waiting.lastKey - expectedSeq > 10)) {
-        val outstanding = (expectedSeq to waiting.lastKey).iterator.filterNot(waiting.contains).toList
-        if (outstanding.size <= 3) outstanding foreach askAround
-        else askAroundFullState()
-        context.system.scheduler.scheduleOnce(askAroundInterval, self, DoConsolidate)(context.dispatcher)
-      }
+      if (nextWaiting.nonEmpty) {
+        // check if we fell behind by too much
+        if (nextWaiting.lastKey - nextExpectedSeq > maxLag) fallBehind(nextExpectedSeq, nextWaiting)
+        else missingSomeUpdates(nextStore, nextExpectedSeq, askedFor, nextWaiting)
+      } else caughtUp(nextStore, nextExpectedSeq)
     }
 
     private def getMembers(n: Int): Seq[Address] = {
@@ -230,7 +282,7 @@ object ActivePassive {
 
   def start(port: Option[Int]): ActorSystem = {
     val system = ActorSystem("ActivePassive", roleConfig("backend", port) withFallback commonConfig)
-    val localReplica = system.actorOf(Props(new Passive(3, 3.seconds)), "passive")
+    val localReplica = system.actorOf(Props(new Passive(3, 3.seconds, 100)), "passive")
     val managerProps =
       ClusterSingletonManager.props(Props(new Active(localReplica, 2, 120)), "active", PoisonPill,
         role = Some("backend"), retryInterval = 150.millis)
@@ -262,7 +314,7 @@ object ActivePassive {
     })) ! Run
 
     Thread.sleep(10000)
-    
+
     val rnd = new Random
     while (!terminate) {
       Thread.sleep(5000)
@@ -283,7 +335,7 @@ object ActivePassive {
     sys.shutdown()
     systems foreach (_.shutdown())
   }
-  
+
   private def awaitMembers(sys: ActorSystem, count: Int): Unit = {
     while (Cluster(sys).state.members.size < count) {
       Thread.sleep(500)
