@@ -34,7 +34,7 @@ object ActiveActive {
         cmd match {
           case Put(key, value, r) =>
             map += key -> value
-            replyTo ! SeqResult(seq, PutConfirmed(key), self, r)
+            replyTo ! SeqResult(seq, PutConfirmed(key, value), self, r)
           case Get(key, r) =>
             replyTo ! SeqResult(seq, GetResult(key, map get key), self, r)
         }
