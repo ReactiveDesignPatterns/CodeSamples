@@ -1,11 +1,12 @@
 import sbt._
 
 object Build {
-  val akkaVersion = "2.3.11"
+  val akkaVersion = "2.4-M2"
 
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
   val akkaContrib = "com.typesafe.akka" %% "akka-contrib" % akkaVersion
+  val akkaDData = "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion
 
   val sbtIO = "org.scala-sbt" %% "io" % "0.13.8"
 

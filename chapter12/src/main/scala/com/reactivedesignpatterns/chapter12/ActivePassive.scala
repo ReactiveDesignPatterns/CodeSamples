@@ -14,8 +14,10 @@ import scala.collection.immutable.TreeMap
 import scala.concurrent.forkjoin.ThreadLocalRandom
 import scala.util.Random
 import scala.annotation.tailrec
-import akka.contrib.pattern.ClusterSingletonManager
-import akka.contrib.pattern.ClusterSingletonProxy
+import akka.cluster.singleton.ClusterSingletonManager
+import akka.cluster.singleton.ClusterSingletonProxy
+import akka.cluster.singleton.ClusterSingletonManagerSettings
+import akka.cluster.singleton.ClusterSingletonProxySettings
 import com.typesafe.config.ConfigFactory
 import scala.io.StdIn
 
@@ -33,8 +35,8 @@ object ActivePassive {
   class Active(localReplica: ActorRef, replicationFactor: Int, maxQueueSize: Int) extends Actor with Stash with ActorLogging {
     private val MaxOutstanding = maxQueueSize / 2
 
-    private var theStore = Map.empty[String, JsValue]
-    private var seqNr = Iterator from 0
+    private var theStore: Map[String, JsValue] = _
+    private var seqNr: Iterator[Int] = _
     private val toReplicate = Queue.empty[Replicate]
     private var replicating = TreeMap.empty[Int, (Replicate, Int)]
 
@@ -146,9 +148,11 @@ object ActivePassive {
       case Replicate(s, _, _, replyTo) if s - expectedSeq < 0 =>
         replyTo ! Replicated(s)
       case r: Replicate if r.seq == expectedSeq =>
+        val nextStore = theStore + (r.key -> r.value)
+        persist(name, expectedSeq, nextStore)
         r.replyTo ! Replicated(r.seq)
         applied.enqueue(r)
-        context.become(upToDate(theStore + (r.key -> r.value), r.seq + 1))
+        context.become(upToDate(nextStore, expectedSeq + 1))
       case r: Replicate =>
         if (r.seq - expectedSeq > maxLag)
           fallBehind(expectedSeq, TreeMap(r.seq -> r))
@@ -283,9 +287,12 @@ object ActivePassive {
   def start(port: Option[Int]): ActorSystem = {
     val system = ActorSystem("ActivePassive", roleConfig("backend", port) withFallback commonConfig)
     val localReplica = system.actorOf(Props(new Passive(3, 3.seconds, 100)), "passive")
+    val settings = ClusterSingletonManagerSettings(system)
+      .withSingletonName("active")
+      .withRole("backend")
+      .withHandOverRetryInterval(150.millis)
     val managerProps =
-      ClusterSingletonManager.props(Props(new Active(localReplica, 2, 120)), "active", PoisonPill,
-        role = Some("backend"), retryInterval = 150.millis)
+      ClusterSingletonManager.props(Props(new Active(localReplica, 2, 120)), PoisonPill, settings)
     val manager = system.actorOf(managerProps, "activeManager")
     system
   }
@@ -300,7 +307,10 @@ object ActivePassive {
 
     awaitMembers(sys, systems.length + 1)
 
-    val proxy = sys.actorOf(ClusterSingletonProxy.props("/user/activeManager/active", Some("backend")), "proxy")
+    val proxySettings = ClusterSingletonProxySettings(sys)
+      .withRole("backend")
+      .withSingletonName("active")
+    val proxy = sys.actorOf(ClusterSingletonProxy.props("/user/activeManager", proxySettings), "proxy")
 
     val useStorage = sys.actorOf(Props(new UseStorage(proxy)), "useStorage")
     useStorage ! Run(0)

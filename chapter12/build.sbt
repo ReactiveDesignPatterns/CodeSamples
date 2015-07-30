@@ -1,3 +1,3 @@
 import Build._
 
-libraryDependencies ++= Seq(akkaContrib, playJson, sbtIO, akkaTestkit, junit, scalatest)
+libraryDependencies ++= Seq(akkaContrib, akkaDData, playJson, sbtIO, akkaTestkit, junit, scalatest)
