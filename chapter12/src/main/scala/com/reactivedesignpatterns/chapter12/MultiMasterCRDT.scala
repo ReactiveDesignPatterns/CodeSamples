@@ -1,41 +1,32 @@
 package com.reactivedesignpatterns.chapter12
 
-import akka.cluster.ddata.ReplicatedData
+import akka.actor._
+import akka.cluster.ddata._
+import scala.concurrent.duration._
+import akka.cluster.Cluster
+import com.typesafe.config.ConfigFactory
 
 object MultiMasterCRDT {
+  
+  private var statusMap = Map.empty[String, Status]
 
-  sealed trait Status extends ReplicatedData {
+  final case class Status(val name: String)(_pred: => Set[Status], _succ: => Set[Status]) extends ReplicatedData {
     type T = Status
     def merge(that: Status): Status = mergeStatus(this, that)
+
+    lazy val predecessors = _pred
+    lazy val successors = _succ
     
-    def predecessors: Set[Status]
-    def successors: Set[Status]
+    if (!statusMap.contains(name)) statusMap += name -> this
+    private def readResolve: AnyRef = statusMap(name)
   }
 
-  case object New extends Status {
-    lazy val predecessors: Set[Status] = Set.empty
-    lazy val successors: Set[Status] = Set(Scheduled)
-  }
-  case object Scheduled extends Status {
-    lazy val predecessors: Set[Status] = Set(New)
-    lazy val successors: Set[Status] = Set(Executing, Cancelled)
-  }
-  case object Executing extends Status {
-    lazy val predecessors: Set[Status] = Set(Scheduled)
-    lazy val successors: Set[Status] = Set(Aborted)
-  }
-  case object Finished extends Status {
-    lazy val predecessors: Set[Status] = Set(Executing, Aborted)
-    lazy val successors: Set[Status] = Set.empty
-  }
-  case object Cancelled extends Status {
-    lazy val predecessors: Set[Status] = Set(New, Scheduled)
-    lazy val successors: Set[Status] = Set(Aborted)
-  }
-  case object Aborted extends Status {
-    lazy val predecessors: Set[Status] = Set(Cancelled, Executing)
-    lazy val successors: Set[Status] = Set(Finished)
-  }
+  val New: Status = Status("new")(Set.empty, Set(Scheduled, Cancelled))
+  val Scheduled: Status = Status("scheduled")(Set(New), Set(Executing, Cancelled))
+  val Executing: Status = Status("executing")(Set(Scheduled), Set(Aborted, Finished))
+  val Finished: Status = Status("finished")(Set(Executing, Aborted), Set.empty)
+  val Cancelled: Status = Status("cancelled")(Set(New, Scheduled), Set(Aborted))
+  val Aborted: Status = Status("aborted")(Set(Cancelled, Executing), Set(Finished))
 
   def mergeStatus(left: Status, right: Status): Status = {
     /*
@@ -61,5 +52,131 @@ object MultiMasterCRDT {
 
     innerLoop(right, Set.empty)
   }
+
+  object StorageComponent extends Key[ORMap[Status]]("StorageComponent")
+
+  case class Submit(job: String)
+  case class Cancel(job: String)
+  case class Execute(job: String)
+  case class Finish(job: String)
+  case object PrintStatus
+
+  class ClientInterface extends Actor with ActorLogging {
+    val replicator = DistributedData(context.system).replicator
+    implicit val cluster = Cluster(context.system)
+
+    def receive = {
+      case Submit(job) =>
+        log.info("submitting job {}", job)
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"submit $job"))(_ + (job -> New))
+      case Cancel(job) =>
+        log.info("cancelling job {}", job)
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"cancel $job"))(_ + (job -> Cancelled))
+      case r: Replicator.UpdateResponse[_] =>
+        log.info("received update result: {}", r)
+      case PrintStatus =>
+        replicator ! Replicator.Get(StorageComponent, Replicator.ReadMajority(5.seconds))
+      case g: Replicator.GetSuccess[_] =>
+        log.info("overall status: {}", g.get(StorageComponent))
+    }
+  }
+
+  class Executor extends Actor with ActorLogging {
+    val replicator = DistributedData(context.system).replicator
+    implicit val cluster = Cluster(context.system)
+    
+    var lastState = Map.empty[String, Status]
+    
+    replicator ! Replicator.Subscribe(StorageComponent, self)
+
+    def receive = {
+      case Execute(job) =>
+        log.info("executing job {}", job)
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"submit $job")) { map =>
+          if (map.get(job) == Some(New)) map + (job -> Executing)
+          else map
+        }
+      case Finish(job) =>
+        log.info("job {} finished", job)
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"cancel $job"))(_ + (job -> Finished))
+      case r: Replicator.UpdateResponse[_] =>
+        log.info("received update result: {}", r)
+      case ch: Replicator.Changed[_] =>
+        val current = ch.get(StorageComponent).entries
+        for {
+          (job, status) <- current.iterator
+          if (status == Aborted)
+          if (lastState.get(job) != Some(Aborted))
+        } log.info("aborting job {}", job)
+        lastState = current
+    }
+  }
+
+  val commonConfig = ConfigFactory.parseString("""
+    akka.actor.provider = akka.cluster.ClusterActorRefProvider
+    akka.remote.netty.tcp {
+      host = "127.0.0.1"
+      port = 0
+    }
+    akka.cluster {
+      gossip-interval = 100ms
+      failure-detector {
+        heartbeat-interval = 100ms
+        acceptable-heartbeat-pause = 500ms
+      }
+      distributed-data.gossip-interval = 100ms
+    }
+    """)
   
+  object sleep
+  implicit object waitConvert extends DurationConversions.Classifier[sleep.type] {
+    type R = Unit
+    def convert(d: FiniteDuration): Unit = Thread.sleep(d.toMillis)
+  }
+    
+  def main(args: Array[String]): Unit = {
+    val sys1 = ActorSystem("MultiMasterCRDT", commonConfig)
+    val addr1 = Cluster(sys1).selfAddress
+    Cluster(sys1).join(addr1)
+    
+    val sys2 = ActorSystem("MultiMasterCRDT", commonConfig)
+    Cluster(sys2).join(addr1)
+    
+    awaitMembers(sys1, 2)
+    
+    val clientInterface = sys1.actorOf(Props(new ClientInterface), "clientInterface")
+    val executor = sys2.actorOf(Props(new Executor), "executor")
+    
+    clientInterface ! Submit("alpha")
+    clientInterface ! Submit("beta")
+    clientInterface ! Submit("gamma")
+    clientInterface ! Submit("delta")
+    1 second sleep
+    executor ! Execute("alpha")
+    executor ! Execute("gamma")
+    clientInterface ! Cancel("delta")
+    1 second sleep
+    clientInterface ! Cancel("alpha")
+    clientInterface ! Cancel("beta")
+    executor ! Execute("beta")
+    1 second sleep
+    clientInterface ! Cancel("gamma")
+    1 second sleep
+    executor ! Finish("gamma")
+    3 seconds sleep
+    clientInterface ! PrintStatus
+    1 second sleep
+    
+    sys1.terminate()
+    sys2.terminate()
+  }
+
+  private def awaitMembers(sys: ActorSystem, count: Int): Unit = {
+    while (Cluster(sys).state.members.size < count) {
+      Thread.sleep(500)
+      print('.')
+      Console.flush()
+    }
+    println("cluster started")
+  }
 }
