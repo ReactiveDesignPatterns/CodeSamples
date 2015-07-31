@@ -92,13 +92,15 @@ object MultiMasterCRDT {
     def receive = {
       case Execute(job) =>
         log.info("executing job {}", job)
-        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"submit $job")) { map =>
-          if (map.get(job) == Some(New)) map + (job -> Executing)
-          else map
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(job)) { map =>
+          require(map.get(job) == Some(New))
+          map + (job -> Executing)
         }
       case Finish(job) =>
         log.info("job {} finished", job)
-        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"cancel $job"))(_ + (job -> Finished))
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds))(_ + (job -> Finished))
+      case Replicator.UpdateSuccess(StorageComponent, Some(job)) =>
+        log.info("starting job {}", job)
       case r: Replicator.UpdateResponse[_] =>
         log.info("received update result: {}", r)
       case ch: Replicator.Changed[_] =>
@@ -159,6 +161,7 @@ object MultiMasterCRDT {
     clientInterface ! Cancel("alpha")
     clientInterface ! Cancel("beta")
     executor ! Execute("beta")
+    executor ! Execute("delta")
     1 second sleep
     clientInterface ! Cancel("gamma")
     1 second sleep
