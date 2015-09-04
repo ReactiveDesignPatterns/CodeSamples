@@ -110,5 +110,6 @@ src_managed/
 project/boot/
 .history
 .cache
+.cache-main
 
 theDatabase*
