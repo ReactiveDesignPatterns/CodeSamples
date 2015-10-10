@@ -1,13 +1,14 @@
 import sbt._
 
 object Build {
-  val akkaVersion = "2.4-M2"
+  val akkaVersion = "2.4.0"
 
-  val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
+  val akkaActor   = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
   val akkaContrib = "com.typesafe.akka" %% "akka-contrib" % akkaVersion
-  val akkaDData = "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion
-  val akkaStream = "com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
+  val akkaDData   = "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion
+  val akkaStream  = "com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
+  val akkaTyped   = "com.typesafe.akka" %% "akka-typed-experimental" % akkaVersion
 
   val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.10.14"
 
