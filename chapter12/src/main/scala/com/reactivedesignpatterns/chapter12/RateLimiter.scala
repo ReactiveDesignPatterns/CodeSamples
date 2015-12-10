@@ -27,3 +27,30 @@ class RateLimiter(requests: Int, period: FiniteDuration) {
     }
   }
 }
+
+object CircuitBreaker {
+  private object StorageFailed extends RuntimeException
+  private def sendToStorage(job: Job): Future[StorageStatus] = {
+    // make an asynchronous request to the storage subsystem
+    val f: Future[StorageStatus] = ???
+    // map storage failures to Future failures to alert the breaker
+    f.map {
+      case StorageStatus.Failed => throw StorageFailed
+      case other                => other
+    }
+  }
+  private val breaker = CircuitBreaker(
+    system.scheduler, // used for scheduling timeouts
+    5, // number of failures in a row when it trips
+    300.millis, // timeout for each service call
+    30.seconds // time before trying to close after tripping
+    )
+  def persist(job: Job): Future[StorageStatus] =
+    breaker
+      .withCircuitBreaker(sendToStorage(job))
+      .recover {
+        case StorageFailed                  => StorageStatus.Failed
+        case _: TimeoutException            => StorageStatus.Unknown
+        case _: CircuitBreakerOpenException => StorageStatus.Failed
+      }
+}

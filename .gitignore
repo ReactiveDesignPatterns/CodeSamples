@@ -113,3 +113,4 @@ project/boot/
 .cache-main
 
 theDatabase*
+journal/
