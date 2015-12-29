@@ -15,3 +15,9 @@ lazy val chapter12 = project dependsOn (common)
 lazy val chapter13 = project dependsOn (common)
 
 lazy val chapter14 = project dependsOn (common)
+
+lazy val chapter15 = project dependsOn (common)
+
+lazy val chapter16 = project dependsOn (common)
+
+lazy val chapter17 = project dependsOn (common)
