@@ -14,7 +14,7 @@ import akka.actor.Props
 object PullPattern {
 
   case class Job(id: Long, input: Int, replyTo: ActorRef)
-  case class Result(id: Long, report: BigDecimal)
+  case class JobResult(id: Long, report: BigDecimal)
 
   case class WorkRequest(worker: ActorRef, items: Int)
 
@@ -37,7 +37,7 @@ object PullPattern {
             worker ! job
             outstandingWork += 1
         }
-      case Result(id, report) =>
+      case JobResult(id, report) =>
         approximation = aggregator(approximation, report)
         outstandingWork -= 1
         if (outstandingWork == 0 && workStream.isEmpty) {
@@ -67,7 +67,7 @@ object PullPattern {
         request()
         val sign = if ((data & 1) == 1) plus else minus
         val result = sign / data
-        replyTo ! Result(id, result)
+        replyTo ! JobResult(id, result)
     }
   }
 

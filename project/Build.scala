@@ -7,7 +7,7 @@ object Build {
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
   val akkaContrib = "com.typesafe.akka" %% "akka-contrib" % akkaVersion
   val akkaDData   = "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion
-  val akkaStream  = "com.typesafe.akka" %% "akka-stream-experimental" % "2.0-M1"
+  val akkaStream  = "com.typesafe.akka" %% "akka-stream-experimental" % "2.0.1"
   val akkaTyped   = "com.typesafe.akka" %% "akka-typed-experimental" % akkaVersion
   val akkaPersistence = "com.typesafe.akka" %% "akka-persistence" % akkaVersion
   val akkaPersistenceQuery = "com.typesafe.akka" %% "akka-persistence-query-experimental" % akkaVersion
