@@ -6,6 +6,7 @@ object Build {
   val akkaActor   = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
   val akkaContrib = "com.typesafe.akka" %% "akka-contrib" % akkaVersion
+  val akkaSharding= "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
   val akkaDData   = "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion
   val akkaStream  = "com.typesafe.akka" %% "akka-stream-experimental" % "2.0.1"
   val akkaTyped   = "com.typesafe.akka" %% "akka-typed-experimental" % akkaVersion
