@@ -42,10 +42,7 @@ object ActivePassive {
 
     private var rejected = 0
 
-    val cluster = Cluster(context.system)
-
-    import context.dispatcher
-    val timer = context.system.scheduler.schedule(1.second, 1.second, self, Tick)
+    val timer = context.system.scheduler.schedule(1.second, 1.second, self, Tick)(context.dispatcher)
     override def postStop() = timer.cancel()
 
     log.info("taking over from local replica")
@@ -99,10 +96,13 @@ object ActivePassive {
         replicating += r.seq -> (r, replicationFactor)
         disseminate(r)
       }
+
     private def disseminate(r: Replicate): Unit = {
       val req = r.copy(replyTo = self)
-      cluster.state.members.foreach(m => replicaOn(m.address) ! req)
+      val members = Cluster(context.system).state.members
+      members.foreach(m => replicaOn(m.address) ! req)
     }
+
     private def replicaOn(addr: Address): ActorSelection =
       context.actorSelection(localReplica.path.toStringWithAddress(addr))
   }
@@ -246,6 +246,7 @@ object ActivePassive {
     }
 
     private def getMembers(n: Int): Seq[Address] = {
+      // using .iterator to avoid one intermediate collection to be created
       random.shuffle(cluster.state.members.iterator.map(_.address).toSeq).take(n)
     }
     private def askAround(seq: Int): Unit = {

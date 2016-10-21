@@ -89,12 +89,13 @@ class TopProductListener extends Actor with ActorLogging {
     .collect { case EventEnvelope(_, _, _, add: ItemAdded) => add }
     .groupedWithin(100000, 1.second)
     .addAttributes(Attributes.asyncBoundary)
-    .runForeach { seq =>
-      val histogram = seq.foldLeft(Map.empty[ItemRef, IntHolder]) { (map, event) =>
-        map.get(event.item) match {
-          case Some(holder) => { holder.value += event.count; map }
-          case None         => map.updated(event.item, new IntHolder(event.count))
-        }
+    .runForeach { seq: Seq[ItemAdded] =>
+      val histogram = seq.foldLeft(Map.empty[ItemRef, IntHolder]) {
+        (map, event) =>
+          map.get(event.item) match {
+            case Some(holder) => { holder.value += event.count; map }
+            case None         => map.updated(event.item, new IntHolder(event.count))
+          }
       }
       self ! TopProducts(0, histogram.map(p => (p._1, p._2.value)))
     }
