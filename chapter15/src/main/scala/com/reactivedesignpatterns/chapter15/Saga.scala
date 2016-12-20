@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter14
+package com.reactivedesignpatterns.chapter15
 
 import akka.actor._
 import akka.persistence.PersistentActor

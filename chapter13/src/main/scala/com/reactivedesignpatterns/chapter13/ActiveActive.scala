@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter12
+package com.reactivedesignpatterns.chapter13
 
 import akka.actor._
 import play.api.libs.json.JsValue

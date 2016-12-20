@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter15
+package com.reactivedesignpatterns.chapter16
 
 import java.math.MathContext
 import java.math.RoundingMode

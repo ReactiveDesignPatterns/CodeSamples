@@ -1,4 +1,4 @@
-package com.reactivedesignpatterns.chapter12
+package com.reactivedesignpatterns.chapter13
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.duration.Deadline

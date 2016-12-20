@@ -1,4 +1,4 @@
-package com.reactivedesignpatterns.chapter12
+package com.reactivedesignpatterns.chapter13
 
 import org.scalatest.WordSpec
 import org.scalatest.Matchers

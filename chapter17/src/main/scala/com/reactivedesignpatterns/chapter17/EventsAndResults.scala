@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter16
+package com.reactivedesignpatterns.chapter17
 
 sealed trait Event extends ShoppingCartMessage
 case class OwnerChanged(shoppingCart: ShoppingCartRef, owner: CustomerRef) extends Event

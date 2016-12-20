@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter16
+package com.reactivedesignpatterns.chapter17
 
 import com.typesafe.config.ConfigFactory
 import akka.actor._

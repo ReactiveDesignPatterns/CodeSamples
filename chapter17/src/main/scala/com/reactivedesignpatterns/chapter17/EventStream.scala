@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter16
+package com.reactivedesignpatterns.chapter17
 
 import akka.actor._
 import akka.stream._
@@ -121,10 +121,10 @@ akka.persistence.journal {
   leveldb {
     native = off
     event-adapters {
-      tagging = "com.reactivedesignpatterns.chapter16.ShoppingCartTagging"
+      tagging = "com.reactivedesignpatterns.chapter17.ShoppingCartTagging"
     }
     event-adapter-bindings {
-      "com.reactivedesignpatterns.chapter16.ShoppingCartMessage" = tagging
+      "com.reactivedesignpatterns.chapter17.ShoppingCartMessage" = tagging
     }
   }
 }
