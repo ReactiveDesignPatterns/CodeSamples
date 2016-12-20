@@ -1,3 +1,3 @@
 import Build._
 
-libraryDependencies ++= Seq(akkaActor, akkaTyped, akkaPersistence, akkaPersistenceQuery, akkaStream, junit, scalatest, levelDb)
+libraryDependencies ++= Seq(akkaActor, akkaStream, amazonAWS, scalaJava8, akkaTestkit, junit, scalatest)
