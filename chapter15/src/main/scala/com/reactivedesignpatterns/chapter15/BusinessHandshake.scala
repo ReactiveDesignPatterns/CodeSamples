@@ -142,7 +142,7 @@ object PersistentBusinessHandshake extends App {
       var deliveryId: Long = 0
       deliver(alice)(id => { deliveryId = id; ChangeBudget(-amount, self, persistenceId) })
 
-      LoggingReceive {
+      LoggingReceive({
         case ChangeBudgetDone =>
           persist(AliceConfirmedChange(deliveryId)) { ev =>
             confirmDelivery(ev.deliveryId)
@@ -153,7 +153,7 @@ object PersistentBusinessHandshake extends App {
             confirmDelivery(ev.deliveryId)
             context.stop(self)
           }
-      }
+      }: Receive)
     }
 
     def talkToBob() = {

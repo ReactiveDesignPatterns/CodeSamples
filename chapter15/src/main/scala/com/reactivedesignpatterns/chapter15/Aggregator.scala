@@ -9,6 +9,7 @@ import akka.typed.AskPattern._
 import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.AskTimeoutException
+import akka.actor.ReceiveTimeout
 
 object Aggregator {
 
@@ -59,7 +60,7 @@ object Aggregator {
     ContextAware { ctx =>
       Static {
         case GetFrontPage(user, replyTo) =>
-          val childRef = ctx.spawnAnonymous(Props {
+          val childRef = ctx.spawnAnonymous(Deferred { () =>
             val builder = new FrontPageResultBuilder(user)
             Partial[AnyRef](
               pf {
@@ -85,6 +86,7 @@ object Aggregator {
     ContextAware { ctx =>
       import ctx.executionContext
       implicit val timeout = Timeout(1.second)
+      implicit val scheduler = ctx.system.scheduler
 
       Static {
         case GetFrontPage(user, replyTo) =>
@@ -123,6 +125,7 @@ object Aggregator {
     ContextAware { ctx =>
       import ctx.executionContext
       implicit val timeout = Timeout(1.second)
+      implicit val scheduler = ctx.system.scheduler
 
       Static {
         case GetFrontPage(user, replyTo) =>

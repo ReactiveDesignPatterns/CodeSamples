@@ -6,16 +6,18 @@ package com.reactivedesignpatterns.chapter14;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 import java.util.stream.Stream;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import akka.NotUsed;
 import akka.japi.Pair;
 import akka.japi.function.*;
 import akka.stream.javadsl.*;
-import akka.stream.scaladsl.Keep;
+import akka.stream.javadsl.Keep;
 import scala.concurrent.Future;
 import scala.runtime.BoxedUnit;
 
@@ -151,10 +153,10 @@ public interface ComplexCommand {
 	
 	class Inject<T> implements Function<DataElement, DataElement> {
 		private static final long serialVersionUID = 1L;
-		public final RunnableGraph<Future<T>> value;
+		public final RunnableGraph<CompletionStage<T>> value;
 		public final String fieldname;
 
-		public Inject(RunnableGraph<Future<T>> value, String fieldname) {
+		public Inject(RunnableGraph<CompletionStage<T>> value, String fieldname) {
 			this.value = value;
 			this.fieldname = fieldname;
 		}
@@ -198,10 +200,10 @@ public interface ComplexCommand {
 	}
 	
 	public static void akkaStreamDSL() {
-		RunnableGraph<Future<Long>> p =
+		RunnableGraph<CompletionStage<Long>> p =
 			Source.<DataElement>empty()
 			.filter(new InRange("year", 1950, 1960))
-			.toMat(Sink.fold(0L, new Median<Long>("price")), Keep.<BoxedUnit, Long>right());
+			.toMat(Sink.fold(0L, new Median<Long>("price")), Keep.<NotUsed, CompletionStage<Long>>right());
 		
 		Source.<DataElement>empty()
 			.map(new Inject<Long>(p, "p"))

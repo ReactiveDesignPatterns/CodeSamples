@@ -27,8 +27,10 @@ object AskPattern {
                        body: String, correlationID: UUID,
                        replyTo: ActorRef[SendEmailResult])
 
+  sealed trait Result
+  case object ReceiveTimeout extends Result
   case class SendEmailResult(correlationID: UUID, status: StatusCode,
-                             explanation: String)
+                             explanation: String) extends Result
 
   sealed trait StatusCode
   object StatusCode {
@@ -38,7 +40,7 @@ object AskPattern {
 
   def withoutAskPattern(emailGateway: ActorRef[SendEmail]): Behavior[StartVerificationProcess] =
     ContextAware[MyCommands] { ctx =>
-      val log = Logging(ctx.system.eventStream, "VerificationProcessManager")
+      val log = new BusLogging(ctx.system.eventStream, "VerificationProcessManager", getClass, ctx.system.logFilter)
       var statusMap = Map.empty[UUID, (String, ActorRef[VerificationProcessResponse])]
       val adapter = ctx.spawnAdapter((s: SendEmailResult) => MyEmailResult(s.correlationID, s.status, s.explanation))
 
@@ -69,16 +71,16 @@ object AskPattern {
 
   def withChildActor(emailGateway: ActorRef[SendEmail]): Behavior[StartVerificationProcess] =
     ContextAware { ctx: ActorContext[StartVerificationProcess] =>
-      val log = Logging(ctx.system.eventStream, "VerificationProcessManager")
+      val log = new BusLogging(ctx.system.eventStream, "VerificationProcessManager", getClass, ctx.system.logFilter)
 
       Static {
         case StartVerificationProcess(userEmail, replyTo) =>
           val corrID = UUID.randomUUID()
-          val childActor = ctx.spawnAnonymous(Props(FullTotal[SendEmailResult] {
+          val childActor = ctx.spawnAnonymous(FullTotal[Result] {
             case Sig(ctx, PreStart) =>
-              ctx.setReceiveTimeout(5.seconds)
+              ctx.setReceiveTimeout(5.seconds, ReceiveTimeout)
               Same
-            case Sig(_, ReceiveTimeout) =>
+            case Msg(_, ReceiveTimeout) =>
               log.warning("verification process initiation timed out for {}", userEmail)
               replyTo ! VerificationProcessFailed(userEmail)
               Stopped
@@ -93,7 +95,7 @@ object AskPattern {
             case Msg(_, SendEmailResult(wrongID, _, _)) =>
               log.error("received wrong SendEmailResult for corrID {}", corrID)
               Same
-          }))
+          })
           val request = SendEmail("verification@example.com", List(userEmail), constructBody(userEmail, corrID), corrID, childActor)
           emailGateway ! request
       }
@@ -101,9 +103,10 @@ object AskPattern {
 
   def withAskPattern(emailGateway: ActorRef[SendEmail]): Behavior[StartVerificationProcess] =
     ContextAware { ctx =>
-      val log = Logging(ctx.system.eventStream, "VerificationProcessManager")
+      val log = new BusLogging(ctx.system.eventStream, "VerificationProcessManager", getClass, ctx.system.logFilter)
       implicit val timeout = Timeout(5.seconds)
       import ctx.executionContext
+      implicit val scheduler = ctx.system.scheduler
 
       Static {
         case StartVerificationProcess(userEmail, replyTo) =>

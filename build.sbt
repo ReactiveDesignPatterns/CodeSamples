@@ -1,6 +1,6 @@
 organization in ThisBuild := "com.reactivedesignpatterns"
 version in ThisBuild := "0.1-SNAPSHOT"
-scalaVersion in ThisBuild := "2.11.6"
+scalaVersion in ThisBuild := "2.11.8"
 
 lazy val common = project
 

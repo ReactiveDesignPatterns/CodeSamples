@@ -30,12 +30,12 @@ object RequestResponseTypedActors {
     }
 
   def main(args: Array[String]): Unit = {
-    ActorSystem("ReqResTyped", Props(ContextAware[Unit] { ctx =>
-      val res = ctx.spawn(Props(responder), "responder")
-      val req = ctx.watch(ctx.spawn(Props(requester(res)), "requester"))
+    ActorSystem("ReqResTyped", ContextAware[Unit] { ctx =>
+      val res = ctx.spawn(responder, "responder")
+      val req = ctx.watch(ctx.spawn(requester(res), "requester"))
       Full {
         case Sig(ctx, Terminated(`req`)) => Stopped
       }
-    }))
+    })
   }
 }
