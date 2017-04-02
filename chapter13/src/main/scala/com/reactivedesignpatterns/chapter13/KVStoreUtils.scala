@@ -5,7 +5,7 @@ package com.reactivedesignpatterns.chapter13
 
 import play.api.libs.json.JsValue
 import java.io.File
-import sbt.IO
+import sbt.io.IO
 import play.api.libs.json.Json
 import akka.actor.ActorRef
 

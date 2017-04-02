@@ -3,17 +3,13 @@
  */
 package com.reactivedesignpatterns.chapter13
 
-import sbt.IO
 import play.api.libs.json._
-import java.io.File
 import akka.actor._
 import scala.collection.mutable.Queue
 import akka.cluster.Cluster
 import scala.concurrent.duration._
 import scala.collection.immutable.TreeMap
-import scala.concurrent.forkjoin.ThreadLocalRandom
 import scala.util.Random
-import scala.annotation.tailrec
 import akka.cluster.singleton.ClusterSingletonManager
 import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonManagerSettings
