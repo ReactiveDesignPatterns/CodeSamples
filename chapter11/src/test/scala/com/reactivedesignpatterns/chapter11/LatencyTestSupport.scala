@@ -1,4 +1,4 @@
-package com.reactivedesignpatterns.chapter4
+package com.reactivedesignpatterns.chapter11
 
 import scala.collection.immutable
 import scala.concurrent.{ ExecutionContext, Future }
