@@ -6,3 +6,6 @@ This repository hosts the code samples that are used in [Reactive Design Pattern
 
 The code in this repository is offered royalty-free under the Apache License version 2, see the LICENSE file in the root directory. 
 
+## Contributing
+
+see [CONTRIBUTING.md](CONTRIBUTING.md)
