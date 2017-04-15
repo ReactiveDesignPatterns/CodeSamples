@@ -1,8 +1,7 @@
-package com.reactivedesignpatterns.chapter13
+package com.reactivedesignpatterns.chapter12
 
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.duration.Deadline
 import scala.concurrent.Future
+import scala.concurrent.duration.{Deadline, FiniteDuration}
 
 case object RateLimitExceeded extends RuntimeException
 
