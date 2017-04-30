@@ -1,14 +1,13 @@
-package com.reactivedesignpatterns.chapter4
+package com.reactivedesignpatterns.chapter11
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import akka.actor.ActorRef
-import akka.actor.Actor
+import java.util.concurrent.TimeoutException
+
+import akka.actor.{Actor, ActorRef, Props}
 import akka.util.Timeout
 import com.reactivedesignpatterns.Defaults._
-import java.util.concurrent.TimeoutException
-import akka.actor.Props
+
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 class TranslationService {
   import ExecutionContext.Implicits.global
