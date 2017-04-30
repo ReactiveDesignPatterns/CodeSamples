@@ -1,4 +1,4 @@
-package com.reactivedesignpatterns.chapter11
+package com.reactivedesignpatterns.chapter4
 
 import scala.concurrent.duration.{ DurationInt, FiniteDuration }
 import scala.util.Try

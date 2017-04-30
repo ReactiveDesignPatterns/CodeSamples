@@ -6,9 +6,9 @@ lazy val common = project
 
 lazy val chapter02 = project dependsOn (common)
 
-lazy val chapter07 = project dependsOn (common)
+lazy val chapter04 = project dependsOn (common)
 
-lazy val chapter11 = project dependsOn (common)
+lazy val chapter07 = project dependsOn (common)
 
 lazy val chapter12 = project dependsOn (common)
 

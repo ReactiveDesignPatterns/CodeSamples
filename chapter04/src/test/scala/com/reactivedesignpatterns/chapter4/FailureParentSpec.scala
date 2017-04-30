@@ -1,4 +1,4 @@
-package com.reactivedesignpatterns.chapter11
+package com.reactivedesignpatterns.chapter4
 
 import org.scalatest._
 import akka.actor._
