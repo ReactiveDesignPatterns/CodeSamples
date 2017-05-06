@@ -142,12 +142,12 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val sorted = timings.sorted
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
-      val SLA = if (Helpers.isCiTest) 10.milliseconds else 1.millisecond
+      val SLA = if (Helpers.isCiTest) 25.milliseconds else 1.millisecond
       ninetyfifthPercentile should be < SLA
     }
 
     "keep its SLA when used in parallel with Futures" in {
-      implicit val timeout = Timeout(100.millis)
+      implicit val timeout = Timeout(500.millis)
       import system.dispatcher
       val echo = echoService("keepSLAfuture")
       val N = 10000
@@ -164,7 +164,8 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val sorted = timings.sorted
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
-      ninetyfifthPercentile should be < 100.milliseconds
+      val SLA = if (Helpers.isCiTest) 500.milliseconds else 100.milliseconds
+      ninetyfifthPercentile should be < SLA
     }
 
     "keep its SLA when used in parallel" in {
@@ -185,7 +186,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val sorted = result.timings.sorted
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
-      val SLA = if (Helpers.isCiTest) 10.milliseconds else 2.milliseconds
+      val SLA = if (Helpers.isCiTest) 25.milliseconds else 2.milliseconds
       ninetyfifthPercentile should be < SLA
     }
 
@@ -205,7 +206,8 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val lat = Await.result(latencies, 20.seconds)
       info(s"latency info: $lat")
       lat.failureCount should be(0)
-      lat.quantile(0.99) should be < 10.milliseconds
+      val SLA = if (Helpers.isCiTest) 50.milliseconds else 10.milliseconds
+      lat.quantile(0.99) should be < SLA
     }
 
   }
