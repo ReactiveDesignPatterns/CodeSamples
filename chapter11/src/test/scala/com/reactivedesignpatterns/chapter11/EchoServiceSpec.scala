@@ -147,7 +147,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
     }
 
     "keep its SLA when used in parallel with Futures" in {
-      implicit val timeout = Timeout(100.millis)
+      implicit val timeout = Timeout(500.millis)
       import system.dispatcher
       val echo = echoService("keepSLAfuture")
       val N = 10000
@@ -205,7 +205,8 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val lat = Await.result(latencies, 20.seconds)
       info(s"latency info: $lat")
       lat.failureCount should be(0)
-      lat.quantile(0.99) should be < 10.milliseconds
+      val SLA = if (Helpers.isCiTest) 50.milliseconds else 10.milliseconds
+      lat.quantile(0.99) should be < SLA
     }
 
   }
