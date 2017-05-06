@@ -1,7 +1,6 @@
-package com.reactivedesignpatterns.chapter4
+package com.reactivedesignpatterns.chapter11
 
-import akka.actor.Actor
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 
 object EchoService {
   case class Request(tag: String, client: ActorRef)
