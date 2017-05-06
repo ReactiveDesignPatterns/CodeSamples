@@ -4,6 +4,7 @@ import scala.concurrent.duration.{ DurationInt, FiniteDuration }
 import scala.util.Try
 import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 import com.reactivedesignpatterns.Defaults._
+import com.reactivedesignpatterns.Helpers
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props, actorRef2Scala }
 import akka.testkit.TestProbe
 import akka.util.Timeout
@@ -141,7 +142,8 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val sorted = timings.sorted
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
-      ninetyfifthPercentile should be < 1.millisecond
+      val SLA = if (Helpers.isCiTest) 10.milliseconds else 1.millisecond
+      ninetyfifthPercentile should be < SLA
     }
 
     "keep its SLA when used in parallel with Futures" in {
@@ -183,7 +185,8 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val sorted = result.timings.sorted
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
-      ninetyfifthPercentile should be < 2.milliseconds
+      val SLA = if (Helpers.isCiTest) 10.milliseconds else 2.milliseconds
+      ninetyfifthPercentile should be < SLA
     }
 
   }
