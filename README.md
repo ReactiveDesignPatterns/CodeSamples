@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/ReactiveDesignPatterns/CodeSamples.svg?branch=master)](https://travis-ci.com/ReactiveDesignPatterns/CodeSamples)
+[![Build Status](https://travis-ci.org/ReactiveDesignPatterns/CodeSamples.svg?branch=master)](https://travis-ci.org/ReactiveDesignPatterns/CodeSamples)
 
 # Reactive Design Patterns Code Samples
 
