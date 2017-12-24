@@ -19,8 +19,8 @@ class PersistentObjectManager extends PersistentActor {
     case ManagerCommand(cmd, id, replyTo) =>
       try {
         val event = cmd match {
-          case SetOwner(cart, owner)         => OwnerChanged(cart, owner)
-          case AddItem(cart, item, count)    => ItemAdded(cart, item, count)
+          case SetOwner(cart, owner) => OwnerChanged(cart, owner)
+          case AddItem(cart, item, count) => ItemAdded(cart, item, count)
           case RemoveItem(cart, item, count) => ItemRemoved(cart, item, count)
         }
         // perform the update here in order to treat validation errors immediately
@@ -83,7 +83,7 @@ akka.persistence.snapshot-store.plugin = "akka.persistence.no-snapshot-store"
     manager ! ManagerQuery(GetItems(shoppingCart), 5, self)
 
     def receive = {
-      case ManagerEvent(id, event)   => log.info("success ({}): {}", id, event)
+      case ManagerEvent(id, event) => log.info("success ({}): {}", id, event)
       case ManagerRejection(id, msg) => log.warning("rejected ({}): {}", id, msg)
       case ManagerResult(id, result) =>
         log.info("result ({}): {}", id, result)

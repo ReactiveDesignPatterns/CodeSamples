@@ -64,10 +64,10 @@ object Aggregator {
             val builder = new FrontPageResultBuilder(user)
             Partial[AnyRef](
               pf {
-                case ThemeResult(css)         => builder.addCSS(css)
+                case ThemeResult(css) => builder.addCSS(css)
                 case PersonalNewsResult(news) => builder.addPersonalNews(news)
-                case TopNewsResult(news)      => builder.addTopNews(news)
-                case ReceiveTimeout           => builder.timeout()
+                case TopNewsResult(news) => builder.addTopNews(news)
+                case ReceiveTimeout => builder.timeout()
               } andThen { _ =>
                 if (builder.isComplete) {
                   replyTo ! builder.result
@@ -121,7 +121,7 @@ object Aggregator {
     }
 
   def futureFrontPageWithOverride(themes: ActorRef[GetTheme], personalNews: ActorRef[GetPersonalNews],
-                                  topNews: ActorRef[GetTopNews], overrides: ActorRef[GetOverride]): Behavior[GetFrontPage] =
+    topNews: ActorRef[GetTopNews], overrides: ActorRef[GetOverride]): Behavior[GetFrontPage] =
     ContextAware { ctx =>
       import ctx.executionContext
       implicit val timeout = Timeout(1.second)

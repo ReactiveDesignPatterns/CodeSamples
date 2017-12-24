@@ -119,7 +119,7 @@ object ThrottlingPattern {
           outstandingWork += 1
         }
       case JobResult(id, report) => registerReport(Report.success(report))
-      case JobRejected(id)       => registerReport(Report.failure)
+      case JobRejected(id) => registerReport(Report.failure)
     }
 
     def registerReport(r: Report) = {

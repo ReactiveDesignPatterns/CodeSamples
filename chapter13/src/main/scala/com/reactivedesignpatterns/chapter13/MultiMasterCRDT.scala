@@ -7,7 +7,7 @@ import akka.cluster.Cluster
 import com.typesafe.config.ConfigFactory
 
 object MultiMasterCRDT {
-  
+
   private var statusMap = Map.empty[String, Status]
 
   final case class Status(val name: String)(_pred: => Set[Status], _succ: => Set[Status]) extends ReplicatedData {
@@ -16,7 +16,7 @@ object MultiMasterCRDT {
 
     lazy val predecessors = _pred
     lazy val successors = _succ
-    
+
     if (!statusMap.contains(name)) statusMap += name -> this
     private def readResolve: AnyRef = statusMap(name)
   }
@@ -84,9 +84,9 @@ object MultiMasterCRDT {
   class Executor extends Actor with ActorLogging {
     val replicator = DistributedData(context.system).replicator
     implicit val cluster = Cluster(context.system)
-    
+
     var lastState = Map.empty[String, Status]
-    
+
     replicator ! Replicator.Subscribe(StorageComponent, self)
 
     def receive = {
@@ -129,26 +129,26 @@ object MultiMasterCRDT {
       distributed-data.gossip-interval = 100ms
     }
     """)
-  
+
   object sleep
   implicit object waitConvert extends DurationConversions.Classifier[sleep.type] {
     type R = Unit
     def convert(d: FiniteDuration): Unit = Thread.sleep(d.toMillis)
   }
-    
+
   def main(args: Array[String]): Unit = {
     val sys1 = ActorSystem("MultiMasterCRDT", commonConfig)
     val addr1 = Cluster(sys1).selfAddress
     Cluster(sys1).join(addr1)
-    
+
     val sys2 = ActorSystem("MultiMasterCRDT", commonConfig)
     Cluster(sys2).join(addr1)
-    
+
     awaitMembers(sys1, 2)
-    
+
     val clientInterface = sys1.actorOf(Props(new ClientInterface), "clientInterface")
     val executor = sys2.actorOf(Props(new Executor), "executor")
-    
+
     clientInterface ! Submit("alpha")
     clientInterface ! Submit("beta")
     clientInterface ! Submit("gamma")
@@ -169,7 +169,7 @@ object MultiMasterCRDT {
     3 seconds sleep
     clientInterface ! PrintStatus
     1 second sleep
-    
+
     sys1.terminate()
     sys2.terminate()
   }

@@ -42,9 +42,9 @@ object BusinessHandshake extends App {
       context.setReceiveTimeout(1.second)
 
       LoggingReceive {
-        case ChangeBudgetDone           => context.become(talkToBob())
+        case ChangeBudgetDone => context.become(talkToBob())
         case CannotChangeBudget(reason) => context.stop(self)
-        case ReceiveTimeout             => alice ! ChangeBudget(-amount, self)
+        case ReceiveTimeout => alice ! ChangeBudget(-amount, self)
       }
     }
 
@@ -120,7 +120,7 @@ object PersistentBusinessHandshake extends App {
   case class AliceDeniedChange(deliveryId: Long)
 
   class PersistentSam(alice: ActorPath, bob: ActorPath, amount: BigDecimal, override val persistenceId: String)
-      extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
+    extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
 
     def receiveCommand = Actor.emptyBehavior
 

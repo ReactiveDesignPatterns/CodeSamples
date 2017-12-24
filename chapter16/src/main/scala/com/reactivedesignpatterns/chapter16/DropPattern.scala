@@ -118,7 +118,7 @@ object DropPattern {
         (calculator ? (Job(i, i, _)))
           .collect {
             case JobResult(_, report) => Report.success(report)
-            case _                    => Report.failure
+            case _ => Report.failure
           }
           .recover {
             case _: TimeoutException => Report.dropped

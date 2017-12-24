@@ -1,6 +1,8 @@
 organization in ThisBuild := "com.reactivedesignpatterns"
 version in ThisBuild := "0.1-SNAPSHOT"
-scalaVersion in ThisBuild := "2.11.8"
+scalaVersion in ThisBuild := "2.12.4"
+
+enablePlugins(spray.boilerplate.BoilerplatePlugin)
 
 lazy val common = project
 

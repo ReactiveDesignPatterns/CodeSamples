@@ -91,7 +91,7 @@ akka.cluster.sharding.state-store-mode = ddata
       manager ! ManagerQuery(GetItems(shoppingCart1), 5, self)
 
       def receive = {
-        case ManagerEvent(id, event)   => log.info("success ({}): {}", id, event)
+        case ManagerEvent(id, event) => log.info("success ({}): {}", id, event)
         case ManagerRejection(id, msg) => log.warning("rejected ({}): {}", id, msg)
         case ManagerResult(id, result) =>
           log.info("result ({}): {}", id, result)
@@ -106,7 +106,7 @@ akka.cluster.sharding.state-store-mode = ddata
           context.become(second)
       }
       def second: Receive = {
-        case ManagerEvent(id, event)   => log.info("success ({}): {}", id, event)
+        case ManagerEvent(id, event) => log.info("success ({}): {}", id, event)
         case ManagerRejection(id, msg) => log.warning("rejected ({}): {}", id, msg)
         case ManagerResult(id, result) =>
           log.info("result ({}): {}", id, result)

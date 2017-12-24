@@ -24,13 +24,13 @@ object AskPattern {
   case class VerificationProcessFailed(userEmail: String) extends VerificationProcessResponse
 
   case class SendEmail(sender: String, recipients: List[String],
-                       body: String, correlationID: UUID,
-                       replyTo: ActorRef[SendEmailResult])
+    body: String, correlationID: UUID,
+    replyTo: ActorRef[SendEmailResult])
 
   sealed trait Result
   case object ReceiveTimeout extends Result
   case class SendEmailResult(correlationID: UUID, status: StatusCode,
-                             explanation: String) extends Result
+    explanation: String) extends Result
 
   sealed trait StatusCode
   object StatusCode {

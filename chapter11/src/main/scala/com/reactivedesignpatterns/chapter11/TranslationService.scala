@@ -2,12 +2,12 @@ package com.reactivedesignpatterns.chapter11
 
 import java.util.concurrent.TimeoutException
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{ Actor, ActorRef, Props }
 import akka.util.Timeout
 import com.reactivedesignpatterns.Defaults._
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class TranslationService {
   import ExecutionContext.Implicits.global
@@ -43,7 +43,7 @@ object TranslationService {
         }
     }
   }
-  
+
   def propsV1: Props = Props(new TranslatorV1)
 
   /**
@@ -80,6 +80,6 @@ object TranslationService {
         } pipeTo replyTo
     }
   }
-  
+
   def propsV2(v1: ActorRef): Props = Props(new TranslatorV2(v1))
 }

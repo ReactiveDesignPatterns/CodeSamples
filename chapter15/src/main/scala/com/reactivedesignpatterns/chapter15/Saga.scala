@@ -68,13 +68,13 @@ object Saga {
 
       {
         case t: TransferStarted => { start = t; last = t }
-        case e: Event           => last = e
+        case e: Event => last = e
         case RecoveryCompleted =>
           last match {
-            case null               => // wait for initialization
+            case null => // wait for initialization
             case t: TransferStarted => withdrawMoney(t)
-            case MoneyWithdrawn     => depositMoney(start.amount, start.x, start.y)
-            case MoneyDeposited     => context.stop(self)
+            case MoneyWithdrawn => depositMoney(start.amount, start.x, start.y)
+            case MoneyDeposited => context.stop(self)
           }
       }
     }

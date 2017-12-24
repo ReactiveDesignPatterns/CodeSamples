@@ -102,7 +102,7 @@ object QueuePattern {
         (calculator ? (Job(i, i, _)))
           .collect {
             case JobResult(_, report) => Report.success(report)
-            case _                    => Report.failure
+            case _ => Report.failure
           })
     Future.reduce(futures)(_ + _)
       .map(x => println(s"final result: $x"))

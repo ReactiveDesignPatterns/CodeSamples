@@ -74,7 +74,7 @@ object ManagerExample extends App {
     manager ! ManagerQuery(GetItems(shoppingCart), 5, self)
 
     def receive = {
-      case ManagerEvent(id, event)   => log.info("success ({}): {}", id, event)
+      case ManagerEvent(id, event) => log.info("success ({}): {}", id, event)
       case ManagerRejection(id, msg) => log.warning("rejected ({}): {}", id, msg)
       case ManagerResult(id, result) =>
         log.info("result ({}): {}", id, result)

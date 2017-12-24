@@ -20,7 +20,7 @@ class ShoppingCartTagging(system: ExtendedActorSystem) extends WriteEventAdapter
   def toJournal(event: Any): Any =
     event match {
       case s: ShoppingCartMessage => Tagged(event, Set("shoppingCart"))
-      case other                  => other
+      case other => other
     }
 }
 
@@ -62,7 +62,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
   self ! Cont(0)
 
   def receive = {
-    case Cont(n)             => driveCart(n)
+    case Cont(n) => driveCart(n)
     case ManagerEvent(id, _) => if (id % 10000 == 0) log.info("done {} commands", id)
     case ManagerResult(num, GetItemsResult(cart, items)) =>
       context.stop(context.child(cart.id.toString).get)
@@ -94,7 +94,7 @@ class TopProductListener extends Actor with ActorLogging {
         (map, event) =>
           map.get(event.item) match {
             case Some(holder) => { holder.value += event.count; map }
-            case None         => map.updated(event.item, new IntHolder(event.count))
+            case None => map.updated(event.item, new IntHolder(event.count))
           }
       }
       self ! TopProducts(0, histogram.map(p => (p._1, p._2.value)))

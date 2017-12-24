@@ -1,7 +1,7 @@
 import sbt._
 
 object Build {
-  val akkaVersion = "2.4.17"
+  val akkaVersion = "2.4.20"
 
   val akkaActor   = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
@@ -17,13 +17,13 @@ object Build {
 
   val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.109"
 
-  val sbtIO = "org.scala-sbt" %% "io" % "1.0.0-M9"
+  val sbtIO = "org.scala-sbt" %% "io" % "1.1.3"
 
-  val scalaAsync = "org.scala-lang.modules" %% "scala-async" % "0.9.2"
-  val scalaJava8 = "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
+  val scalaAsync = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
+  val scalaJava8 = "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
 
-  val playJson = "com.typesafe.play" %% "play-json" % "2.4.0"
+  val playJson = "com.typesafe.play" %% "play-json" % "2.6.8"
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+  val scalatest = "org.scalatest" %% "scalatest" % "3.0.4" % "test"
   val junit = "junit" % "junit" % "4.11" % "test"
 }
