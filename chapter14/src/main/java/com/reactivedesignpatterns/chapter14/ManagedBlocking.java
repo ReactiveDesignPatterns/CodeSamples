@@ -53,22 +53,27 @@ public interface ManagedBlocking {
 	}
 	
 	public class AccessService extends AbstractActor {
-		private ExecutorService pool;
-		
-		public AccessService(DataSource db, int poolSize, int queueSize) {
-			pool = new ThreadPoolExecutor(0, poolSize, 60, SECONDS, new LinkedBlockingDeque<>(queueSize));
+		private final ExecutorService pool;
+		private final DataSource db;
 
-			final ActorRef self = self();
-			receive(ReceiveBuilder
-				.match(CheckAccess.class, ca -> {
-					try {
-						pool.execute(() -> checkAccess(db, ca, self));
-					} catch (RejectedExecutionException e) {
-						ca.replyTo.tell(new CheckAccessResult(ca, AccessRights.EMPTY), self);
-					}})
-				.build());
+		public AccessService(DataSource db, int poolSize, int queueSize) {
+			this.db = db;
+			pool = new ThreadPoolExecutor(0, poolSize, 60, SECONDS, new LinkedBlockingDeque<>(queueSize));
 		}
-		
+
+		@Override
+		public Receive createReceive() {
+			final ActorRef self = self();
+			return ReceiveBuilder.create()
+					.match(CheckAccess.class, ca -> {
+						try {
+							pool.execute(() -> checkAccess(db, ca, self));
+						} catch (RejectedExecutionException e) {
+							ca.replyTo.tell(new CheckAccessResult(ca, AccessRights.EMPTY), self);
+						}})
+					.build();
+		}
+
 		@Override
 		public void postStop() {
 			pool.shutdownNow();

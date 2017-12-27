@@ -131,10 +131,12 @@ public class ResourceEncapsulation {
 		
 		public WorkerNode(InetAddress address, FiniteDuration checkInterval) {
 			checkTimer = getContext().system().scheduler().schedule(checkInterval, checkInterval, self(), DoHealthCheck.instance, getContext().dispatcher(), self());
-			
+		}
+
+		@Override
+		public Receive createReceive() {
 			List<WorkerNodeMessage> msgs = new ArrayList<>();
-			receive(ReceiveBuilder
-					.match(WorkerNodeMessage.class, msgs::add)
+			return receiveBuilder().match(WorkerNodeMessage.class, msgs::add)
 					.match(DoHealthCheck.class, dhc -> { /* perform check */ })
 					.match(Shutdown.class, s -> {
 						msgs.stream().forEach(msg -> msg.replyTo().tell(new WorkerCommandFailed("shutting down", msg.id()), self()));
@@ -144,9 +146,9 @@ public class ResourceEncapsulation {
 						/* send msgs to the worker */
 						getContext().become(initialized());
 					})
-					.build());
+					.build();
 		}
-		
+
 		private PartialFunction<Object, BoxedUnit> initialized() {
 			/* forward commands and deal with responses from worker node */
 			return null;

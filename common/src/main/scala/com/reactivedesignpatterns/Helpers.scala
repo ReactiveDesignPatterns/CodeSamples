@@ -5,6 +5,6 @@ package com.reactivedesignpatterns
 
 object Helpers {
 
-  def isCiTest: Boolean = sys.env.get("TRAVIS") == Some("true")
+  def isCiTest: Boolean = sys.env.get("TRAVIS").contains("true")
 
 }

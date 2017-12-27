@@ -5,8 +5,10 @@ package com.reactivedesignpatterns.chapter13
 
 import play.api.libs.json._
 import akka.actor._
+
 import scala.collection.mutable.Queue
 import akka.cluster.Cluster
+
 import scala.concurrent.duration._
 import scala.collection.immutable.TreeMap
 import scala.util.Random
@@ -15,6 +17,8 @@ import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonManagerSettings
 import akka.cluster.singleton.ClusterSingletonProxySettings
 import com.typesafe.config.ConfigFactory
+
+import scala.concurrent.Await
 import scala.io.StdIn
 
 object ActivePassive {
@@ -328,8 +332,7 @@ object ActivePassive {
       val sysidx = rnd.nextInt(systems.length)
       val oldsys = systems(sysidx)
       val port = Cluster(oldsys).selfAddress.port
-      oldsys.shutdown()
-      oldsys.awaitTermination()
+      Await.ready(oldsys.terminate(), Duration.Inf)
       val newsys = start(port)
       val seed = Cluster(if (sysidx == 0) systems(1) else systems(0)).selfAddress
       Cluster(newsys).join(seed)
@@ -339,8 +342,8 @@ object ActivePassive {
 
     Thread.sleep(3000)
 
-    sys.shutdown()
-    systems foreach (_.shutdown())
+    sys.terminate()
+    systems foreach (_.terminate())
   }
 
   private def awaitMembers(sys: ActorSystem, count: Int): Unit = {

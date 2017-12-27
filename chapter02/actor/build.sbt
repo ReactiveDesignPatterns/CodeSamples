@@ -1,1 +1,1 @@
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % Build.akka25Version
+libraryDependencies ++= Seq(Build.akka25Actor)

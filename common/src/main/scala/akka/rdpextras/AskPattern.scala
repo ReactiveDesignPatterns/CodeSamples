@@ -15,7 +15,7 @@ object AskPattern {
       if (timeout.duration.length <= 0)
         Future.failed[Any](new IllegalArgumentException(s"Timeout length must not be negative, question not sent to [$actorRef]"))
       else {
-        val a = PromiseActorRef(ref.provider, timeout, targetName = actorRef.toString)
+        val a = PromiseActorRef(ref.provider, timeout, targetName = actorRef.toString, "unknown")
         actorRef.tell(f(a), a)
         a.result.future
       }
