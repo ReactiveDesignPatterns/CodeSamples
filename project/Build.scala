@@ -2,6 +2,7 @@ import sbt._
 
 object Build {
   val akkaVersion = "2.4.20"
+  val akka25Version = "2.5.8"
 
   val akkaActor   = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"

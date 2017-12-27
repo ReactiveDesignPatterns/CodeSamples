@@ -8,10 +8,10 @@ import scala.util.Success
 
 object Defaults {
 
-  val Timestamp = Deadline
+  val Timestamp: Deadline.type = Deadline
   type Timestamp = Deadline
 
-  val SynchronousEventLoop = scala.concurrent.rdpextras.SynchronousEventLoop
+  private val SynchronousEventLoop = scala.concurrent.rdpextras.SynchronousEventLoop
 
   implicit class AskableActorRef(val ref: ActorRef) extends AnyVal {
     def ?(f: ActorRef => Any)(implicit timeout: Timeout): Future[Any] = akka.rdpextras.AskPattern.ask(ref, timeout, f)
