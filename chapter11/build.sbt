@@ -1,3 +1,1 @@
-import Build._
-
-libraryDependencies ++= Seq(akkaTestkit, junit, scalatest)
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % Build.akka25Version
