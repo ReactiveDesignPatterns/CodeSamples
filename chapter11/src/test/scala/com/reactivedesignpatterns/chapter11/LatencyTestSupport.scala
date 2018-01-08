@@ -16,7 +16,7 @@ object LatencyTestSupport {
   case class SingleResult[T](future: Future[T], expected: T)
   case class SummaryResult(timings: immutable.Seq[FiniteDuration], failures: immutable.Seq[Throwable]) {
     lazy val sorted = timings.sorted
-    
+
     lazy val failureCount = failures.size
     lazy val failureRatio = failureCount.toDouble / (timings.size + failureCount)
 
@@ -26,9 +26,9 @@ object LatencyTestSupport {
      * obtained for `q = 0.99`.
      */
     def quantile(q: Double): FiniteDuration = sorted.takeRight(Math.max(1, ((1 - q) * timings.size).toInt)).head
-    
+
     override def toString =
-      f"""|SummaryResult($failureCount failures [${failureRatio*100}% 6.2f%%] in ${timings.size} samples)
+      f"""|SummaryResult($failureCount failures [${failureRatio * 100}% 6.2f%%] in ${timings.size} samples)
           |        minimum         = ${sorted.head}
           |        50th percentile = ${quantile(0.5)}
           |        95th percentile = ${quantile(0.95)}

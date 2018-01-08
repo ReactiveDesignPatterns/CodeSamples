@@ -31,12 +31,13 @@ object EchoServiceSpec {
         context.become(running(reportTo, echo, n - sendNow, receiver, outstanding, Nil))
     }
 
-    def running(reportTo: ActorRef,
-                echo: ActorRef,
-                remaining: Int,
-                receiver: ActorRef,
-                outstanding: Map[String, Timestamp],
-                timings: List[FiniteDuration]): Receive = {
+    def running(
+      reportTo: ActorRef,
+      echo: ActorRef,
+      remaining: Int,
+      receiver: ActorRef,
+      outstanding: Map[String, Timestamp],
+      timings: List[FiniteDuration]): Receive = {
       case TimedResponse(Response(r), d) =>
         val start = outstanding(r)
         val newOutstanding = outstanding - r + sendRequest(echo, receiver)
@@ -98,14 +99,14 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
 
   /*
    * Discussion of the thread pool size configuration
-   * 
+   *
    * When using the default configuration of 8 threads or more (depending on
    * the number of processor cores available) the three active actors in the
    * test will bounce frequently between threads, incurring CPU cache misses
    * and wake-up latencies from low-power states. Depending on the precise
    * scheduling patterns for each given run this can lead to variable increases
    * in response latency.
-   * 
+   *
    * Configure a lower number than the number of active Actors means that
    * messages will be delayed by having to wait for their destination Actor
    * to be scheduled again.

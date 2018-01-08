@@ -57,7 +57,7 @@ class MultiMasterCRDTSpec extends WordSpec with Matchers with ConversionCheckedT
         mergeStatus(left, right) should ===(mergeStatus(right, left))
       }
     }
-    
+
     "merge Finished always to Finished" in {
       for {
         other <- allStatus

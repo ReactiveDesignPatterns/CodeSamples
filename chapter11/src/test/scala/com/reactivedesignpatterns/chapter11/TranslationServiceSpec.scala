@@ -31,7 +31,7 @@ object TranslationServiceSpec {
 
     val initial: Receive = {
       case ExpectNominal => context.become(expectingNominal)
-      case ExpectError   => context.become(expectingError)
+      case ExpectError => context.become(expectingError)
     }
 
     val expectingNominal: Receive = {
@@ -39,7 +39,7 @@ object TranslationServiceSpec {
         replyTo ! "How are you?"
         context.become(initial)
     }
-    
+
     val expectingError: Receive = {
       case TranslateV1(other, replyTo) =>
         replyTo ! s"error:cannot parse input '$other'"

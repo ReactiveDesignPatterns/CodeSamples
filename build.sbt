@@ -1,6 +1,7 @@
 import com.typesafe.sbt.SbtGit.GitKeys
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import com.typesafe.sbt.git.DefaultReadableGit
+import sbt.Keys.licenses
 
 import scalariform.formatter.preferences._
 
@@ -22,9 +23,11 @@ enablePlugins(spray.boilerplate.BoilerplatePlugin)
 
 enablePlugins(AutomateHeaderPlugin)
 
-startYear := Some(2017)
-
-licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
+val headerSettings = Seq(
+  startYear := Some(2017),
+  licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
+  organization := "http://rdp.reactiveplatform.xyz/"
+)
 
 def setPreferences(preferences: IFormattingPreferences): IFormattingPreferences = preferences
   .setPreference(RewriteArrowSymbols, true)
@@ -45,6 +48,10 @@ lazy val ReactiveDesignPatterns = (project in file(".")).dependsOn(docs)
 lazy val common = project
 
 lazy val chapter02 = project
+    .enablePlugins(AutomateHeaderPlugin)
+    .settings(headerSettings:_*)
+
+lazy val chapter03 = project
 
 lazy val chapter07 = project
 
@@ -64,6 +71,7 @@ lazy val chapter17 = project dependsOn common
 
 lazy val docs = project.aggregate(
   chapter02,
+  chapter03,
   chapter07,
   chapter11,
   chapter12,
