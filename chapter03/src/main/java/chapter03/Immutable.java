@@ -16,25 +16,22 @@
 
 package chapter03;
 
+// Listing 3.2 Immutable message class that behaves predictably and is easier to reason about
 
-// Listing 3.1 Unsafe, mutable message class, which may hide unexpected behavior
 // #snip
 import java.util.Date;
 
-public class Unsafe {
-    private Date timestamp;
-    private final StringBuffer message;
-    public Unsafe(Date timestamp, StringBuffer message) {
-        this.timestamp = timestamp;
+public class Immutable {
+    private final Date timestamp;
+    private final String message;
+    public Immutable(final Date timestamp, final String message) {
+        this.timestamp = new Date(timestamp.getTime());
         this.message = message;
     }
-    public synchronized Date getTimestamp() {
-        return timestamp;
+    public Date getTimestamp() {
+        return new Date(timestamp.getTime());
     }
-    public synchronized void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-    public StringBuffer getMessage() {
+    public String getMessage() {
         return message;
     }
 }

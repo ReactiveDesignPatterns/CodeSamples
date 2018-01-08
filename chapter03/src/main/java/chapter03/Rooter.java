@@ -16,26 +16,24 @@
 
 package chapter03;
 
+// 代码清单3-5
+// Referential transparency: allowing substitution of precomputed values
 
-// Listing 3.1 Unsafe, mutable message class, which may hide unexpected behavior
 // #snip
-import java.util.Date;
-
-public class Unsafe {
-    private Date timestamp;
-    private final StringBuffer message;
-    public Unsafe(Date timestamp, StringBuffer message) {
-        this.timestamp = timestamp;
-        this.message = message;
+public class Rooter {
+    private final double value;
+    private Double root = null;
+    public Rooter(double value) {
+        this.value = value;
     }
-    public synchronized Date getTimestamp() {
-        return timestamp;
+    public double getValue() {
+        return value;
     }
-    public synchronized void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-    public StringBuffer getMessage() {
-        return message;
+    public double getRoot() {
+        if (root == null) {
+            root = Math.sqrt(value);
+        }
+        return root;
     }
 }
 // #snip

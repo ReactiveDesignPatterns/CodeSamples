@@ -14,28 +14,12 @@
  * limitations under the License.
  */
 
-package chapter03;
+package chapter03
 
+//代码清单 3-3 使用Scala的case class定义的不可变消息
 
-// Listing 3.1 Unsafe, mutable message class, which may hide unexpected behavior
 // #snip
-import java.util.Date;
+import java.util.Date
 
-public class Unsafe {
-    private Date timestamp;
-    private final StringBuffer message;
-    public Unsafe(Date timestamp, StringBuffer message) {
-        this.timestamp = timestamp;
-        this.message = message;
-    }
-    public synchronized Date getTimestamp() {
-        return timestamp;
-    }
-    public synchronized void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-    public StringBuffer getMessage() {
-        return message;
-    }
-}
+case class Message(timestamp: Date, message: String)
 // #snip

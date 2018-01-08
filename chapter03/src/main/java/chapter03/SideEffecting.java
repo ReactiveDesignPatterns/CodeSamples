@@ -16,26 +16,21 @@
 
 package chapter03;
 
+// 代码清单3-6
+// Limiting usability with side effects
 
-// Listing 3.1 Unsafe, mutable message class, which may hide unexpected behavior
+import java.io.Serializable;
+
 // #snip
-import java.util.Date;
-
-public class Unsafe {
-    private Date timestamp;
-    private final StringBuffer message;
-    public Unsafe(Date timestamp, StringBuffer message) {
-        this.timestamp = timestamp;
-        this.message = message;
+public class SideEffecting implements Serializable, Cloneable {
+    private int count;
+    public SideEffecting(int start) {
+        this.count = start;
     }
-    public synchronized Date getTimestamp() {
-        return timestamp;
-    }
-    public synchronized void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-    public StringBuffer getMessage() {
-        return message;
+    public int next() {
+        this.count += Math.incrementExact(this.count);
+        return this.count;
     }
 }
 // #snip
+

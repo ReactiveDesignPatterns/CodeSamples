@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 http://rdp.reactiveplatform.xyz/
+ * Copyright 2017 https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
