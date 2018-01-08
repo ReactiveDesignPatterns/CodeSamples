@@ -2,10 +2,13 @@
 
 《反应式设计模式》
 
-这是一本关于反应式的模式书
+> 原书名《Reactive Design Patterns》
+
+
+一本有关反应式（Reactive）应用程序的模式书。
 
 @@@ index
 
-* [目录](chapter01/index.md)
+* [目录](contents.md)
 
 @@@
