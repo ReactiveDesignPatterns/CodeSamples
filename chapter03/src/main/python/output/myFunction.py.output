@@ -1,0 +1,12 @@
+
+// Python REPL 3-1
+// #output
+
+>>> def addOne(x):
+... returnx+1
+...
+>>> myFunction = addOne
+>>> myFunction(3)
+4
+
+// #output

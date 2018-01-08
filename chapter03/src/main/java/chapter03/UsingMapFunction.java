@@ -16,29 +16,20 @@
 
 package chapter03;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import java.util.concurrent.ThreadLocalRandom;
-
-// 代码清单3-7
-public class IntSeeding {
-    private static final Logger logger = LoggerFactory.getLogger(IntSeeding.class);
-    public class IntRandom{
-        public int next(){
-            return ThreadLocalRandom.current().nextInt();
-        }
-    }
-
-    private final IntRandom se = new IntRandom();
-
-    public int nextInt(){
+//代码清单3-8
+public class UsingMapFunction {
+    public static void main(String[] args) {
         // #snip
-        final int next = se.next();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Next is " + se.next());
-        }
-        return next;
+        final List<Integer> numbers = Arrays.asList(1, 2, 3);
+        final List<Integer> numbersPlusOne =
+                numbers.stream()
+                        .map(number -> number + 1)
+                        .collect(Collectors.toList());
         // #snip
+        System.out.println(numbersPlusOne.toString());
     }
 }

@@ -1,4 +1,7 @@
-package main                                                                                                                                                           
+
+// 代码清单3-10
+// #snip
+package main
 
 import (
     "fmt"
@@ -28,3 +31,4 @@ func consumer(myChannel chan int, iterations int) {
         fmt.Println("Received: ", recVal)
     }   
 }
+// #snip

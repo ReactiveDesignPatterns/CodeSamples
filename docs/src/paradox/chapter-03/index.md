@@ -47,3 +47,20 @@ Limiting usability with side effects
 ## 代码清单3-7
 
 @@snip[代码清单3-7](../../../../chapter03/src/main/java/chapter03/IntSeeding.java){ #snip }
+
+## 代码清单3-8
+
+@@snip[代码清单3-8](../../../../chapter03/src/main/java/chapter03/UsingMapFunction.java){ #snip }
+
+
+## Python REPL 3-1
+
+@@snip[Python REPL 3-1](../../../../chapter03/src/main/python/output/myFunction.py.output){ #output }
+
+## 代码清单3-9
+
+@@snip[代码清单3-9](../../../../chapter03/eventloop/src/main/js/sample.js){ #snip }
+
+## 代码清单3-10
+
+@@snip[代码清单3-10](../../../../chapter03/csp/src/main/go/sample.go){ #snip }

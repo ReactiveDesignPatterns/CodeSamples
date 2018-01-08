@@ -1,3 +1,5 @@
+// 代码清单3-9
+// #snip
 var http = require('http');
 
 var counter = 0;
@@ -9,3 +11,4 @@ http.createServer(function (req, res) {
 }).listen(8888, '127.0.0.1');
 
 console.log('Server up on 127.0.0.1:8888, send requests!');
+// #snip
