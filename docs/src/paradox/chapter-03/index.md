@@ -43,3 +43,7 @@ Referential transparency: allowing substitution of precomputed values
 Limiting usability with side effects
 
 @@snip[代码清单3-6](../../../../chapter03/src/main/java/chapter03/SideEffecting.java){ #snip }
+
+## 代码清单3-7
+
+@@snip[代码清单3-7](../../../../chapter03/src/main/java/chapter03/IntSeeding.java){ #snip }

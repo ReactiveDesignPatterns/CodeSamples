@@ -48,15 +48,15 @@ lazy val ReactiveDesignPatterns = (project in file(".")).dependsOn(docs)
 lazy val common = project
 
 lazy val chapter02 = project
-    .settings(libraryDependencies ++= Seq(
-      "org.slf4j" % "slf4j-api" % "1.7.25"
-    ))
     .enablePlugins(AutomateHeaderPlugin)
     .settings(headerSettings:_*)
 
 lazy val chapter03 = project
   .enablePlugins(AutomateHeaderPlugin)
   .settings(headerSettings:_*)
+  .settings(libraryDependencies ++= Seq(
+    "org.slf4j" % "slf4j-api" % "1.7.25"
+  ))
 
 lazy val chapter07 = project
 
