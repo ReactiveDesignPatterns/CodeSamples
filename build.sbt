@@ -1,9 +1,5 @@
 import com.typesafe.sbt.SbtGit.GitKeys
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import com.typesafe.sbt.git.DefaultReadableGit
-import sbt.Keys.licenses
-
-import scalariform.formatter.preferences._
 
 organization in ThisBuild := "com.reactivedesignpatterns"
 
@@ -23,40 +19,17 @@ enablePlugins(spray.boilerplate.BoilerplatePlugin)
 
 enablePlugins(AutomateHeaderPlugin)
 
-val headerSettings = Seq(
-  startYear := Some(2017),
-  licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
-  organization := "https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/"
-)
-
-def setPreferences(preferences: IFormattingPreferences): IFormattingPreferences = preferences
-  .setPreference(RewriteArrowSymbols, true)
-  .setPreference(AlignParameters, true)
-  .setPreference(AlignSingleLineCaseStatements, true)
-  .setPreference(DoubleIndentConstructorArguments, false)
-  .setPreference(DoubleIndentMethodDeclaration, false)
-  .setPreference(DanglingCloseParenthesis, Preserve)
-  .setPreference(NewlineAtEndOfFile, true)
-
-ScalariformKeys.preferences := setPreferences(ScalariformKeys.preferences.value)
-ScalariformKeys.preferences in Compile := setPreferences(ScalariformKeys.preferences.value)
-ScalariformKeys.preferences in Test := setPreferences(ScalariformKeys.preferences.value)
-
-
 lazy val ReactiveDesignPatterns = (project in file(".")).dependsOn(docs)
 
 lazy val common = project
 
 lazy val chapter02 = project
     .enablePlugins(AutomateHeaderPlugin)
-    .settings(headerSettings:_*)
+    .settings(Build.sharedSettings:_*)
 
 lazy val chapter03 = project
   .enablePlugins(AutomateHeaderPlugin)
-  .settings(headerSettings:_*)
-  .settings(libraryDependencies ++= Seq(
-    "org.slf4j" % "slf4j-api" % "1.7.25"
-  ))
+  .settings(Build.sharedSettings:_*)
 
 lazy val chapter07 = project
 
@@ -118,6 +91,4 @@ lazy val docs = project.aggregate(
     }
   )
 
-scalafixSettings
 
-scalafixConfigure(Compile)

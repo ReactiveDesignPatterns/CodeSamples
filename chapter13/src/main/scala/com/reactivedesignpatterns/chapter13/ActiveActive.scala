@@ -22,7 +22,7 @@ object ActiveActive {
   class Replica extends Actor with Stash {
     var map = Map.empty[String, JsValue]
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case InitialData(m) =>
         map = m
         context.become(initialized)
@@ -94,7 +94,7 @@ object ActiveActive {
     private var replies = TreeMap.empty[Int, ReplyState]
     private var nextReply = 0
 
-    override def supervisorStrategy = SupervisorStrategy.stoppingStrategy
+    override def supervisorStrategy: SupervisorStrategy = SupervisorStrategy.stoppingStrategy
 
     private def newReplica(): ActorRef =
       context.watch(context.actorOf(Replica.props))
@@ -102,7 +102,7 @@ object ActiveActive {
     // schedule timeout messages for quiescent periods
     context.setReceiveTimeout(1.second)
 
-    def receive = ({
+    def receive: PartialFunction[Any, Unit] = ({
       case cmd: Command =>
         val c = SeqCommand(seqNr.next, cmd, self)
         replicas foreach (_ ! c)

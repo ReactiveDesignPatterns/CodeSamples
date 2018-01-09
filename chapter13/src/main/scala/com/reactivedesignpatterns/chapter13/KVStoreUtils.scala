@@ -22,7 +22,7 @@ object ReplicationProtocol {
 
 object Persistence {
   case class Database(seq: Int, kv: Map[String, JsValue])
-  object Database { implicit val format = Json.format[Database] }
+  object Database { implicit val format: _root_.play.api.libs.json.OFormat[_root_.com.reactivedesignpatterns.chapter13.Persistence.Database] = Json.format[Database] }
 
   def persist(name: String, seq: Int, kv: Map[String, JsValue]): Unit = {
     val bytes = Json.stringify(Json.toJson(Database(seq, kv)))

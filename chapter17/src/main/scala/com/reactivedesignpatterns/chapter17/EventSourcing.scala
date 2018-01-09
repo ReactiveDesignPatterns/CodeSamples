@@ -11,11 +11,11 @@ import com.typesafe.config.ConfigFactory
 
 class PersistentObjectManager extends PersistentActor {
   // we expect the name to be the shopping card ID
-  override def persistenceId = context.self.path.name
+  override def persistenceId: String = context.self.path.name
 
-  var shoppingCart = ShoppingCart.empty
+  var shoppingCart: ShoppingCart = ShoppingCart.empty
 
-  def receiveCommand = {
+  def receiveCommand: PartialFunction[Any, Unit] = {
     case ManagerCommand(cmd, id, replyTo) =>
       try {
         val event = cmd match {
@@ -44,7 +44,7 @@ class PersistentObjectManager extends PersistentActor {
       }
   }
 
-  def receiveRecover = {
+  def receiveRecover: PartialFunction[Any, Unit] = {
     case e: Event => shoppingCart = shoppingCart.applyEvent(e)
   }
 }
@@ -82,7 +82,7 @@ akka.persistence.snapshot-store.plugin = "akka.persistence.no-snapshot-store"
     manager ! ManagerCommand(RemoveItem(shoppingCart, item1, 3), 4, self)
     manager ! ManagerQuery(GetItems(shoppingCart), 5, self)
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case ManagerEvent(id, event) => log.info("success ({}): {}", id, event)
       case ManagerRejection(id, msg) => log.warning("rejected ({}): {}", id, msg)
       case ManagerResult(id, result) =>

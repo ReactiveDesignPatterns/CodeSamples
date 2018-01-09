@@ -13,7 +13,7 @@ object RequestResponseActors {
   class Requester(responder: ActorRef) extends Actor {
     responder ! Request("hello")
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Response(msg) =>
         println(s"got response: $msg")
         context.system.terminate()
@@ -21,7 +21,7 @@ object RequestResponseActors {
   }
 
   class Responder extends Actor {
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Request(msg) =>
         println(s"got request: $msg")
         sender() ! Response("got it!")

@@ -25,9 +25,9 @@ class ShoppingCartTagging(system: ExtendedActorSystem) extends WriteEventAdapter
 }
 
 class ShoppingCartSimulator extends Actor with ActorLogging {
-  def rnd = ThreadLocalRandom.current
+  def rnd: ThreadLocalRandom = ThreadLocalRandom.current
 
-  val items = Array(
+  val items: Array[ItemRef] = Array(
     "apple",
     "banana",
     "plum",
@@ -35,17 +35,17 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
     "peach").map(f => ItemRef(new URI(f)))
   def pickItem() = items(rnd.nextInt(items.length))
 
-  val customers = Array(
+  val customers: Array[CustomerRef] = Array(
     "alice",
     "bob",
     "charlie",
     "mallory").map(c => CustomerRef(new URI(c)))
   def pickCustomer() = customers(rnd.nextInt(customers.length))
 
-  val id = Iterator from 0
+  val id: Iterator[Int] = Iterator from 0
   def command(cmd: Command) = ManagerCommand(cmd, id.next, self)
 
-  def driveCart(num: Int) = {
+  def driveCart(num: Int): Unit = {
     val cartRef = ShoppingCartRef(new URI(f"cart$num%08X"))
     val manager = context.actorOf(Props(new PersistentObjectManager), cartRef.id.toString)
     manager ! command(SetOwner(cartRef, pickCustomer()))
@@ -61,7 +61,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
   case class Cont(id: Int)
   self ! Cont(0)
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case Cont(n) => driveCart(n)
     case ManagerEvent(id, _) => if (id % 10000 == 0) log.info("done {} commands", id)
     case ManagerResult(num, GetItemsResult(cart, items)) =>
@@ -79,9 +79,9 @@ object TopProductListener {
 
 class TopProductListener extends Actor with ActorLogging {
   import TopProductListener._
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer: _root_.akka.stream.ActorMaterializer = ActorMaterializer()
 
-  val readJournal =
+  val readJournal: LeveldbReadJournal =
     PersistenceQuery(context.system)
       .readJournalFor[LeveldbReadJournal](LeveldbReadJournal.Identifier)
 
@@ -102,7 +102,7 @@ class TopProductListener extends Actor with ActorLogging {
 
   var topProducts = Map.empty[ItemRef, Int]
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case GetTopProducts(id, replyTo) => replyTo ! TopProducts(id, topProducts)
     case TopProducts(_, products) =>
       topProducts = products

@@ -6,7 +6,7 @@ import akka.actor.SupervisorStrategy.Stop
 import akka.testkit.TestProbe
 
 class FailureParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
-  implicit val system = ActorSystem()
+  implicit val system: ActorSystem = ActorSystem()
 
   "Using a FailureParent" must {
     "Result in failures being collected and returned" in {
@@ -25,18 +25,18 @@ class FailureParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
 case object TestFailureParentMessage
 
 class FailureParent(failures: ActorRef) extends Actor {
-  val props = Props[MyFailureParentActor]
-  val child = context.actorOf(props, "child")
-  override val supervisorStrategy = OneForOneStrategy() {
+  val props: Props = Props[MyFailureParentActor]
+  val child: ActorRef = context.actorOf(props, "child")
+  override val supervisorStrategy: OneForOneStrategy = OneForOneStrategy() {
     case f => failures ! f; Stop
   }
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case msg => child forward msg
   }
 }
 
 class MyFailureParentActor extends Actor {
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case _ => throw new NullPointerException
   }
 }

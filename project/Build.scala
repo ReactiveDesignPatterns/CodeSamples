@@ -1,4 +1,9 @@
-import sbt._
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import sbt.Keys.{licenses, organization, startYear}
+import sbt.{Def, _}
+
+import scalafix.sbt.ScalafixPlugin.autoImport.{scalafixConfigure, scalafixSettings}
+import scalariform.formatter.preferences._
 
 object Build {
   val akkaVersion = "2.4.20"
@@ -24,8 +29,38 @@ object Build {
   val scalaAsync = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
   val scalaJava8 = "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
 
+  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.1.7"
+
   val playJson = "com.typesafe.play" %% "play-json" % "2.6.8"
 
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.4" % "test"
+
   val junit = "junit" % "junit" % "4.11" % "test"
+
+
+  private val headerSettings = Seq(
+    startYear := Some(2017),
+    licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
+    organization := "https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/"
+  )
+
+  private def setPreferences(preferences: IFormattingPreferences): IFormattingPreferences = preferences
+    .setPreference(RewriteArrowSymbols, true)
+    .setPreference(AlignParameters, true)
+    .setPreference(AlignSingleLineCaseStatements, true)
+    .setPreference(DoubleIndentConstructorArguments, false)
+    .setPreference(DoubleIndentMethodDeclaration, false)
+    .setPreference(DanglingCloseParenthesis, Preserve)
+    .setPreference(NewlineAtEndOfFile, true)
+
+  private val formats = Seq(
+    ScalariformKeys.preferences := setPreferences(ScalariformKeys.preferences.value),
+    ScalariformKeys.preferences in Compile := setPreferences(ScalariformKeys.preferences.value),
+    ScalariformKeys.preferences in Test := setPreferences(ScalariformKeys.preferences.value)
+  )
+
+  private val fixes = scalafixSettings ++ scalafixConfigure(Compile)
+
+  val sharedSettings: Seq[Def.Setting[_]] = headerSettings ++ formats ++ fixes
+
 }

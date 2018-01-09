@@ -10,7 +10,7 @@ object EchoService {
 class EchoService extends Actor {
   import EchoService._
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case Request(tag, ref) => ref ! Response(tag)
   }
 }

@@ -32,12 +32,12 @@ object ThrottlingPattern {
 
   class Manager extends Actor {
 
-    var workQueue = Queue.empty[Job]
-    var requestQueue = Queue.empty[WorkRequest]
+    var workQueue: Queue[Job] = Queue.empty[Job]
+    var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
     (1 to 8) foreach (_ => context.actorOf(Props(new Worker(self)).withDispatcher(context.props.dispatcher)))
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case job @ Job(id, _, replyTo) =>
         if (requestQueue.isEmpty) {
           if (workQueue.size < 10000) workQueue :+= job
@@ -78,7 +78,7 @@ object ThrottlingPattern {
 
     request()
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Job(id, data, replyTo) =>
         requested -= 1
         request()
@@ -108,10 +108,10 @@ object ThrottlingPattern {
     val workStream: Iterator[Job] =
       Iterator from 1 map (x => Job(x, x, self)) take N
 
-    var approximation = Report.empty
+    var approximation: Report = Report.empty
     var outstandingWork = 0
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case WorkRequest(worker, items) =>
         if (start == null) start = Deadline.now
         workStream.take(items).foreach { job =>
@@ -137,11 +137,11 @@ object ThrottlingPattern {
   }
 
   class CalculatorClient(workSource: ActorRef, calculator: ActorRef, ratePerSecond: Long, bucketSize: Int, batchSize: Int) extends Actor {
-    def now() = System.nanoTime()
-    val nanoSecondsBetweenTokens = 1000000000L / ratePerSecond
+    def now(): Long = System.nanoTime()
+    val nanoSecondsBetweenTokens: Long = 1000000000L / ratePerSecond
 
-    var tokenBucket = bucketSize
-    var lastTokenTime = now()
+    var tokenBucket: Int = bucketSize
+    var lastTokenTime: Long = now()
 
     def refillBucket(time: Long): Unit = {
       val accrued = (time - lastTokenTime) * ratePerSecond / 1000000000L
@@ -180,7 +180,7 @@ object ThrottlingPattern {
 
     request(lastTokenTime)
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case job: Job =>
         val time = now()
         if (Debug) if (requested == 1) println(s"$time: received job")
@@ -202,9 +202,9 @@ worker-dispatcher {
   }
 }
 """)
-    implicit val sys = ActorSystem("pi", config)
-    implicit val materializer = ActorMaterializer()
-    implicit val timeout = Timeout(10.seconds)
+    implicit val sys: ActorSystem = ActorSystem("pi", config)
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
+    implicit val timeout: Timeout = Timeout(10.seconds)
     import sys.dispatcher
 
     val source = sys.actorOf(Props(new WorkSource), "workSource")

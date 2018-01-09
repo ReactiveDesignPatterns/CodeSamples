@@ -28,13 +28,13 @@ object DropPattern {
 
   class Manager extends Actor {
 
-    var workQueue = Queue.empty[Job]
-    var requestQueue = Queue.empty[WorkRequest]
+    var workQueue: Queue[Job] = Queue.empty[Job]
+    var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
     val queueThreshold = 1000
     val dropThreshold = 1500
-    def random = ThreadLocalRandom.current
-    def shallEnqueue(atSize: Int) =
+    def random: ThreadLocalRandom = ThreadLocalRandom.current
+    def shallEnqueue(atSize: Int): Boolean =
       (atSize < queueThreshold) || {
         val dropFactor = (atSize - queueThreshold) >> 6
         random.nextInt(dropFactor + 2) == 0
@@ -42,7 +42,7 @@ object DropPattern {
 
     (1 to 8) foreach (_ => context.actorOf(Props(new Worker(self))))
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case job @ Job(id, _, replyTo) =>
         if (requestQueue.isEmpty) {
           val atSize = workQueue.size
@@ -80,7 +80,7 @@ object DropPattern {
 
     request()
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Job(id, data, replyTo) =>
         requested -= 1
         request()
@@ -105,10 +105,10 @@ object DropPattern {
   }
 
   def main(args: Array[String]): Unit = {
-    implicit val sys = ActorSystem("pi")
+    implicit val sys: ActorSystem = ActorSystem("pi")
     import sys.dispatcher
-    implicit val timeout = Timeout(1.seconds)
-    implicit val materializer = ActorMaterializer()
+    implicit val timeout: Timeout = Timeout(1.seconds)
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
 
     val calculator = sys.actorOf(Props(new Manager), "manager")
 

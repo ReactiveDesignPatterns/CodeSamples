@@ -16,8 +16,9 @@ import akka.cluster.singleton.ClusterSingletonManager
 import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonManagerSettings
 import akka.cluster.singleton.ClusterSingletonProxySettings
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ Config, ConfigFactory }
 
+import scala.collection.immutable
 import scala.concurrent.Await
 import scala.io.StdIn
 
@@ -42,13 +43,13 @@ object ActivePassive {
 
     private var rejected = 0
 
-    val timer = context.system.scheduler.schedule(1.second, 1.second, self, Tick)(context.dispatcher)
-    override def postStop() = timer.cancel()
+    val timer: Cancellable = context.system.scheduler.schedule(1.second, 1.second, self, Tick)(context.dispatcher)
+    override def postStop(): Unit = timer.cancel()
 
     log.info("taking over from local replica")
     localReplica ! TakeOver(self)
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case InitialState(m, s) =>
         log.info("took over at sequence {}", s)
         theStore = m
@@ -115,17 +116,17 @@ object ActivePassive {
     private val applied = Queue.empty[Replicate]
     private var awaitingInitialState = Option.empty[ActorRef]
 
-    val name = Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
+    val name: String = Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
     val cluster = Cluster(context.system)
     val random = new Random
 
     private var tickTask = Option.empty[Cancellable]
-    def scheduleTick() = {
+    def scheduleTick(): Unit = {
       tickTask foreach (_.cancel())
       tickTask = Some(context.system.scheduler.scheduleOnce(askAroundInterval, self, DoConsolidate)(context.dispatcher))
     }
 
-    def receive = readPersisted(name) match {
+    def receive: Receive = readPersisted(name) match {
       case Database(s, kv) =>
         log.info("started at sequence {}", s)
         upToDate(kv, s + 1)
@@ -261,7 +262,7 @@ object ActivePassive {
       context.actorSelection(self.path.toStringWithAddress(addr))
   }
 
-  val commonConfig = ConfigFactory.parseString("""
+  val commonConfig: Config = ConfigFactory.parseString("""
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp {
       host = "127.0.0.1"
@@ -275,7 +276,7 @@ object ActivePassive {
       }
     }
     """)
-  def roleConfig(name: String, port: Option[Int]) = {
+  def roleConfig(name: String, port: Option[Int]): Config = {
     val roles = ConfigFactory.parseString(s"""akka.cluster.roles = ["$name"]""")
     port match {
       case None => roles
@@ -317,7 +318,7 @@ object ActivePassive {
     useStorage ! Run(0)
 
     sys.actorOf(Props(new Actor {
-      def receive = {
+      def receive: PartialFunction[Any, Unit] = {
         case Run =>
           StdIn.readLine()
           useStorage ! Stop
@@ -362,12 +363,12 @@ object ActivePassive {
   private class UseStorage(db: ActorRef) extends Actor with ActorLogging {
     val N = 200
     var theStore = Map.empty[String, JsValue]
-    val keys = (1 to N).map(i => f"$i%03d")
+    val keys: immutable.IndexedSeq[String] = (1 to N).map(i => f"$i%03d")
     var outstanding = Set.empty[String]
     val rnd = new Random
     var lastOutstandingCount = 0
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Run(0) =>
         db ! Get("initial", self)
       case GetResult("initial", _) =>

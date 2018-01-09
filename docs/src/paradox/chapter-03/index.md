@@ -64,3 +64,34 @@ Limiting usability with side effects
 ## 代码清单3-10
 
 @@snip[代码清单3-10](../../../../chapter03/csp/src/main/go/sample.go){ #snip }
+
+## 代码清单3-11
+
+@@snip[代码清单3-11](../../../../chapter03/futures-and-promises/src/main/java/chapter03/future/ParallelRetrievalExample.java){ #snip }
+
+## 代码清单3-12
+
+@@snip[代码清单3-12](../../../../chapter03/futures-and-promises/src/main/scala/chapter03/future/StagedFuturesForExample.scala){ #snip }
+
+## 代码清单3-13
+
+@@snip[代码清单3-13](../../../../chapter03/futures-and-promises/src/main/scala/chapter03/future/StagedFuturesAsyncExample.scala){ #snip }
+
+## 代码清单3-14
+
+@@snip[代码清单3-14](../../../../chapter03/reactiveExtensions/src/main/java/chapter03/rxjava/RxJavaExample.java){ #snip }
+
+## 代码清单3-15
+
+@@snip[代码清单3-15](../../../../chapter03/reactiveExtensions/src/main/java/chapter03/rxjava/RxJavaExampleDriver.java){ #snip }
+
+## 代码清单3-16
+
+@@snip[代码清单3-16](../../../../chapter03/actor/src/main/scala/chapter03/actor/Example.scala){ #snip }
+
+
+
+
+
+
+

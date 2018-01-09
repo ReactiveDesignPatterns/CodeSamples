@@ -23,14 +23,14 @@ object PullPattern {
     val workStream: Iterator[Job] =
       Iterator from 1 map (x => Job(x, x, self)) take 1000000
 
-    val aggregator = (x: BigDecimal, y: BigDecimal) => x + y
+    val aggregator: (BigDecimal, BigDecimal) => BigDecimal = (x: BigDecimal, y: BigDecimal) => x + y
     var approximation = BigDecimal(0, new MathContext(10000, RoundingMode.HALF_EVEN))
 
     var outstandingWork = 0
 
     (1 to 8) foreach (_ => context.actorOf(Props(new Worker(self))))
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case WorkRequest(worker, items) =>
         workStream.take(items).foreach {
           job =>
@@ -61,7 +61,7 @@ object PullPattern {
 
     request()
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Job(id, data, replyTo) =>
         requested -= 1
         request()

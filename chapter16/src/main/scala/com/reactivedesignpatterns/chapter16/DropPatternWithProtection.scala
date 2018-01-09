@@ -34,16 +34,16 @@ object DropPatternWithProtection {
   case class GetIncomingRef(replyTo: ActorRef)
 
   class Protector extends Actor {
-    val manager = context.actorOf(Props(new Manager), "manager")
-    val incomingQueue = context.actorOf(Props(new IncomingQueue(manager)).withMailbox("bounded-mailbox"), "incomingQueue")
-    def receive = {
+    val manager: ActorRef = context.actorOf(Props(new Manager), "manager")
+    val incomingQueue: ActorRef = context.actorOf(Props(new IncomingQueue(manager)).withMailbox("bounded-mailbox"), "incomingQueue")
+    def receive: PartialFunction[Any, Unit] = {
       case GetIncomingRef(replyTo) => replyTo ! incomingQueue
     }
   }
 
   private class IncomingQueue(manager: ActorRef) extends Actor {
-    var workQueue = Queue.empty[WorkEnvelope]
-    def receive = {
+    var workQueue: Queue[WorkEnvelope] = Queue.empty[WorkEnvelope]
+    def receive: PartialFunction[Any, Unit] = {
       case job: Job =>
         workQueue = workQueue.dropWhile(_.consumed)
         if (workQueue.size < 1000) {
@@ -56,13 +56,13 @@ object DropPatternWithProtection {
 
   class Manager extends Actor {
 
-    var workQueue = Queue.empty[Job]
-    var requestQueue = Queue.empty[WorkRequest]
+    var workQueue: Queue[Job] = Queue.empty[Job]
+    var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
     val queueThreshold = 1000
     val dropThreshold = 1500
-    def random = ThreadLocalRandom.current
-    def shallEnqueue(atSize: Int) =
+    def random: ThreadLocalRandom = ThreadLocalRandom.current
+    def shallEnqueue(atSize: Int): Boolean =
       (atSize < queueThreshold) || {
         val dropFactor = (atSize - queueThreshold) >> 6
         random.nextInt(dropFactor + 2) == 0
@@ -70,7 +70,7 @@ object DropPatternWithProtection {
 
     (1 to 8) foreach (_ => context.actorOf(Props(new Worker(self))))
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case envelope @ WorkEnvelope(job @ Job(id, _, replyTo)) =>
         envelope.consumed = true
         if (requestQueue.isEmpty) {
@@ -109,7 +109,7 @@ object DropPatternWithProtection {
 
     request()
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Job(id, data, replyTo) =>
         requested -= 1
         request()
@@ -141,10 +141,10 @@ bounded-mailbox {
   mailbox-push-timeout-time = 0s
 }
 """)
-    implicit val sys = ActorSystem("pi", config)
+    implicit val sys: ActorSystem = ActorSystem("pi", config)
     import sys.dispatcher
-    implicit val timeout = Timeout(1.seconds)
-    implicit val materializer = ActorMaterializer()
+    implicit val timeout: Timeout = Timeout(1.seconds)
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
 
     val protector = sys.actorOf(Props(new Protector), "protector")
     val calculator = Await.result((protector ? GetIncomingRef).mapTo[ActorRef], 1.second)

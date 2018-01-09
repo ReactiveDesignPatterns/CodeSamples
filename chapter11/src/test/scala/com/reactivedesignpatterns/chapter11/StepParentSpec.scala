@@ -6,7 +6,7 @@ import akka.actor.SupervisorStrategy.Restart
 import akka.testkit.TestProbe
 
 class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
-  implicit val system = ActorSystem()
+  implicit val system: ActorSystem = ActorSystem()
 
   "An actor that throws an exception" must {
     "Result in the supervisor returning a reference to that actor" in {
@@ -23,17 +23,17 @@ class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
 }
 
 class StepParent extends Actor {
-  override val supervisorStrategy = OneForOneStrategy() {
+  override val supervisorStrategy: OneForOneStrategy = OneForOneStrategy() {
     case thr => Restart
   }
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case p: Props =>
       sender ! context.actorOf(p, "child")
   }
 }
 
 class MyStepParentActor extends Actor {
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case _ => throw new NullPointerException
   }
 }

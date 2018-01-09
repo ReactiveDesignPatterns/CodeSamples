@@ -2,9 +2,10 @@ package com.reactivedesignpatterns.chapter13
 
 import akka.actor._
 import akka.cluster.ddata._
+
 import scala.concurrent.duration._
 import akka.cluster.Cluster
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ Config, ConfigFactory }
 
 object MultiMasterCRDT {
 
@@ -14,8 +15,8 @@ object MultiMasterCRDT {
     type T = Status
     def merge(that: Status): Status = mergeStatus(this, that)
 
-    lazy val predecessors = _pred
-    lazy val successors = _succ
+    @volatile lazy val predecessors: Set[Status] = _pred
+    @volatile lazy val successors: Set[Status] = _succ
 
     if (!statusMap.contains(name)) statusMap += name -> this
     private def readResolve: AnyRef = statusMap(name)
@@ -62,10 +63,10 @@ object MultiMasterCRDT {
   case object PrintStatus
 
   class ClientInterface extends Actor with ActorLogging {
-    val replicator = DistributedData(context.system).replicator
-    implicit val cluster = Cluster(context.system)
+    val replicator: ActorRef = DistributedData(context.system).replicator
+    implicit val cluster: _root_.akka.cluster.Cluster = Cluster(context.system)
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Submit(job) =>
         log.info("submitting job {}", job)
         replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"submit $job"))(_ + (job -> New))
@@ -82,14 +83,14 @@ object MultiMasterCRDT {
   }
 
   class Executor extends Actor with ActorLogging {
-    val replicator = DistributedData(context.system).replicator
-    implicit val cluster = Cluster(context.system)
+    val replicator: ActorRef = DistributedData(context.system).replicator
+    implicit val cluster: _root_.akka.cluster.Cluster = Cluster(context.system)
 
     var lastState = Map.empty[String, Status]
 
     replicator ! Replicator.Subscribe(StorageComponent, self)
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Execute(job) =>
         log.info("executing job {}", job)
         replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(job)) { map =>
@@ -114,7 +115,7 @@ object MultiMasterCRDT {
     }
   }
 
-  val commonConfig = ConfigFactory.parseString("""
+  val commonConfig: Config = ConfigFactory.parseString("""
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp {
       host = "127.0.0.1"

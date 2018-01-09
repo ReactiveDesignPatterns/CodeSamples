@@ -35,7 +35,7 @@ object BusinessHandshake extends App {
   case class CannotChangeBudget(reason: String)
 
   class Sam(alice: ActorRef, bob: ActorRef, amount: BigDecimal) extends Actor {
-    def receive = talkToAlice()
+    def receive: Receive = talkToAlice()
 
     def talkToAlice(): Receive = {
       alice ! ChangeBudget(-amount, self)
@@ -88,7 +88,7 @@ object PersistentBusinessHandshake extends App {
        |}""".stripMargin)
 
   val sys = ActorSystem("BusinessHandshake", config)
-  implicit val t = Timeout(3.seconds)
+  implicit val t: _root_.akka.util.Timeout = Timeout(3.seconds)
 
   val fake = sys.actorOf(Props(new FakeSam("Sam1")), "fakeSam")
   println(Await.result(fake ? "", 5.seconds))
@@ -99,8 +99,8 @@ object PersistentBusinessHandshake extends App {
   val sam = sys.actorOf(Props(new PersistentSam(alice.path, bob.path, 1, "Sam1")), "sam")
 
   class FakeSam(override val persistenceId: String) extends PersistentActor {
-    def receiveRecover = Actor.emptyBehavior
-    def receiveCommand = {
+    def receiveRecover: Actor.emptyBehavior.type = Actor.emptyBehavior
+    def receiveCommand: PartialFunction[Any, Unit] = {
       case _ =>
         deleteMessages(Long.MaxValue)
         context.become(waiting(sender()))
@@ -122,7 +122,7 @@ object PersistentBusinessHandshake extends App {
   class PersistentSam(alice: ActorPath, bob: ActorPath, amount: BigDecimal, override val persistenceId: String)
     extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
 
-    def receiveCommand = Actor.emptyBehavior
+    def receiveCommand: Actor.emptyBehavior.type = Actor.emptyBehavior
 
     override def preStart(): Unit = {
       context.become(talkToAlice())
@@ -137,7 +137,7 @@ object PersistentBusinessHandshake extends App {
         context.stop(self)
     }
 
-    def talkToAlice() = {
+    def talkToAlice(): Receive = {
       log.debug("talking to Alice")
       var deliveryId: Long = 0
       deliver(alice)(id => { deliveryId = id; ChangeBudget(-amount, self, persistenceId) })
@@ -156,7 +156,7 @@ object PersistentBusinessHandshake extends App {
       }: Receive)
     }
 
-    def talkToBob() = {
+    def talkToBob(): Actor.emptyBehavior.type = {
       context.system.terminate()
       Actor.emptyBehavior
     }
@@ -169,13 +169,13 @@ object PersistentBusinessHandshake extends App {
   class PersistentAlice extends PersistentActor with ActorLogging {
     def persistenceId: String = "Alice"
 
-    implicit val mat = ActorMaterializer()
+    implicit val mat: _root_.akka.stream.ActorMaterializer = ActorMaterializer()
     import context.dispatcher
 
     var alreadyDone: Set[String] = Set.empty
     var budget: BigDecimal = 10
 
-    val cleanupTimer = context.system.scheduler.schedule(1.hour, 1.hour, self, CleanupDoneList)
+    val cleanupTimer: Cancellable = context.system.scheduler.schedule(1.hour, 1.hour, self, CleanupDoneList)
 
     def receiveCommand = LoggingReceive {
       case ChangeBudget(amount, replyTo, id) if alreadyDone(id) =>

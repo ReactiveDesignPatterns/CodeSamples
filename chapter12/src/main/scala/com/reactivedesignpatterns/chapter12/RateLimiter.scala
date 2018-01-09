@@ -12,7 +12,7 @@ class RateLimiter(requests: Int, period: FiniteDuration) {
   }
   private var position = 0
   private def lastTime = startTimes(position)
-  private def enqueue(time: Deadline) = {
+  private def enqueue(time: Deadline): Unit = {
     startTimes(position) = time
     position += 1
     if (position == requests) position = 0

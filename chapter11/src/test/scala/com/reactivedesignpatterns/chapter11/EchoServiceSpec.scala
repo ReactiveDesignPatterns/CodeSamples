@@ -22,7 +22,7 @@ object EchoServiceSpec {
 
   class ParallelSLATester extends Actor {
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case TestSLA(echo, n, maxParallelism, reportTo) =>
         val receiver = context.actorOf(receiverProps(self))
         // prime the request pipeline
@@ -66,7 +66,7 @@ object EchoServiceSpec {
         reportTo ! SLAResponse(timings, outstanding)
     }
 
-    val idGenerator = Iterator from 1 map (i => s"test-$i")
+    val idGenerator: Iterator[String] = Iterator from 1 map (i => s"test-$i")
 
     def sendRequest(echo: ActorRef, receiver: ActorRef): (String, Timestamp) = {
       val request = idGenerator.next
@@ -81,7 +81,7 @@ object EchoServiceSpec {
 
   // timestamp received replies in a dedicated actor to keep timing distortions low
   private class ParallelSLATestReceiver(controller: ActorRef) extends Actor {
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case r: Response => controller ! TimedResponse(r, Timestamp.now)
     }
   }
@@ -93,7 +93,7 @@ class EchoServiceSpec extends WordSpec with Matchers with BeforeAndAfterAll {
   import EchoServiceSpec._
 
   // implicitly picked up to create TestProbes, lazy to only start when used
-  implicit lazy val system = ActorSystem("EchoServiceSpec", ConfigFactory.parseString("""
+  implicit lazy val system: ActorSystem = ActorSystem("EchoServiceSpec", ConfigFactory.parseString("""
 akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
 """))
 
@@ -148,7 +148,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
     }
 
     "keep its SLA when used in parallel with Futures" in {
-      implicit val timeout = Timeout(500.millis)
+      implicit val timeout: Timeout = Timeout(500.millis)
       import system.dispatcher
       val echo = echoService("keepSLAfuture")
       val N = 10000
@@ -196,7 +196,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
   "An EchoService (with LatencyTestSupport)" should {
 
     "keep its SLA" in {
-      implicit val timeout = Timeout(5.seconds)
+      implicit val timeout: Timeout = Timeout(5.seconds)
       import system.dispatcher
       val echo = echoService("keepSLAwithSupport")
       val latencySupport = new LatencyTestSupport(system)

@@ -34,7 +34,7 @@ object TranslationService {
    * Implementation of the TranslateV1 protocol.
    */
   private class TranslatorV1 extends Actor {
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case TranslateV1(query, replyTo) =>
         if (query == "sv:en:Hur mår du?") {
           replyTo ! "How are you?"
@@ -62,10 +62,10 @@ object TranslationService {
    * Implementation of the TranslateV2 protocol based on TranslatorV1.
    */
   private class TranslatorV2(v1: ActorRef) extends Actor {
-    implicit val timeout = Timeout(5.seconds)
+    implicit val timeout: Timeout = Timeout(5.seconds)
     import context.dispatcher
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case TranslateV2(phrase, in, out, replyTo) =>
         v1 ? (TranslateV1(s"$in:$out:$phrase", _)) collect {
           case str: String =>

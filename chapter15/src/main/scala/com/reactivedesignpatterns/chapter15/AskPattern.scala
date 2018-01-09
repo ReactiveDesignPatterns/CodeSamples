@@ -7,9 +7,13 @@ import akka.typed._
 import akka.typed.ScalaDSL._
 import akka.typed.AskPattern._
 import java.util.UUID
+
+import akka.actor.Scheduler
 import akka.event.Logging
+
 import scala.concurrent.Future
 import akka.util.Timeout
+
 import scala.concurrent.duration._
 import akka.pattern.AskTimeoutException
 
@@ -104,9 +108,9 @@ object AskPattern {
   def withAskPattern(emailGateway: ActorRef[SendEmail]): Behavior[StartVerificationProcess] =
     ContextAware { ctx =>
       val log = new BusLogging(ctx.system.eventStream, "VerificationProcessManager", getClass, ctx.system.logFilter)
-      implicit val timeout = Timeout(5.seconds)
+      implicit val timeout: Timeout = Timeout(5.seconds)
       import ctx.executionContext
-      implicit val scheduler = ctx.system.scheduler
+      implicit val scheduler: Scheduler = ctx.system.scheduler
 
       Static {
         case StartVerificationProcess(userEmail, replyTo) =>

@@ -28,12 +28,12 @@ object QueuePattern {
 
   class Manager extends Actor {
 
-    var workQueue = Queue.empty[Job]
-    var requestQueue = Queue.empty[WorkRequest]
+    var workQueue: Queue[Job] = Queue.empty[Job]
+    var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
     (1 to 8) foreach (_ => context.actorOf(Props(new Worker(self))))
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case job @ Job(id, _, replyTo) =>
         if (requestQueue.isEmpty) {
           if (workQueue.size < 1000) workQueue :+= job
@@ -70,7 +70,7 @@ object QueuePattern {
 
     request()
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case Job(id, data, replyTo) =>
         requested -= 1
         request()
@@ -96,7 +96,7 @@ object QueuePattern {
     val sys = ActorSystem("pi")
     import sys.dispatcher
     val calculator = sys.actorOf(Props(new Manager), "manager")
-    implicit val timeout = Timeout(10.seconds)
+    implicit val timeout: Timeout = Timeout(10.seconds)
     val futures =
       (1 to 1000000).map(i =>
         (calculator ? (Job(i, i, _)))

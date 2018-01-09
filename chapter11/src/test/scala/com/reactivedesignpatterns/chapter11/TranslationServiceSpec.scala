@@ -23,9 +23,9 @@ object TranslationServiceSpec {
   case class Unexpected(msg: Any)
 
   class MockV1(reporter: ActorRef) extends Actor {
-    def receive = initial
+    def receive: Receive = initial
 
-    override def unhandled(msg: Any) = {
+    override def unhandled(msg: Any): Unit = {
       reporter ! Unexpected(msg)
     }
 
@@ -98,7 +98,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
 
   }
 
-  implicit val system = ActorSystem("TranslationServiceSpec")
+  implicit val system: ActorSystem = ActorSystem("TranslationServiceSpec")
   override def afterAll(): Unit = system.shutdown()
 
   "A TranslationService version adapter" should {

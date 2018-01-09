@@ -6,10 +6,11 @@ package com.reactivedesignpatterns.chapter15
 import akka.typed._
 import akka.typed.ScalaDSL._
 import akka.typed.AskPattern._
+
 import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.AskTimeoutException
-import akka.actor.ReceiveTimeout
+import akka.actor.{ ReceiveTimeout, Scheduler }
 
 object Aggregator {
 
@@ -85,8 +86,8 @@ object Aggregator {
   def futureFrontPage(themes: ActorRef[GetTheme], personalNews: ActorRef[GetPersonalNews], topNews: ActorRef[GetTopNews]): Behavior[GetFrontPage] =
     ContextAware { ctx =>
       import ctx.executionContext
-      implicit val timeout = Timeout(1.second)
-      implicit val scheduler = ctx.system.scheduler
+      implicit val timeout: Timeout = Timeout(1.second)
+      implicit val scheduler: Scheduler = ctx.system.scheduler
 
       Static {
         case GetFrontPage(user, replyTo) =>
@@ -124,8 +125,8 @@ object Aggregator {
     topNews: ActorRef[GetTopNews], overrides: ActorRef[GetOverride]): Behavior[GetFrontPage] =
     ContextAware { ctx =>
       import ctx.executionContext
-      implicit val timeout = Timeout(1.second)
-      implicit val scheduler = ctx.system.scheduler
+      implicit val timeout: Timeout = Timeout(1.second)
+      implicit val scheduler: Scheduler = ctx.system.scheduler
 
       Static {
         case GetFrontPage(user, replyTo) =>

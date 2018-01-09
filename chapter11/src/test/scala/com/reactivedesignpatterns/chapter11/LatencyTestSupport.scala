@@ -15,10 +15,10 @@ object LatencyTestSupport {
 
   case class SingleResult[T](future: Future[T], expected: T)
   case class SummaryResult(timings: immutable.Seq[FiniteDuration], failures: immutable.Seq[Throwable]) {
-    lazy val sorted = timings.sorted
+    lazy val sorted: immutable.Seq[FiniteDuration] = timings.sorted
 
-    lazy val failureCount = failures.size
-    lazy val failureRatio = failureCount.toDouble / (timings.size + failureCount)
+    lazy val failureCount: Int = failures.size
+    lazy val failureRatio: Double = failureCount.toDouble / (timings.size + failureCount)
 
     /**
      * Return the quantile of the timings that is described by the parameter q
@@ -27,7 +27,7 @@ object LatencyTestSupport {
      */
     def quantile(q: Double): FiniteDuration = sorted.takeRight(Math.max(1, ((1 - q) * timings.size).toInt)).head
 
-    override def toString =
+    override def toString: String =
       f"""|SummaryResult($failureCount failures [${failureRatio * 100}% 6.2f%%] in ${timings.size} samples)
           |        minimum         = ${sorted.head}
           |        50th percentile = ${quantile(0.5)}
@@ -39,7 +39,7 @@ object LatencyTestSupport {
   private case class RunMeasurement(count: Int, maxParallelism: Int, ec: ExecutionContext, f: Int => SingleResult[_], replyTo: ActorRef)
 
   private class Supervisor extends Actor {
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case r: RunMeasurement => context.actorOf(runnerProps(r))
     }
   }
@@ -76,7 +76,7 @@ object LatencyTestSupport {
       sent += 1
     }
 
-    def receive = {
+    def receive: PartialFunction[Any, Unit] = {
       case TestSuccess(timing) =>
         results :+= timing
         nextOrFinish()
