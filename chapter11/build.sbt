@@ -1,1 +1,0 @@
-libraryDependencies ++= Seq(Build.akka25Actor)
