@@ -35,7 +35,14 @@ lazy val chapter07 = project
 
 lazy val chapter11 = project dependsOn common
 
-lazy val chapter12 = project
+lazy val chapter12 = project.dependsOn(common)
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings:_*)
+  .settings(
+  libraryDependencies ++= Seq(
+    Build.akka25Actor
+  )
+)
 
 lazy val chapter13 = project dependsOn common
 
