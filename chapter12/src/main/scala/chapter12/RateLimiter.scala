@@ -16,6 +16,10 @@
 
 package chapter12
 
+// 代码清单 12-1
+// Listing 12.2 Protecting a component by using a rate limiter
+
+// #snip
 import scala.concurrent.Future
 import scala.concurrent.duration.{ Deadline, FiniteDuration }
 
@@ -35,10 +39,12 @@ class RateLimiter(requests: Int, period: FiniteDuration) {
   }
   def call[T](block: ⇒ Future[T]): Future[T] = {
     val now = Deadline.now
-    if ((now - lastTime) < period) Future.failed(RateLimitExceeded)
-    else {
+    if ((now - lastTime) < period) {
+      Future.failed(RateLimitExceeded)
+    } else {
       enqueue(now)
       block
     }
   }
 }
+// #snip

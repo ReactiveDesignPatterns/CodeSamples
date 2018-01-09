@@ -1,0 +1,28 @@
+
+// #snip
+
+S: 220 mailhost.example.com ESMTP Postfix
+C: HELO alice-workstation.example.com
+S: 250 Hello alice-workstation.example.com
+C: MAIL FROM:<alice@example.com>
+S: 250 Ok
+C: RCPT TO:<bob@example.com>
+S: 250 Ok
+C: DATA
+S: 354 End data with <CR><LF>.<CR><LF>
+C: From: "Alice" <alice@example.com>
+C: To: "Bob" <bob@example.com>
+C: Date: Fri, 23 October 2015 10:34:12 +0200
+C: Subject: lunch
+C:
+C: Hi Bob,
+C:
+C: sorry, I cannot make it, something else came up.
+C:
+C: Regards, Alice
+C: .
+S: 250 Ok, queued as 4567876345
+C: QUIT
+S: 221 Bye
+
+// #snip

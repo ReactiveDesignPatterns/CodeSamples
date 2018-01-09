@@ -1,20 +1,34 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright 2017 https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-package com.reactivedesignpatterns.chapter15
+
+package chapter15
 
 import akka.actor._
-import akka.persistence._
-import scala.concurrent.duration._
 import akka.event.LoggingReceive
+import akka.pattern.{ ask, pipe }
+import akka.persistence._
 import akka.persistence.query.PersistenceQuery
 import akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
-import akka.stream.scaladsl._
 import akka.stream.ActorMaterializer
-import akka.pattern.{ ask, pipe }
-import com.typesafe.config.ConfigFactory
+import akka.stream.scaladsl._
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
+
 import scala.concurrent.Await
+import scala.concurrent.duration._
 
 object BusinessHandshake extends App {
 
@@ -42,9 +56,9 @@ object BusinessHandshake extends App {
       context.setReceiveTimeout(1.second)
 
       LoggingReceive {
-        case ChangeBudgetDone => context.become(talkToBob())
-        case CannotChangeBudget(reason) => context.stop(self)
-        case ReceiveTimeout => alice ! ChangeBudget(-amount, self)
+        case ChangeBudgetDone           ⇒ context.become(talkToBob())
+        case CannotChangeBudget(reason) ⇒ context.stop(self)
+        case ReceiveTimeout             ⇒ alice ! ChangeBudget(-amount, self)
       }
     }
 
@@ -59,16 +73,16 @@ object BusinessHandshake extends App {
     var alreadyDone: Set[ActorRef] = Set.empty
 
     def receive = LoggingReceive {
-      case ChangeBudget(amount, replyTo) if alreadyDone(replyTo) =>
+      case ChangeBudget(amount, replyTo) if alreadyDone(replyTo) ⇒
         replyTo ! ChangeBudgetDone
-      case ChangeBudget(amount, replyTo) if amount + budget > 0 =>
+      case ChangeBudget(amount, replyTo) if amount + budget > 0 ⇒
         budget += amount
         alreadyDone += replyTo
         context.watch(replyTo)
         replyTo ! ChangeBudgetDone
-      case ChangeBudget(_, replyTo) =>
+      case ChangeBudget(_, replyTo) ⇒
         replyTo ! CannotChangeBudget("insufficient budget")
-      case Terminated(saga) =>
+      case Terminated(saga) ⇒
         alreadyDone -= saga
     }
   }
@@ -101,12 +115,12 @@ object PersistentBusinessHandshake extends App {
   class FakeSam(override val persistenceId: String) extends PersistentActor {
     def receiveRecover: Actor.emptyBehavior.type = Actor.emptyBehavior
     def receiveCommand: PartialFunction[Any, Unit] = {
-      case _ =>
+      case _ ⇒
         deleteMessages(Long.MaxValue)
         context.become(waiting(sender()))
     }
     def waiting(replyTo: ActorRef): Receive = {
-      case d @ (_: DeleteMessagesSuccess | _: DeleteMessagesFailure) =>
+      case d @ (_: DeleteMessagesSuccess | _: DeleteMessagesFailure) ⇒
         replyTo ! d
         context.stop(self)
     }
@@ -129,10 +143,10 @@ object PersistentBusinessHandshake extends App {
     }
 
     def receiveRecover = LoggingReceive {
-      case AliceConfirmedChange(deliveryId) =>
+      case AliceConfirmedChange(deliveryId) ⇒
         confirmDelivery(deliveryId)
         context.become(talkToBob())
-      case AliceDeniedChange(deliveryId) =>
+      case AliceDeniedChange(deliveryId) ⇒
         confirmDelivery(deliveryId)
         context.stop(self)
     }
@@ -140,16 +154,16 @@ object PersistentBusinessHandshake extends App {
     def talkToAlice(): Receive = {
       log.debug("talking to Alice")
       var deliveryId: Long = 0
-      deliver(alice)(id => { deliveryId = id; ChangeBudget(-amount, self, persistenceId) })
+      deliver(alice)(id ⇒ { deliveryId = id; ChangeBudget(-amount, self, persistenceId) })
 
       LoggingReceive({
-        case ChangeBudgetDone =>
-          persist(AliceConfirmedChange(deliveryId)) { ev =>
+        case ChangeBudgetDone ⇒
+          persist(AliceConfirmedChange(deliveryId)) { ev ⇒
             confirmDelivery(ev.deliveryId)
             context.become(talkToBob())
           }
-        case CannotChangeBudget(reason) =>
-          persist(AliceDeniedChange(deliveryId)) { ev =>
+        case CannotChangeBudget(reason) ⇒
+          persist(AliceDeniedChange(deliveryId)) { ev ⇒
             confirmDelivery(ev.deliveryId)
             context.stop(self)
           }
@@ -178,35 +192,35 @@ object PersistentBusinessHandshake extends App {
     val cleanupTimer: Cancellable = context.system.scheduler.schedule(1.hour, 1.hour, self, CleanupDoneList)
 
     def receiveCommand = LoggingReceive {
-      case ChangeBudget(amount, replyTo, id) if alreadyDone(id) =>
+      case ChangeBudget(amount, replyTo, id) if alreadyDone(id) ⇒
         replyTo ! ChangeBudgetDone
-      case ChangeBudget(amount, replyTo, id) if amount + budget > 0 =>
-        persist(BudgetChanged(amount, id)) { ev =>
+      case ChangeBudget(amount, replyTo, id) if amount + budget > 0 ⇒
+        persist(BudgetChanged(amount, id)) { ev ⇒
           budget += ev.amount
           alreadyDone += ev.persistenceId
           replyTo ! ChangeBudgetDone
         }
-      case ChangeBudget(_, replyTo, _) =>
+      case ChangeBudget(_, replyTo, _) ⇒
         replyTo ! CannotChangeBudget("insufficient budget")
-      case CleanupDoneList =>
+      case CleanupDoneList ⇒
         val journal = PersistenceQuery(context.system).readJournalFor[LeveldbReadJournal](LeveldbReadJournal.Identifier)
-        for (persistenceId <- alreadyDone) {
+        for (persistenceId ← alreadyDone) {
           val stream = journal.currentEventsByPersistenceId(persistenceId).map(_.event).collect {
-            case AliceConfirmedChange(_) => ChangeDone(persistenceId)
+            case AliceConfirmedChange(_) ⇒ ChangeDone(persistenceId)
           }
           stream.runWith(Sink.head).pipeTo(self)
         }
-      case ChangeDone(id) =>
-        persist(ChangeDone(id)) { ev =>
+      case ChangeDone(id) ⇒
+        persist(ChangeDone(id)) { ev ⇒
           alreadyDone -= ev.persistenceId
         }
     }
 
     def receiveRecover = LoggingReceive {
-      case BudgetChanged(amount, id) =>
+      case BudgetChanged(amount, id) ⇒
         budget += amount
         alreadyDone += id
-      case ChangeDone(id) =>
+      case ChangeDone(id) ⇒
         alreadyDone -= id
     }
 

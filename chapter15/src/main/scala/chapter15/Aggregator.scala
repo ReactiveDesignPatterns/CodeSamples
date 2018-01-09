@@ -1,16 +1,29 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright 2017 https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-package com.reactivedesignpatterns.chapter15
 
-import akka.typed._
-import akka.typed.ScalaDSL._
+package chapter15
+
+import akka.actor.{ ReceiveTimeout, Scheduler }
+import akka.pattern.AskTimeoutException
 import akka.typed.AskPattern._
+import akka.typed.ScalaDSL._
+import akka.typed._
+import akka.util.Timeout
 
 import scala.concurrent.duration._
-import akka.util.Timeout
-import akka.pattern.AskTimeoutException
-import akka.actor.{ ReceiveTimeout, Scheduler }
 
 object Aggregator {
 
@@ -58,18 +71,18 @@ object Aggregator {
   private def pf(p: PartialFunction[AnyRef, Unit]): p.type = p
 
   def frontPage(themes: ActorRef[GetTheme], personalNews: ActorRef[GetPersonalNews], topNews: ActorRef[GetTopNews]): Behavior[GetFrontPage] =
-    ContextAware { ctx =>
+    ContextAware { ctx ⇒
       Static {
-        case GetFrontPage(user, replyTo) =>
-          val childRef = ctx.spawnAnonymous(Deferred { () =>
+        case GetFrontPage(user, replyTo) ⇒
+          val childRef = ctx.spawnAnonymous(Deferred { () ⇒
             val builder = new FrontPageResultBuilder(user)
             Partial[AnyRef](
               pf {
-                case ThemeResult(css) => builder.addCSS(css)
-                case PersonalNewsResult(news) => builder.addPersonalNews(news)
-                case TopNewsResult(news) => builder.addTopNews(news)
-                case ReceiveTimeout => builder.timeout()
-              } andThen { _ =>
+                case ThemeResult(css)         ⇒ builder.addCSS(css)
+                case PersonalNewsResult(news) ⇒ builder.addPersonalNews(news)
+                case TopNewsResult(news)      ⇒ builder.addTopNews(news)
+                case ReceiveTimeout           ⇒ builder.timeout()
+              } andThen { _ ⇒
                 if (builder.isComplete) {
                   replyTo ! builder.result
                   Stopped
@@ -84,35 +97,35 @@ object Aggregator {
     }
 
   def futureFrontPage(themes: ActorRef[GetTheme], personalNews: ActorRef[GetPersonalNews], topNews: ActorRef[GetTopNews]): Behavior[GetFrontPage] =
-    ContextAware { ctx =>
+    ContextAware { ctx ⇒
       import ctx.executionContext
       implicit val timeout: Timeout = Timeout(1.second)
       implicit val scheduler: Scheduler = ctx.system.scheduler
 
       Static {
-        case GetFrontPage(user, replyTo) =>
+        case GetFrontPage(user, replyTo) ⇒
           val cssFuture =
             (themes ? (GetTheme(user, _: ActorRef[ThemeResult])))
               .map(_.css)
               .recover {
-                case _: AskTimeoutException => "default.css"
+                case _: AskTimeoutException ⇒ "default.css"
               }
           val personalNewsFuture =
             (personalNews ? (GetPersonalNews(user, _: ActorRef[PersonalNewsResult])))
               .map(_.news)
               .recover {
-                case _: AskTimeoutException => Nil
+                case _: AskTimeoutException ⇒ Nil
               }
           val topNewsFuture =
             (topNews ? (GetTopNews(_: ActorRef[TopNewsResult])))
               .map(_.news)
               .recover {
-                case _: AskTimeoutException => Nil
+                case _: AskTimeoutException ⇒ Nil
               }
           for {
-            css <- cssFuture
-            personalNews <- personalNewsFuture
-            topNews <- topNewsFuture
+            css ← cssFuture
+            personalNews ← personalNewsFuture
+            topNews ← topNewsFuture
           } {
             val topSet = topNews.toSet
             val allNews = topNews ::: personalNews.filterNot(topSet.contains)
@@ -122,54 +135,54 @@ object Aggregator {
     }
 
   def futureFrontPageWithOverride(themes: ActorRef[GetTheme], personalNews: ActorRef[GetPersonalNews],
-    topNews: ActorRef[GetTopNews], overrides: ActorRef[GetOverride]): Behavior[GetFrontPage] =
-    ContextAware { ctx =>
+                                  topNews: ActorRef[GetTopNews], overrides: ActorRef[GetOverride]): Behavior[GetFrontPage] =
+    ContextAware { ctx ⇒
       import ctx.executionContext
       implicit val timeout: Timeout = Timeout(1.second)
       implicit val scheduler: Scheduler = ctx.system.scheduler
 
       Static {
-        case GetFrontPage(user, replyTo) =>
+        case GetFrontPage(user, replyTo) ⇒
           val cssFuture =
             (themes ? (GetTheme(user, _: ActorRef[ThemeResult])))
               .map(_.css)
               .recover {
-                case _: AskTimeoutException => "default.css"
+                case _: AskTimeoutException ⇒ "default.css"
               }
           val personalNewsFuture =
             (personalNews ? (GetPersonalNews(user, _: ActorRef[PersonalNewsResult])))
               .map(_.news)
               .recover {
-                case _: AskTimeoutException => Nil
+                case _: AskTimeoutException ⇒ Nil
               }
           val topNewsFuture =
             (topNews ? (GetTopNews(_: ActorRef[TopNewsResult])))
               .map(_.news)
               .recover {
-                case _: AskTimeoutException => Nil
+                case _: AskTimeoutException ⇒ Nil
               }
           val overrideFuture =
             (overrides ? (GetOverride(_: ActorRef[OverrideResult])))
               .recover {
-                case _: AskTimeoutException => NoOverride
+                case _: AskTimeoutException ⇒ NoOverride
               }
           for {
-            css <- cssFuture
-            personalNews <- personalNewsFuture
-            topNews <- topNewsFuture
-            ovr <- overrideFuture
+            css ← cssFuture
+            personalNews ← personalNewsFuture
+            topNews ← topNewsFuture
+            ovr ← overrideFuture
           } ovr match {
-            case NoOverride =>
+            case NoOverride ⇒
               val topSet = topNews.toSet
               val allNews = topNews ::: personalNews.filterNot(topSet.contains)
               replyTo ! FrontPageResult(user, css, allNews)
-            case other => // nothing to do here
+            case other ⇒ // nothing to do here
           }
           for {
-            ovr <- overrideFuture
+            ovr ← overrideFuture
           } ovr match {
-            case NoOverride => // nothing to do here
-            case Override(css, news) =>
+            case NoOverride ⇒ // nothing to do here
+            case Override(css, news) ⇒
               replyTo ! FrontPageResult(user, css, news)
           }
       }

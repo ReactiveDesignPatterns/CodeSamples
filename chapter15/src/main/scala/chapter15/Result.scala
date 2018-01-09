@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package chapter12
+package chapter15
 
-sealed trait StorageStatus
+import java.util.UUID
 
-object StorageStatus {
-  case object Failed extends StorageStatus
-  case object Unknown extends StorageStatus
-  case object Gated extends StorageStatus
-}
+sealed trait Result
+
+case object ReceiveTimeout extends Result
+
+// 代码清单 15-7
+// Listing 15.7 Encapsulated information needed for multiple SMTP exchanges
+
+// #snip
+case class SendEmailResult(
+  correlationID: UUID,
+  status:        StatusCode,
+  explanation:   Option[String]) extends Result
+// #snip
+

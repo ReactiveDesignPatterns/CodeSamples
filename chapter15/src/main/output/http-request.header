@@ -1,0 +1,5 @@
+// #snip
+GET /request?msg=hello HTTP/1.1
+Host: client-interface.our.application.domain
+Accept: application/json
+// #snip

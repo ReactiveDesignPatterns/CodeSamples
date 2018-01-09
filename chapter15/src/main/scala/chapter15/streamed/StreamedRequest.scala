@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package chapter12
+package chapter15.streamed
 
-sealed trait StorageStatus
-
-object StorageStatus {
-  case object Failed extends StorageStatus
-  case object Unknown extends StorageStatus
-  case object Gated extends StorageStatus
+trait StreamedRequest {
+  def payload: Source[String]
 }

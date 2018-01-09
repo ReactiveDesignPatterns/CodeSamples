@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package chapter12
+package chapter15
 
-sealed trait StorageStatus
-
-object StorageStatus {
-  case object Failed extends StorageStatus
-  case object Unknown extends StorageStatus
-  case object Gated extends StorageStatus
+sealed trait StatusCode
+object StatusCode {
+  case object OK extends StatusCode
+  case object Failed extends StatusCode
 }

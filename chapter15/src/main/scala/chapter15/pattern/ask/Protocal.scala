@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package chapter12
+package chapter15.pattern.ask
 
-sealed trait StorageStatus
+import java.util.UUID
 
-object StorageStatus {
-  case object Failed extends StorageStatus
-  case object Unknown extends StorageStatus
-  case object Gated extends StorageStatus
-}
+import akka.typed.ActorRef
+import chapter15.StatusCode
+
+sealed trait MyCommands
+private case class MyEmailResult(correlationID: UUID, status: StatusCode, explanation: Option[String]) extends MyCommands
+
+case class StartVerificationProcess(userEmail: String, replyTo: ActorRef[VerificationProcessResponse]) extends MyCommands
+
+sealed trait VerificationProcessResponse
+case class VerificationProcessStarted(userEmail: String) extends VerificationProcessResponse
+case class VerificationProcessFailed(userEmail: String) extends VerificationProcessResponse
+

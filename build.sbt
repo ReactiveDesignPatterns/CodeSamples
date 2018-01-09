@@ -48,7 +48,9 @@ lazy val chapter13 = project dependsOn common
 
 lazy val chapter14 = project dependsOn common
 
-lazy val chapter15 = project dependsOn common
+lazy val chapter15 = project.dependsOn(common)
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings:_*)
 
 lazy val chapter16 = project dependsOn common
 

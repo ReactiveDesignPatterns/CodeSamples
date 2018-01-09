@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package chapter12
+package chapter15.pullable
 
-sealed trait StorageStatus
+import java.net.URL
+import java.util.UUID
 
-object StorageStatus {
-  case object Failed extends StorageStatus
-  case object Unknown extends StorageStatus
-  case object Gated extends StorageStatus
-}
+import akka.typed.ActorRef
+import chapter15.SendEmailResult
+
+// 代码清单 15-9
+// Listing 15.9 Enabling the body to be pulled by the recipient
+
+// #snip
+case class SendEmail(sender: String, recipients: List[String],
+                     bodyLocation:  URL,
+                     correlationID: UUID,
+                     replyTo:       ActorRef[SendEmailResult])
+// #snip
+

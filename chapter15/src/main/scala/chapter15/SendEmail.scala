@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package chapter12
+package chapter15
 
-sealed trait StorageStatus
+import java.util.UUID
 
-object StorageStatus {
-  case object Failed extends StorageStatus
-  case object Unknown extends StorageStatus
-  case object Gated extends StorageStatus
-}
+import akka.typed.ActorRef
+
+// 代码清单 15-7
+// Listing 15.7 Encapsulated information needed for multiple SMTP exchanges
+
+// #snip
+case class SendEmail(
+  sender:     String,
+  recipients: List[String],
+  body:       String, correlationID: UUID,
+  replyTo: ActorRef[SendEmailResult])
+// #snip

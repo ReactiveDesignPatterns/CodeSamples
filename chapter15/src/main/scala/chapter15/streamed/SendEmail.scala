@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package chapter12
+package chapter15.streamed
 
-sealed trait StorageStatus
+import java.util.UUID
 
-object StorageStatus {
-  case object Failed extends StorageStatus
-  case object Unknown extends StorageStatus
-  case object Gated extends StorageStatus
+import akka.typed.ActorRef
+import chapter15.SendEmailResult
+
+// 代码清单15-8
+// Listing 15.8 Separating the body so it can be delivered on demand
+
+// #snip
+case class SendEmail(
+  sender:        String,
+  recipients:    List[String],
+  correlationID: UUID,
+  replyTo:       ActorRef[SendEmailResult])(body: Source[String]) extends StreamedRequest {
+  override def payload: Source[String] = body
 }
+// #snip
