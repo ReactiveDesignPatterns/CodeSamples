@@ -37,6 +37,8 @@ object Build {
 
   val junit = "junit" % "junit" % "4.11" % "test"
 
+  val guava =  "com.google.guava" % "guava" % "23.0"
+
 
   private val headerSettings = Seq(
     startYear := Some(2017),

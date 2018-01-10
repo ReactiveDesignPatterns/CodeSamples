@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.reactivedesignpatterns.chapter11
 
 import java.util.concurrent.TimeoutException
@@ -35,7 +51,7 @@ object TranslationService {
    */
   private class TranslatorV1 extends Actor {
     def receive: PartialFunction[Any, Unit] = {
-      case TranslateV1(query, replyTo) =>
+      case TranslateV1(query, replyTo) ⇒
         if (query == "sv:en:Hur mår du?") {
           replyTo ! "How are you?"
         } else {
@@ -66,16 +82,16 @@ object TranslationService {
     import context.dispatcher
 
     def receive: PartialFunction[Any, Unit] = {
-      case TranslateV2(phrase, in, out, replyTo) =>
+      case TranslateV2(phrase, in, out, replyTo) ⇒
         v1 ? (TranslateV1(s"$in:$out:$phrase", _)) collect {
-          case str: String =>
+          case str: String ⇒
             if (str.startsWith("error:")) {
               TranslationErrorV2(phrase, in, out, str.substring(6))
             } else {
               TranslationV2(phrase, str, in, out)
             }
         } recover {
-          case _: TimeoutException =>
+          case _: TimeoutException ⇒
             TranslationErrorV2(phrase, in, out, "timeout while talking to V1 back-end")
         } pipeTo replyTo
     }

@@ -31,13 +31,15 @@ class GatedStorageClient(system: ActorSystem) {
     system.scheduler,
     10, Duration.Zero, 10.seconds)
 
-  def persistForThisClient(job: Job): Future[StorageStatus] =
+  def persistForThisClient(job: Job): Future[StorageStatus] = {
+    import akka.rdpextras.ExecutionContexts.sameThreadExecutionContext
     breaker
       .withCircuitBreaker(limiter.call(persist(job)))
       .recover {
         case RateLimitExceeded              ⇒ StorageStatus.Failed
         case _: CircuitBreakerOpenException ⇒ StorageStatus.Gated
       }
+  }
   // #snip
   def persist(job: Job): Future[StorageStatus] = ??? // remote call
 }

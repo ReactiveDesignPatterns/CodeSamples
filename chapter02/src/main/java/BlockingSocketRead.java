@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.reactivedesignpatterns.chapter11
+import java.io.IOException;
+import java.net.Socket;
 
-import akka.actor.{ Actor, ActorRef }
+public class BlockingSocketRead {
+    public static void main(String[] args) throws IOException {
+        byte[] requestMessageBytes = "request".getBytes();
+        byte[] responseBuffer = new byte[1024];
 
-object EchoService {
-  case class Request(tag: String, client: ActorRef)
-  case class Response(tag: String)
-}
+        // #snip
+        final Socket socket = new Socket("127.0.0.1",8080);
+        socket.getOutputStream().write(requestMessageBytes);
+        final int bytesRead = socket.getInputStream().read(responseBuffer);
+        // #snip
 
-class EchoService extends Actor {
-  import EchoService._
-
-  def receive: PartialFunction[Any, Unit] = {
-    case Request(tag, ref) ⇒ ref ! Response(tag)
-  }
+    }
 }

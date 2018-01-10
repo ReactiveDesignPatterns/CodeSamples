@@ -23,9 +23,15 @@ lazy val ReactiveDesignPatterns = (project in file(".")).dependsOn(docs)
 
 lazy val common = project
 
-lazy val chapter02 = project
+lazy val chapter02 = project.dependsOn(common)
     .enablePlugins(AutomateHeaderPlugin)
     .settings(Build.sharedSettings:_*)
+      .settings(
+        libraryDependencies ++= Seq(
+          Build.akka25Actor,
+          Build.guava
+        )
+      )
 
 lazy val chapter03 = project
   .enablePlugins(AutomateHeaderPlugin)

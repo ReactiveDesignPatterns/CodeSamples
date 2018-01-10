@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package com.reactivedesignpatterns.chapter11
+object SimpleFunction {
+  def f(int: Int): Int = int
 
-import akka.actor.{ Actor, ActorRef }
-
-object EchoService {
-  case class Request(tag: String, client: ActorRef)
-  case class Response(tag: String)
-}
-
-class EchoService extends Actor {
-  import EchoService._
-
-  def receive: PartialFunction[Any, Unit] = {
-    case Request(tag, ref) ⇒ ref ! Response(tag)
+  def main(args: Array[String]): Unit = {
+    // #snip
+    val result = f(42)
+    // #snip
   }
 }

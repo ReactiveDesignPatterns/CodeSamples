@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.reactivedesignpatterns.chapter11
+object ExceptionHandler {
+  def f(int: Int): Int = int
 
-import akka.actor.{ Actor, ActorRef }
+  def main(args: Array[String]): Unit = {
+    val i = 3
+    // #snip
+    try {
+      f(i)
+    } catch {
+      case _: java.lang.ArithmeticException ⇒ Int.MaxValue
+      case ex: java.lang.StackOverflowError ⇒ ???
+      case ex: java.net.ConnectException    ⇒ ???
+    }
+    // #snip
 
-object EchoService {
-  case class Request(tag: String, client: ActorRef)
-  case class Response(tag: String)
-}
-
-class EchoService extends Actor {
-  import EchoService._
-
-  def receive: PartialFunction[Any, Unit] = {
-    case Request(tag, ref) ⇒ ref ! Response(tag)
   }
 }

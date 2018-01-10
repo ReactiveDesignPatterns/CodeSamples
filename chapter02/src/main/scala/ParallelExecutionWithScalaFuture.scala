@@ -14,25 +14,32 @@
  * limitations under the License.
  */
 
-package chapter12
-
 import scala.concurrent.Future
 
-// 代码清单 12-3
-// Listing 12.3 Circuit breaker: limiting requests from a client
-class StorageClient {
-  import scala.concurrent.duration._
-  // #snip
-  private val limiter = new RateLimiter(100, 2.seconds)
+object ParallelExecutionWithScalaFuture {
 
-  def persistForThisClient(job: Job): Future[StorageStatus] = {
-    import akka.rdpextras.ExecutionContexts.sameThreadExecutionContext
-    limiter
-      .call(persist(job))
-      .recover {
-        case RateLimitExceeded ⇒ StorageStatus.Failed
-      }
+  class ReplyA
+  class ReplyB
+  class ReplyC
+  class Result
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  def taskA(): Future[ReplyA] = Future(new ReplyA)
+  def taskB(): Future[ReplyB] = Future(new ReplyB)
+  def taskC(): Future[ReplyC] = Future(new ReplyC)
+
+  def aggregate(a: ReplyA, b: ReplyB, c: ReplyC): Result = ???
+
+  def main(args: Array[String]): Unit = {
+    // #snip
+    val fa: Future[ReplyA] = taskA()
+    val fb: Future[ReplyB] = taskB()
+    val fc: Future[ReplyC] = taskC()
+
+    val fr: Future[Result] = for (a ← fa; b ← fb; c ← fc)
+      yield aggregate(a, b, c)
+    // #snip
+    println(fr)
   }
-  // #snip
-  def persist(job: Job): Future[StorageStatus] = ??? // remote call
 }
