@@ -1,15 +1,30 @@
-package com.reactivedesignpatterns.chapter11
+/*
+ * Copyright 2017 https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import scala.collection.immutable
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.concurrent.duration.FiniteDuration
-import scala.reflect.classTag
-
-import com.reactivedesignpatterns.Defaults.{ AskableActorRef, Timestamp }
+package chapter11
 
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props, actorRef2Scala }
 import akka.pattern.pipe
 import akka.util.Timeout
+import com.reactivedesignpatterns.Defaults.{ AskableActorRef, Timestamp }
+
+import scala.collection.immutable
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.{ ExecutionContext, Future }
+import scala.reflect.classTag
 
 object LatencyTestSupport {
 
@@ -36,11 +51,11 @@ object LatencyTestSupport {
           |        maximum         = ${sorted.last}""".stripMargin
   }
 
-  private case class RunMeasurement(count: Int, maxParallelism: Int, ec: ExecutionContext, f: Int => SingleResult[_], replyTo: ActorRef)
+  private case class RunMeasurement(count: Int, maxParallelism: Int, ec: ExecutionContext, f: Int ⇒ SingleResult[_], replyTo: ActorRef)
 
   private class Supervisor extends Actor {
     def receive: PartialFunction[Any, Unit] = {
-      case r: RunMeasurement => context.actorOf(runnerProps(r))
+      case r: RunMeasurement ⇒ context.actorOf(runnerProps(r))
     }
   }
 
@@ -53,7 +68,7 @@ object LatencyTestSupport {
     override def isDefinedAt(ex: Throwable) = true
   }
 
-  private class TestRunner(count: Int, maxParallelism: Int, f: Int => SingleResult[_], replyTo: ActorRef)(implicit ec: ExecutionContext) extends Actor {
+  private class TestRunner(count: Int, maxParallelism: Int, f: Int ⇒ SingleResult[_], replyTo: ActorRef)(implicit ec: ExecutionContext) extends Actor {
 
     var sent = 0
     var received = 0
@@ -68,7 +83,7 @@ object LatencyTestSupport {
     def send(i: Int): Unit = {
       val start = Timestamp.now
       val r = f(i)
-      r.future map { v =>
+      r.future map { v ⇒
         val stop = Timestamp.now
         assert(v == r.expected, s"$v did not equal ${r.expected}")
         stop - start
@@ -77,10 +92,10 @@ object LatencyTestSupport {
     }
 
     def receive: PartialFunction[Any, Unit] = {
-      case TestSuccess(timing) =>
+      case TestSuccess(timing) ⇒
         results :+= timing
         nextOrFinish()
-      case TestFailure(ex) =>
+      case TestFailure(ex) ⇒
         failures :+= ex
         nextOrFinish()
     }
@@ -103,7 +118,7 @@ class LatencyTestSupport(system: ActorSystem) {
 
   private val supervisor = system.actorOf(Props[Supervisor], "LatencyTestSupportSupervisor")
 
-  def measure(count: Int, maxParallelism: Int)(f: Int => SingleResult[_])(implicit timeout: Timeout, ec: ExecutionContext): Future[SummaryResult] = {
+  def measure(count: Int, maxParallelism: Int)(f: Int ⇒ SingleResult[_])(implicit timeout: Timeout, ec: ExecutionContext): Future[SummaryResult] = {
     supervisor ? (RunMeasurement(count, maxParallelism, ec, f, _)) mapTo classTag[SummaryResult]
   }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reactivedesignpatterns.chapter11
+package chapter11
 
 import java.util.concurrent.TimeoutException
 

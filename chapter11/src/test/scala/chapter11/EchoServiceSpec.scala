@@ -1,17 +1,33 @@
-package com.reactivedesignpatterns.chapter11
+/*
+ * Copyright 2017 https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import scala.concurrent.duration.{ DurationInt, FiniteDuration }
-import scala.util.Try
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
-import com.reactivedesignpatterns.Defaults._
-import com.reactivedesignpatterns.Helpers
+package chapter11
+
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props, actorRef2Scala }
 import akka.testkit.TestProbe
 import akka.util.Timeout
-import scala.concurrent.Await
-import scala.concurrent.Future
+import chapter11.LatencyTestSupport._
+import com.reactivedesignpatterns.Defaults._
+import com.reactivedesignpatterns.Helpers
 import com.typesafe.config.ConfigFactory
-import LatencyTestSupport._
+import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
+
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration.{ Duration, DurationInt, FiniteDuration }
+import scala.util.Try
 
 object EchoServiceSpec {
   import EchoService._
@@ -23,22 +39,22 @@ object EchoServiceSpec {
   class ParallelSLATester extends Actor {
 
     def receive: PartialFunction[Any, Unit] = {
-      case TestSLA(echo, n, maxParallelism, reportTo) =>
+      case TestSLA(echo, n, maxParallelism, reportTo) ⇒
         val receiver = context.actorOf(receiverProps(self))
         // prime the request pipeline
         val sendNow = Math.min(n, maxParallelism)
-        val outstanding = Map.empty ++ (for (_ <- 1 to sendNow) yield sendRequest(echo, receiver))
+        val outstanding = Map.empty ++ (for (_ ← 1 to sendNow) yield sendRequest(echo, receiver))
         context.become(running(reportTo, echo, n - sendNow, receiver, outstanding, Nil))
     }
 
     def running(
-      reportTo: ActorRef,
-      echo: ActorRef,
-      remaining: Int,
-      receiver: ActorRef,
+      reportTo:    ActorRef,
+      echo:        ActorRef,
+      remaining:   Int,
+      receiver:    ActorRef,
       outstanding: Map[String, Timestamp],
-      timings: List[FiniteDuration]): Receive = {
-      case TimedResponse(Response(r), d) =>
+      timings:     List[FiniteDuration]): Receive = {
+      case TimedResponse(Response(r), d) ⇒
         val start = outstanding(r)
         val newOutstanding = outstanding - r + sendRequest(echo, receiver)
         val newTimings = (d - start) :: timings
@@ -47,13 +63,13 @@ object EchoServiceSpec {
           context.become(running(reportTo, echo, newRemaining, receiver, newOutstanding, newTimings))
         else
           context.become(finishing(reportTo, newOutstanding, newTimings))
-      case AbortSLATest =>
+      case AbortSLATest ⇒
         context.stop(self)
         reportTo ! SLAResponse(timings, outstanding)
     }
 
     def finishing(reportTo: ActorRef, outstanding: Map[String, Timestamp], timings: List[FiniteDuration]): Receive = {
-      case TimedResponse(Response(r), d) =>
+      case TimedResponse(Response(r), d) ⇒
         val start = outstanding(r)
         val newOutstanding = outstanding - r
         val newTimings = (d - start) :: timings
@@ -61,12 +77,12 @@ object EchoServiceSpec {
           context.stop(self)
           reportTo ! SLAResponse(newTimings, newOutstanding)
         } else context.become(finishing(reportTo, newOutstanding, newTimings))
-      case AbortSLATest =>
+      case AbortSLATest ⇒
         context.stop(self)
         reportTo ! SLAResponse(timings, outstanding)
     }
 
-    val idGenerator: Iterator[String] = Iterator from 1 map (i => s"test-$i")
+    val idGenerator: Iterator[String] = Iterator from 1 map (i ⇒ s"test-$i")
 
     def sendRequest(echo: ActorRef, receiver: ActorRef): (String, Timestamp) = {
       val request = idGenerator.next
@@ -82,7 +98,7 @@ object EchoServiceSpec {
   // timestamp received replies in a dedicated actor to keep timing distortions low
   private class ParallelSLATestReceiver(controller: ActorRef) extends Actor {
     def receive: PartialFunction[Any, Unit] = {
-      case r: Response => controller ! TimedResponse(r, Timestamp.now)
+      case r: Response ⇒ controller ! TimedResponse(r, Timestamp.now)
     }
   }
 
@@ -113,7 +129,8 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
    */
 
   override def afterAll(): Unit = {
-    system.shutdown()
+    val terminated = system.terminate()
+    Await.ready(terminated, Duration.Inf)
   }
 
   private def echoService(name: String): ActorRef = system.actorOf(Props[EchoService], name)
@@ -131,7 +148,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val probe = TestProbe()
       val echo = echoService("keepSLA")
       val N = 200
-      val timings = for (i <- 1 to N) yield {
+      val timings = for (i ← 1 to N) yield {
         val string = s"test$i"
         val start = Timestamp.now
         echo ! Request(string, probe.ref)
@@ -152,11 +169,11 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       import system.dispatcher
       val echo = echoService("keepSLAfuture")
       val N = 10000
-      val timingFutures = for (i <- 1 to N) yield {
+      val timingFutures = for (i ← 1 to N) yield {
         val string = s"test$i"
         val start = Timestamp.now
         (echo ? (Request(string, _))) collect {
-          case Response(`string`) => Timestamp.now - start
+          case Response(`string`) ⇒ Timestamp.now - start
         }
       }
       val futureOfTimings = Future.sequence(timingFutures)
@@ -177,7 +194,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val controller = system.actorOf(Props[ParallelSLATester], "keepSLAparallelController")
       controller ! TestSLA(echo, N, maxParallelism, probe.ref)
       val result = Try(probe.expectMsgType[SLAResponse]).recover {
-        case ae: AssertionError =>
+        case ae: AssertionError ⇒
           controller ! AbortSLATest
           val result = probe.expectMsgType[SLAResponse]
           info(s"controller timed out, state so far is $result")
@@ -200,7 +217,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       import system.dispatcher
       val echo = echoService("keepSLAwithSupport")
       val latencySupport = new LatencyTestSupport(system)
-      val latencies = latencySupport.measure(count = 10000, maxParallelism = 500) { i =>
+      val latencies = latencySupport.measure(count = 10000, maxParallelism = 500) { i ⇒
         val message = s"test$i"
         SingleResult((echo ? (Request(message, _))), Response(message))
       }

@@ -22,35 +22,43 @@ enablePlugins(AutomateHeaderPlugin)
 lazy val ReactiveDesignPatterns = (project in file(".")).dependsOn(docs)
 
 lazy val common = project
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings: _*)
 
 lazy val chapter02 = project.dependsOn(common)
-    .enablePlugins(AutomateHeaderPlugin)
-    .settings(Build.sharedSettings:_*)
-      .settings(
-        libraryDependencies ++= Seq(
-          Build.akka25Actor,
-          Build.guava
-        )
-      )
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      Build.akka25Actor,
+      Build.guava
+    )
+  )
 
 lazy val chapter03 = project
   .enablePlugins(AutomateHeaderPlugin)
-  .settings(Build.sharedSettings:_*)
+  .settings(Build.sharedSettings: _*)
 
 lazy val chapter07 = project
 
 lazy val chapter11 = project.dependsOn(common)
   .enablePlugins(AutomateHeaderPlugin)
-  .settings(Build.sharedSettings:_*)
+  .settings(Build.sharedSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      Build.akkaTestkit,
+      Build.scalatest
+    )
+  )
 
 lazy val chapter12 = project.dependsOn(common)
   .enablePlugins(AutomateHeaderPlugin)
-  .settings(Build.sharedSettings:_*)
+  .settings(Build.sharedSettings: _*)
   .settings(
-  libraryDependencies ++= Seq(
-    Build.akka25Actor
+    libraryDependencies ++= Seq(
+      Build.akka25Actor
+    )
   )
-)
 
 lazy val chapter13 = project dependsOn common
 
@@ -58,7 +66,7 @@ lazy val chapter14 = project dependsOn common
 
 lazy val chapter15 = project.dependsOn(common)
   .enablePlugins(AutomateHeaderPlugin)
-  .settings(Build.sharedSettings:_*)
+  .settings(Build.sharedSettings: _*)
 
 lazy val chapter16 = project dependsOn common
 
