@@ -45,13 +45,13 @@ object TranslationServiceSpec {
       case ExpectError   ⇒ context.become(expectingError)
     }
 
-    val expectingNominal: Receive = {
+    def expectingNominal: Receive = {
       case TranslateV1("sv:en:Hur mår du?", replyTo) ⇒
         replyTo ! "How are you?"
         context.become(initial)
     }
 
-    val expectingError: Receive = {
+    def expectingError: Receive = {
       case TranslateV1(other, replyTo) ⇒
         replyTo ! s"error:cannot parse input '$other'"
         context.become(initial)
@@ -144,7 +144,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
       req2.replyTo ! "error:cannot parse input 'sv:en:Hur är läget?'"
       client.expectMsg(TranslationErrorV2("Hur är läget?", "sv", "en", "cannot parse input 'sv:en:Hur är läget?'"))
 
-      v1.expectNoMsg(1.second)
+      v1.expectNoMessage(1.second)
     }
 
     "translate requests with async error reporting" in {
@@ -161,7 +161,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
       client.expectMsg(TranslationV2("Hur mår du?", "How are you?", "sv", "en"))
 
       // non-blocking check for async errors
-      asyncErrors.expectNoMsg(0.seconds)
+      asyncErrors.expectNoMessage(0.seconds)
 
       // now verify translation errors
       v1 ! ExpectError
@@ -169,7 +169,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
       client.expectMsg(TranslationErrorV2("Hur är läget?", "sv", "en", "cannot parse input 'sv:en:Hur är läget?'"))
 
       // final check for async errors
-      asyncErrors.expectNoMsg(1.second)
+      asyncErrors.expectNoMessage(1.second)
     }
 
   }

@@ -41,6 +41,21 @@ class TranslationService {
  */
 object TranslationService {
 
+  case class Translate(query: String, replyTo: ActorRef)
+
+  private class Translator extends Actor {
+    def receive: PartialFunction[Any, Unit] = {
+      case Translate(query, replyTo) ⇒ query match {
+        case "Hur mår du?" ⇒
+          replyTo ! "How are you?"
+        case _ ⇒
+          replyTo ! s"error:cannot translate '$query'"
+      }
+    }
+  }
+
+  def props: Props = Props(new Translator)
+
   /**
    * Simplistic version 1 of the protocol: the reply will just be a String.
    */
