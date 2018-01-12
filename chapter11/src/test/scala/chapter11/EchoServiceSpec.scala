@@ -57,7 +57,7 @@ object EchoServiceSpec {
       case TimedResponse(Response(r), d) ⇒
         val start = outstanding(r)
         val newOutstanding = outstanding - r + sendRequest(echo, receiver)
-        val newTimings = (d - start) :: timings
+        val newTimings = (d - start).toFiniteDuration :: timings
         val newRemaining = remaining - 1
         if (newRemaining > 0)
           context.become(running(reportTo, echo, newRemaining, receiver, newOutstanding, newTimings))
@@ -72,7 +72,7 @@ object EchoServiceSpec {
       case TimedResponse(Response(r), d) ⇒
         val start = outstanding(r)
         val newOutstanding = outstanding - r
-        val newTimings = (d - start) :: timings
+        val newTimings = (d - start).toFiniteDuration :: timings
         if (newOutstanding.isEmpty) {
           context.stop(self)
           reportTo ! SLAResponse(newTimings, newOutstanding)
@@ -144,7 +144,9 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       probe.expectMsg(1.second, Response("test"))
     }
 
+    // Listing 11.5 Determining 95th percentile latency
     "keep its SLA" in {
+      // #snip_11-9
       val probe = TestProbe()
       val echo = echoService("keepSLA")
       val N = 200
@@ -161,12 +163,15 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
       val SLA = if (Helpers.isCiTest) 25.milliseconds else 1.millisecond
-      ninetyfifthPercentile should be < SLA
+      ninetyfifthPercentile.toFiniteDuration should be <= SLA
+      // #snip_11-9
     }
 
+    // Listing 11.6 Generating the test samples in parallel with the Ask pattern
     "keep its SLA when used in parallel with Futures" in {
       implicit val timeout: Timeout = Timeout(500.millis)
       import system.dispatcher
+      // #snip_11-10
       val echo = echoService("keepSLAfuture")
       val N = 10000
       val timingFutures = for (i ← 1 to N) yield {
@@ -183,15 +188,20 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
       val SLA = if (Helpers.isCiTest) 500.milliseconds else 100.milliseconds
-      ninetyfifthPercentile should be < SLA
+      ninetyfifthPercentile.toFiniteDuration should be < SLA
+      // #snip_11-10
     }
 
+    // Listing 11.7 Using a custom Actor to bound the number of parallel test samples
     "keep its SLA when used in parallel" in {
+      // #snip_11-11
       val echo = echoService("keepSLAparallel")
       val probe = TestProbe()
       val N = 10000
       val maxParallelism = 500
-      val controller = system.actorOf(Props[ParallelSLATester], "keepSLAparallelController")
+      val controller = system.actorOf(
+        Props[ParallelSLATester],
+        "keepSLAparallelController")
       controller ! TestSLA(echo, N, maxParallelism, probe.ref)
       val result = Try(probe.expectMsgType[SLAResponse]).recover {
         case ae: AssertionError ⇒
@@ -206,10 +216,12 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
       val SLA = if (Helpers.isCiTest) 25.milliseconds else 2.milliseconds
       ninetyfifthPercentile should be < SLA
+      // #snip_11-11
     }
 
   }
 
+  // Listing 11.8 Verifying that no additional messages are received
   "An EchoService (with LatencyTestSupport)" should {
 
     "keep its SLA" in {

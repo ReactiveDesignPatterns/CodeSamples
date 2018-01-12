@@ -20,11 +20,19 @@ import java.util.concurrent.TimeUnit
 
 import scala.concurrent.duration.FiniteDuration
 
-class Timestamp(val time: Long) {
+case class Timestamp(time: Long) {
   def -(that: Timestamp): Timestamp = new Timestamp(time - that.time)
 }
 object Timestamp {
+  implicit object TimestampOrdering extends Ordering[Timestamp] {
+    override def compare(x: Timestamp, y: Timestamp): Int =
+      x.time.compare(y.time)
+  }
   implicit class TimestampOps(val timestamp: Timestamp) extends AnyVal {
+    def toFiniteDuration: FiniteDuration = FiniteDuration(
+      timestamp.time,
+      TimeUnit.MILLISECONDS)
+
     def -(that: FiniteDuration): FiniteDuration = {
       FiniteDuration(timestamp.time - that.toMillis, TimeUnit.MILLISECONDS)
     }

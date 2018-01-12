@@ -16,18 +16,21 @@
 
 package chapter11
 
-import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import java.util.UUID
+
+import akka.actor.{ Actor, ActorRef, ActorSystem, Cancellable, Props }
 import akka.testkit.TestProbe
-import chapter11.SchedulerSpec.{ Schedule, Scheduler }
+import chapter11.SchedulerSpec._
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec }
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 
-// 代码清单11-8
-// Listing 11.4 Using a TestProbe to receive the response from the scheduler
 class SchedulerSpec extends FlatSpec with BeforeAndAfterAll {
   private implicit lazy val system: ActorSystem = ActorSystem()
+
+  // 代码清单11-8
+  // Listing 11.4 Using a TestProbe to receive the response from the scheduler
 
   "Using a TestProbe to receive the response from the scheduler" should "ok" in {
 
@@ -46,6 +49,24 @@ class SchedulerSpec extends FlatSpec with BeforeAndAfterAll {
     // #snip
   }
 
+  // 代码清单11-12
+  // Listing 11.8 Verifying that no additional messages are received
+
+  it should "Verifying that no additional messages are received" in {
+    // #snip_11-12
+    import scala.concurrent.duration._
+    val scheduler = system.actorOf(Scheduler.props)
+
+    val probe = TestProbe()
+    scheduler ! ScheduleRepeatedly(probe.ref, 1.second, "tick")
+    val token = probe.expectMsgType[SchedulerToken]
+    probe.expectMsg(1500.millis, "tick")
+    scheduler ! CancelSchedule(token, probe.ref)
+    probe.expectMsg(100.millis, ScheduleCanceled)
+    probe.expectNoMessage(2.seconds)
+    // #snip_11-12
+  }
+
   override def afterAll(): Unit = {
     val terminated = system.terminate()
     Await.ready(terminated, Duration.Inf)
@@ -54,14 +75,42 @@ class SchedulerSpec extends FlatSpec with BeforeAndAfterAll {
 
 object SchedulerSpec {
   sealed trait SchedulerCommand
-  case class Schedule(replyTo: ActorRef, msg: Any, delay: FiniteDuration) extends SchedulerCommand
+  final case class Schedule(replyTo: ActorRef, msg: Any, delay: FiniteDuration) extends SchedulerCommand
+  final case class ScheduleRepeatedly(replyTo: ActorRef, delay: FiniteDuration, msg: String) extends SchedulerCommand
+  final case class CancelSchedule(token: SchedulerToken, replyTo: ActorRef) extends SchedulerCommand
+
+  sealed trait SchedulerEvent
+  final case class SchedulerToken(token: String) extends SchedulerEvent
+  final case object ScheduleCanceled extends SchedulerEvent
+  final case class ScheduleNotFound(token: SchedulerToken) extends SchedulerEvent
 
   class Scheduler extends Actor {
+    private var schedulerTokens = Map.empty[SchedulerToken, Cancellable]
     override def receive: Receive = {
       case Schedule(replyTo, msg, delay) ⇒
         import context.dispatcher
         context.system.scheduler
           .scheduleOnce(delay, replyTo, msg)
+      case ScheduleRepeatedly(replyTo, delay, msg) ⇒
+        import context.dispatcher
+        val cancellable = context.system.scheduler
+          .schedule(
+            initialDelay = delay,
+            interval = delay,
+            receiver = replyTo,
+            message = msg
+          )
+        val schedulerToken = SchedulerToken(UUID.randomUUID().toString)
+        schedulerTokens = schedulerTokens.updated(schedulerToken, cancellable)
+        replyTo ! schedulerToken
+      case CancelSchedule(token, replyTo) ⇒
+        schedulerTokens.get(token) match {
+          case Some(cancellable) ⇒
+            cancellable.cancel()
+            replyTo ! ScheduleCanceled
+          case None ⇒
+            replyTo ! ScheduleNotFound(token)
+        }
     }
   }
 
