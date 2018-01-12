@@ -56,7 +56,7 @@ Listing 11.6 Generating the test samples in parallel with the Ask pattern
 
 Listing 11.8 Verifying that no additional messages are received
 
-@@snip[代码清单11-12](../../../../chapter11/src/test/scala/chapter11/EchoServiceSpec.scala){ #snip_11-12 }
+@@snip[代码清单11-12](../../../../chapter11/src/test/scala/chapter11/SchedulerSpec.scala){ #snip_11-12 }
 
 ## 代码清单11-13
 
