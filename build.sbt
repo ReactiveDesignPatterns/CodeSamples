@@ -5,7 +5,7 @@ organization in ThisBuild := "com.reactivedesignpatterns"
 
 name := "ReactiveDesignPatterns"
 
-version in ThisBuild := "0.1-SNAPSHOT"
+version in ThisBuild := "1.0.0-SNAPSHOT"
 
 scalaVersion := "2.12.4"
 

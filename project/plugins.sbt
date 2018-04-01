@@ -12,7 +12,7 @@ addSbtPlugin("de.heikoseeberger" % "sbt-header" % "4.0.0")
 
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
 
-addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.5.7")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.5.10")
 
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")
 
