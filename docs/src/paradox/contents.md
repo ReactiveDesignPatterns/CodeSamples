@@ -11,7 +11,7 @@
     * [第4章——消息传递](chapter-04/index.md)
     * [第5章——位置透明性](chapter-05/index.md)
     * [第6章——分而治之](chapter-06/index.md)
-    * [第7章——原则化的失败处理](chapter-07/index.md)
+    * [第7章——有规划的失败处理](chapter-07/index.md)
     * [第8章——有限定的一致性](chapter-08/index.md)
     * [第9章——按需的不确定性](chapter-09/index.md)
 * [第三部分 设计模式](part3.md)    
