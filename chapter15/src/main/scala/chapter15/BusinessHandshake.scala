@@ -49,9 +49,10 @@ object BusinessHandshake extends App {
   case object ChangeBudgetDone
   case class CannotChangeBudget(reason: String)
 
-  class Sam(alice: ActorRef,
-            bob: ActorRef,
-            amount: BigDecimal) extends Actor {
+  class Sam(
+    alice:  ActorRef,
+    bob:    ActorRef,
+    amount: BigDecimal) extends Actor {
     def receive: Receive = talkToAlice()
 
     def talkToAlice(): Receive = {
@@ -139,10 +140,11 @@ object PersistentBusinessHandshake extends App {
   case class AliceConfirmedChange(deliveryId: Long)
   case class AliceDeniedChange(deliveryId: Long)
 
-  class PersistentSam(alice: ActorPath,
-                      bob: ActorPath,
-                      amount: BigDecimal,
-                      override val persistenceId: String)
+  class PersistentSam(
+    alice:                      ActorPath,
+    bob:                        ActorPath,
+    amount:                     BigDecimal,
+    override val persistenceId: String)
     extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
 
     def receiveCommand: Actor.emptyBehavior.type = Actor.emptyBehavior
@@ -154,8 +156,10 @@ object PersistentBusinessHandshake extends App {
     def talkToAlice(): Receive = {
       log.debug("talking to Alice")
       var deliveryId: Long = 0
-      deliver(alice)(id ⇒ { deliveryId = id;
-        ChangeBudget(-amount, self, persistenceId) })
+      deliver(alice)(id ⇒ {
+        deliveryId = id;
+        ChangeBudget(-amount, self, persistenceId)
+      })
 
       LoggingReceive({
         case ChangeBudgetDone ⇒
@@ -223,8 +227,8 @@ object PersistentBusinessHandshake extends App {
             .currentEventsByPersistenceId(persistenceId)
             .map(_.event)
             .collect {
-            case AliceConfirmedChange(_) ⇒ ChangeDone(persistenceId)
-          }
+              case AliceConfirmedChange(_) ⇒ ChangeDone(persistenceId)
+            }
           stream.runWith(Sink.head).pipeTo(self)
         }
       case ChangeDone(id) ⇒

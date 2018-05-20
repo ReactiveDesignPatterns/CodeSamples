@@ -162,10 +162,11 @@ object Aggregator {
 
   //#snip_15-14
 
-  def futureFrontPageWithOverride(themes: ActorRef[GetTheme],
-                                  personalNews: ActorRef[GetPersonalNews],
-                                  topNews: ActorRef[GetTopNews],
-                                  overrides: ActorRef[GetOverride]): Behavior[GetFrontPage] =
+  def futureFrontPageWithOverride(
+    themes:       ActorRef[GetTheme],
+    personalNews: ActorRef[GetPersonalNews],
+    topNews:      ActorRef[GetTopNews],
+    overrides:    ActorRef[GetOverride]): Behavior[GetFrontPage] =
     ContextAware { ctx ⇒
       import ctx.executionContext
       implicit val timeout: Timeout = Timeout(1.second)
