@@ -5,7 +5,7 @@ organization in ThisBuild := "com.reactivedesignpatterns"
 
 name := "ReactiveDesignPatterns"
 
-version in ThisBuild := "1.0.0-SNAPSHOT"
+version in ThisBuild := "1.0.0"
 
 scalaVersion := "2.12.4"
 
@@ -109,7 +109,7 @@ lazy val docs = project.aggregate(
     paradoxMaterialTheme in Compile ~= {
       _.withColor("red", "pink")
         .withLogoIcon("cloud")
-        .withCopyright("Copyleft © 2017 rdp.reactiveplatform.xyz")
+        .withCopyright("Copyleft © 2018 rdp.reactiveplatform.xyz")
         .withRepository(uri("https://github.com/ReactivePlatform/reactive-design-patterns-cn"))
         .withSearch(tokenizer = "[\\s\\-\\.]+")
         .withSocial(

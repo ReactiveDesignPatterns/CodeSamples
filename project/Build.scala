@@ -1,26 +1,25 @@
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import sbt.Keys.{licenses, organization, startYear}
 import sbt.{Def, _}
-
-import scalafix.sbt.ScalafixPlugin.autoImport.{scalafixConfigure, scalafixSettings}
+import scalafix.sbt.ScalafixPlugin.autoImport._
 import scalariform.formatter.preferences._
 
 object Build {
   val akkaVersion = "2.4.20"
-  val akka25Version = "2.5.9"
+  val akka25Version = "2.5.12"
 
-  val akkaActor   = "com.typesafe.akka" %% "akka-actor" % akkaVersion
-  val akka25Actor   = "com.typesafe.akka" %% "akka-actor" % akka25Version
+  val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
+  val akka25Actor = "com.typesafe.akka" %% "akka-actor" % akka25Version
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akka25Version % "test"
   val akkaContrib = "com.typesafe.akka" %% "akka-contrib" % akkaVersion
-  val akkaSharding= "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
-  val akkaDData   = "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion
-  val akkaStream  = "com.typesafe.akka" %% "akka-stream" % akkaVersion
-  val akkaTyped   = "com.typesafe.akka" %% "akka-typed-experimental" % akkaVersion
+  val akkaSharding = "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
+  val akkaDData = "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion
+  val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
+  val akkaTyped = "com.typesafe.akka" %% "akka-typed-experimental" % akkaVersion
   val akkaPersistence = "com.typesafe.akka" %% "akka-persistence" % akkaVersion
   val akkaPersistenceQuery = "com.typesafe.akka" %% "akka-persistence-query-experimental" % akkaVersion
 
-  val levelDb     = "org.iq80.leveldb" % "leveldb" % "0.7"
+  val levelDb = "org.iq80.leveldb" % "leveldb" % "0.7"
 
   val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.109"
 
@@ -37,11 +36,11 @@ object Build {
 
   val junit = "junit" % "junit" % "4.11" % "test"
 
-  val guava =  "com.google.guava" % "guava" % "23.0"
+  val guava = "com.google.guava" % "guava" % "23.0"
 
 
   private val headerSettings = Seq(
-    startYear := Some(2017),
+    startYear := Some(2018),
     licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
     organization := "https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/"
   )

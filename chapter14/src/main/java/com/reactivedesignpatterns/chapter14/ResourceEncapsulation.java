@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import scala.PartialFunction;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
@@ -23,7 +22,6 @@ import akka.dispatch.Futures;
 import akka.japi.pf.PFBuilder;
 import akka.japi.pf.ReceiveBuilder;
 import akka.pattern.CircuitBreaker;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.handlers.AsyncHandler;
@@ -41,28 +39,28 @@ import com.amazonaws.services.ec2.model.TerminateInstancesResult;
  * collection of code snippets used in section 13.1.
  */
 public class ResourceEncapsulation {
-	public Instance startInstance(AWSCredentials credentials) {
-		AmazonEC2Client amazonEC2Client = new AmazonEC2Client(credentials);
+  public Instance startInstance(AWSCredentials credentials) {
+    AmazonEC2Client amazonEC2Client = new AmazonEC2Client(credentials);
 
-		RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
-				.withImageId("").withInstanceType("m1.small").withMinCount(1)
-				.withMaxCount(1);
+    RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
+        .withImageId("").withInstanceType("m1.small").withMinCount(1)
+        .withMaxCount(1);
 
-		RunInstancesResult runInstancesResult = amazonEC2Client
-				.runInstances(runInstancesRequest);
+    RunInstancesResult runInstancesResult = amazonEC2Client
+        .runInstances(runInstancesRequest);
 
-		Reservation reservation = runInstancesResult.getReservation();
-		List<Instance> instances = reservation.getInstances();
+    Reservation reservation = runInstancesResult.getReservation();
+    List<Instance> instances = reservation.getInstances();
 
-		// there will be exactly one instance in this list, otherwise
-		// runInstances() would have thrown an exception
-		return instances.get(0);
-	}
+    // there will be exactly one instance in this list, otherwise
+    // runInstances() would have thrown an exception
+    return instances.get(0);
+  }
 
-	private ExecutionContext executionContext;
-	private CircuitBreaker circuitBreaker;
+  private ExecutionContext executionContext;
+  private CircuitBreaker circuitBreaker;
 
-	public Future<Instance> startInstanceAsync(AWSCredentials credentials) {
+  public Future<Instance> startInstanceAsync(AWSCredentials credentials) {
 		Future<Instance> f = circuitBreaker.callWithCircuitBreaker(() ->
 			Futures.future(() -> startInstance(credentials), executionContext));
 		PartialFunction<Throwable, Future<Instance>> recovery =
@@ -73,24 +71,25 @@ public class ResourceEncapsulation {
 				.build();
 		return f.recoverWith(recovery, executionContext);
 	}
-	
-	public Future<RunInstancesResult> runInstancesAsync(RunInstancesRequest request, AmazonEC2Async client) {
-		Promise<RunInstancesResult> promise = Futures.promise();
-		client.runInstancesAsync(request, new AsyncHandler<RunInstancesRequest, RunInstancesResult>() {
-			@Override
-			public void onSuccess(RunInstancesRequest request, RunInstancesResult result) {
-				promise.success(result);
-			}
-			
-			@Override
-			public void onError(Exception exception) {
-				promise.failure(exception);
-			}
-		});
-		return promise.future();
-	}
-	
-	public Future<TerminateInstancesResult> terminateInstancesAsync(AmazonEC2Client client, Instance... instances) {
+
+  public Future<RunInstancesResult> runInstancesAsync(RunInstancesRequest request,
+      AmazonEC2Async client) {
+    Promise<RunInstancesResult> promise = Futures.promise();
+    client.runInstancesAsync(request, new AsyncHandler<RunInstancesRequest, RunInstancesResult>() {
+      @Override
+      public void onSuccess(RunInstancesRequest request, RunInstancesResult result) {
+        promise.success(result);
+      }
+
+      @Override
+      public void onError(Exception exception) {
+        promise.failure(exception);
+      }
+    });
+    return promise.future();
+  }
+
+  public Future<TerminateInstancesResult> terminateInstancesAsync(AmazonEC2Client client, Instance... instances) {
 		List<String> ids = Arrays.stream(instances).map(i -> i.getInstanceId()).collect(Collectors.toList());
 		TerminateInstancesRequest request = new TerminateInstancesRequest(ids);
 		Future<TerminateInstancesResult> f = circuitBreaker.callWithCircuitBreaker(() ->
@@ -103,37 +102,44 @@ public class ResourceEncapsulation {
 				.build();
 		return f.recoverWith(recovery, executionContext);
 	}
-	
-	static interface WorkerNodeMessage {
-		public long id();
-		public ActorRef replyTo();
-	}
-	static class WorkerCommandFailed {
-		public final String reason;
-		public final long id;
-		public WorkerCommandFailed(String reason, long id) {
-			this.reason = reason;
-			this.id = id;
-		}
-	}
-	static class DoHealthCheck {
-		static public DoHealthCheck instance = new DoHealthCheck();
-	}
-	static class Shutdown {
-		static public Shutdown instance = new Shutdown();
-	}
-	static class WorkerNodeReady {
-		static public WorkerNodeReady instance = new WorkerNodeReady();
-	}
-	
-	class WorkerNode extends AbstractActor {
-		private final Cancellable checkTimer;
-		
-		public WorkerNode(InetAddress address, FiniteDuration checkInterval) {
-			checkTimer = getContext().system().scheduler().schedule(checkInterval, checkInterval, self(), DoHealthCheck.instance, getContext().dispatcher(), self());
-		}
 
-		@Override
+  static interface WorkerNodeMessage {
+    public long id();
+
+    public ActorRef replyTo();
+  }
+  static class WorkerCommandFailed {
+    public final String reason;
+    public final long id;
+
+    public WorkerCommandFailed(String reason, long id) {
+      this.reason = reason;
+      this.id = id;
+    }
+  }
+  static class DoHealthCheck {
+    static public DoHealthCheck instance = new DoHealthCheck();
+  }
+  static class Shutdown {
+    static public Shutdown instance = new Shutdown();
+  }
+  static class WorkerNodeReady {
+    static public WorkerNodeReady instance = new WorkerNodeReady();
+  }
+
+  class WorkerNode extends AbstractActor {
+    private final Cancellable checkTimer;
+
+    public WorkerNode(InetAddress address, FiniteDuration checkInterval) {
+      checkTimer =
+          getContext()
+              .system()
+              .scheduler()
+              .schedule(checkInterval, checkInterval, self(), DoHealthCheck.instance,
+                  getContext().dispatcher(), self());
+    }
+
+    @Override
 		public Receive createReceive() {
 			List<WorkerNodeMessage> msgs = new ArrayList<>();
 			return receiveBuilder().match(WorkerNodeMessage.class, msgs::add)
@@ -149,15 +155,15 @@ public class ResourceEncapsulation {
 					.build();
 		}
 
-		private PartialFunction<Object, BoxedUnit> initialized() {
-			/* forward commands and deal with responses from worker node */
-			return null;
-		}
-		
-		@Override
-		public void postStop() {
-			checkTimer.cancel();
-		}
-	}
+    private PartialFunction<Object, BoxedUnit> initialized() {
+      /* forward commands and deal with responses from worker node */
+      return null;
+    }
+
+    @Override
+    public void postStop() {
+      checkTimer.cancel();
+    }
+  }
 
 }
