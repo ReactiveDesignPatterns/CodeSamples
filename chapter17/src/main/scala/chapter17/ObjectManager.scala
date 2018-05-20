@@ -1,13 +1,14 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter17
+package chapter17
 
 import java.net.URI
 import java.util.UUID
-import akka.actor._
-import scala.util.control.NonFatal
 
+import akka.actor._
+
+//#snip_17-3
 case class ManagerCommand(cmd: Command, id: Long, replyTo: ActorRef)
 case class ManagerEvent(id: Long, event: Event)
 case class ManagerQuery(cmd: Query, id: Long, replyTo: ActorRef)
@@ -53,6 +54,7 @@ class Manager(var shoppingCart: ShoppingCart) extends Actor {
       }
   }
 }
+//#snip_17-3
 
 object ManagerExample extends App {
   def mkURI(): URI = URI.create(UUID.randomUUID().toString)

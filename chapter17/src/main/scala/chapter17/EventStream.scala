@@ -1,19 +1,21 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter17
+package chapter17
+
+import java.net.URI
+import java.util.concurrent.ThreadLocalRandom
 
 import akka.actor._
-import akka.stream._
-import akka.stream.scaladsl._
 import akka.persistence.journal._
 import akka.persistence.query._
 import akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
+import akka.stream._
 import com.typesafe.config.ConfigFactory
-import java.net.URI
-import java.util.concurrent.ThreadLocalRandom
+
 import scala.concurrent.duration._
 
+//#snip_17-8
 class ShoppingCartTagging(system: ExtendedActorSystem) extends WriteEventAdapter {
   def manifest(event: Any): String = ""
 
@@ -23,6 +25,7 @@ class ShoppingCartTagging(system: ExtendedActorSystem) extends WriteEventAdapter
       case other => other
     }
 }
+//#snip_17-8
 
 class ShoppingCartSimulator extends Actor with ActorLogging {
   def rnd: ThreadLocalRandom = ThreadLocalRandom.current
@@ -73,13 +76,14 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
 case class GetTopProducts(id: Long, replyTo: ActorRef)
 case class TopProducts(id: Long, products: Map[ItemRef, Int])
 
+//#snip_17-9
 object TopProductListener {
   private class IntHolder(var value: Int)
 }
 
 class TopProductListener extends Actor with ActorLogging {
   import TopProductListener._
-  implicit val materializer: _root_.akka.stream.ActorMaterializer = ActorMaterializer()
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   val readJournal: LeveldbReadJournal =
     PersistenceQuery(context.system)
@@ -109,6 +113,7 @@ class TopProductListener extends Actor with ActorLogging {
       log.info("new {}", products)
   }
 }
+//#snip_17-9
 
 object EventStreamExample extends App {
   val config = ConfigFactory.parseString("""

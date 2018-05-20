@@ -1,15 +1,17 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter17
+package chapter17
 
-import com.typesafe.config.ConfigFactory
-import akka.actor._
-import akka.cluster._
-import akka.cluster.sharding._
 import java.net.URI
 import java.util.UUID
 
+import akka.actor._
+import akka.cluster._
+import akka.cluster.sharding._
+import com.typesafe.config.ConfigFactory
+
+//#snip_17-4
 object ShardSupport {
   /*
    * use the shoppingCart reference as the sharding key; the partial function
@@ -30,11 +32,18 @@ object ShardSupport {
     case ManagerCommand(cmd, _, _) => toHex(cmd.shoppingCart.id.hashCode & 255)
     case ManagerQuery(query, _, _) => toHex(query.shoppingCart.id.hashCode & 255)
   }
-  private def toHex(b: Int) = new java.lang.StringBuilder(2).append(hexDigits(b >> 4)).append(hexDigits(b & 15)).toString
+
+  private def toHex(b: Int) =
+    new java.lang.StringBuilder(2)
+      .append(hexDigits(b >> 4))
+      .append(hexDigits(b & 15))
+      .toString
+
   private val hexDigits = "0123456789ABCDEF"
 
   val RegionName = "ShoppingCart"
 }
+//#snip_17-4
 
 object ShardingExample extends App {
   val clusterConfig = ConfigFactory.parseString("""
@@ -50,6 +59,7 @@ akka.cluster.sharding.state-store-mode = ddata
 """)
   val node1Config = ConfigFactory.parseString("akka.remote.netty.tcp.port = 2552")
 
+  //#snip_17-5
   val sys1 = ActorSystem("ShardingExample", node1Config.withFallback(clusterConfig))
   val seed = Cluster(sys1).selfAddress
 
@@ -67,13 +77,16 @@ akka.cluster.sharding.state-store-mode = ddata
 
   val sys2 = ActorSystem("ShardingExample", clusterConfig)
   startNode(sys2)
+  //#snip_17-5
 
   /*
    * From this point onward we can talk to the sharded shopping carts via
    * the shard region which acts as a local mediator that will send the
    * commands to the right node.
    */
+  // #snip
   val manager = ClusterSharding(sys1).shardRegion(ShardSupport.RegionName)
+  // #snip
 
   def mkURI(): URI = URI.create(UUID.randomUUID().toString)
 

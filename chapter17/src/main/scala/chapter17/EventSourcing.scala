@@ -1,14 +1,16 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter17
+package chapter17
 
-import akka.persistence.PersistentActor
-import akka.actor._
 import java.net.URI
 import java.util.UUID
+
+import akka.actor._
+import akka.persistence.PersistentActor
 import com.typesafe.config.ConfigFactory
 
+// #snip_17-7
 class PersistentObjectManager extends PersistentActor {
   // we expect the name to be the shopping card ID
   override def persistenceId: String = context.self.path.name
@@ -48,6 +50,7 @@ class PersistentObjectManager extends PersistentActor {
     case e: Event => shoppingCart = shoppingCart.applyEvent(e)
   }
 }
+// #snip_17-7
 
 /*
  * Running the application for the first time will do the same as the ManagerExample.
