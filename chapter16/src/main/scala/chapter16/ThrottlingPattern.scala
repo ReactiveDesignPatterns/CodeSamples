@@ -1,18 +1,19 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter16
+package chapter16
 
-import java.math.MathContext
-import java.math.RoundingMode
+import java.math.{ MathContext, RoundingMode }
+
 import akka.actor._
-import akka.stream.scaladsl._
 import akka.pattern.extended.ask
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl._
+import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
+
 import scala.collection.immutable.Queue
 import scala.concurrent.duration._
-import com.typesafe.config.ConfigFactory
-import akka.stream.ActorMaterializer
-import akka.util.Timeout
 import scala.util.{ Failure, Success }
 
 object ThrottlingPattern {
@@ -136,7 +137,13 @@ object ThrottlingPattern {
     }
   }
 
-  class CalculatorClient(workSource: ActorRef, calculator: ActorRef, ratePerSecond: Long, bucketSize: Int, batchSize: Int) extends Actor {
+  // #snip_16-4
+  class CalculatorClient(
+    workSource: ActorRef,
+    calculator: ActorRef,
+    ratePerSecond: Long,
+    bucketSize: Int,
+    batchSize: Int) extends Actor {
     def now(): Long = System.nanoTime()
     val nanoSecondsBetweenTokens: Long = 1000000000L / ratePerSecond
 
@@ -167,13 +174,20 @@ object ThrottlingPattern {
           sendRequest(time, tokenBucket)
         } else {
           val timeForNextToken = lastTokenTime + nanoSecondsBetweenTokens - time
-          context.system.scheduler.scheduleOnce(timeForNextToken.nanos, workSource, WorkRequest(self, 1))(context.dispatcher)
+          context.system.scheduler
+            .scheduleOnce(
+              timeForNextToken.nanos,
+              workSource,
+              WorkRequest(self, 1))(context.dispatcher)
           requested = 1
-          if (Debug) println(s"$time: request(1) scheduled for ${time + timeForNextToken}")
+          if (Debug)
+            println(s"$time: request(1) scheduled for ${time + timeForNextToken}")
         }
-      } else if (Debug) println(s"$time: not requesting (requested=$requested tokenBucket=$tokenBucket)")
+      } else if (Debug)
+        println(s"$time: not requesting (requested=$requested tokenBucket=$tokenBucket)")
     def sendRequest(time: Long, items: Int): Unit = {
-      if (Debug) println(s"$time: requesting $items items (requested=$requested tokenBucket=$tokenBucket)")
+      if (Debug)
+        println(s"$time: requesting $items items (requested=$requested tokenBucket=$tokenBucket)")
       workSource ! WorkRequest(self, items)
       requested += items
     }
@@ -190,18 +204,20 @@ object ThrottlingPattern {
         calculator ! job
     }
   }
+  // #snip_16-4
 
   def main(args: Array[String]): Unit = {
-    val config = ConfigFactory.parseString("""
-akka.scheduler.tick-duration=1ms
-worker-dispatcher {
-  executor = "thread-pool-executor"
-  thread-pool-executor {
-    core-pool-size-min = 9
-    core-pool-size-max = 9
-  }
-}
-""")
+    val config = ConfigFactory.parseString(
+      """
+        |akka.scheduler.tick-duration=1ms
+        |worker-dispatcher {
+        |  executor = "thread-pool-executor"
+        |  thread-pool-executor {
+        |    core-pool-size-min = 9
+        |    core-pool-size-max = 9
+        |  }
+        |}
+      """.stripMargin)
     implicit val sys: ActorSystem = ActorSystem("pi", config)
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val timeout: Timeout = Timeout(10.seconds)

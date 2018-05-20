@@ -1,15 +1,11 @@
 /**
  * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
  */
-package com.reactivedesignpatterns.chapter16
+package chapter16
 
-import java.math.MathContext
-import java.math.RoundingMode
+import java.math.{ MathContext, RoundingMode }
 
-import akka.actor.Actor
-import akka.actor.ActorRef
-import akka.actor.ActorSystem
-import akka.actor.Props
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 
 object PullPattern {
 
@@ -18,6 +14,7 @@ object PullPattern {
 
   case class WorkRequest(worker: ActorRef, items: Int)
 
+  // #snip_16-2
   class Manager extends Actor {
 
     val workStream: Iterator[Job] =
@@ -46,7 +43,9 @@ object PullPattern {
         }
     }
   }
+  // #snip_16-2
 
+  // #snip_16-1
   class Worker(manager: ActorRef) extends Actor {
     val mc = new MathContext(100, RoundingMode.HALF_EVEN)
     val plus = BigDecimal(1, mc)
@@ -70,6 +69,7 @@ object PullPattern {
         replyTo ! JobResult(id, result)
     }
   }
+  // #snip_16-1
 
   def main(args: Array[String]): Unit = {
     val sys = ActorSystem("pi")
