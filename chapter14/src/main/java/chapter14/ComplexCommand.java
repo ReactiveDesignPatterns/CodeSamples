@@ -1,25 +1,30 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/ 
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
-package com.reactivedesignpatterns.chapter14;
 
+package chapter14;
+
+import akka.NotUsed;
+import akka.japi.Pair;
+import akka.japi.function.Function;
+import akka.japi.function.Function2;
+import akka.japi.function.Predicate;
+import akka.stream.javadsl.Keep;
+import akka.stream.javadsl.RunnableGraph;
+import akka.stream.javadsl.Sink;
+import akka.stream.javadsl.Source;
+
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Stream;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-
-import akka.NotUsed;
-import akka.japi.Pair;
-import akka.japi.function.*;
-import akka.stream.javadsl.*;
-import akka.stream.javadsl.Keep;
-import scala.concurrent.Future;
-import scala.runtime.BoxedUnit;
 
 public interface ComplexCommand {
 	

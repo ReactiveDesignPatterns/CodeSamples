@@ -1,8 +1,9 @@
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
-import sbt.Keys.{licenses, organization, startYear}
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{HeaderLicense, headerLicense}
 import sbt.{Def, _}
 import scalafix.sbt.ScalafixPlugin.autoImport._
 import scalariform.formatter.preferences._
+
 
 object Build {
   val akkaVersion = "2.4.20"
@@ -38,12 +39,12 @@ object Build {
 
   val guava = "com.google.guava" % "guava" % "23.0"
 
+  //
+  //  private val headerSettings = Seq(
+  //    startYear := Some(2018),
+  //    organization := "https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/"
+  //  )
 
-  private val headerSettings = Seq(
-    startYear := Some(2018),
-    licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
-    organization := "https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/"
-  )
 
   private def setPreferences(preferences: IFormattingPreferences): IFormattingPreferences = preferences
     .setPreference(RewriteArrowSymbols, true)
@@ -54,7 +55,7 @@ object Build {
     .setPreference(DanglingCloseParenthesis, Preserve)
     .setPreference(NewlineAtEndOfFile, true)
 
-  private val formats = Seq(
+  private val formats: Seq[Def.Setting[IFormattingPreferences]] = Seq(
     ScalariformKeys.preferences := setPreferences(ScalariformKeys.preferences.value),
     ScalariformKeys.preferences in Compile := setPreferences(ScalariformKeys.preferences.value),
     ScalariformKeys.preferences in Test := setPreferences(ScalariformKeys.preferences.value)
@@ -62,6 +63,13 @@ object Build {
 
   private val fixes = scalafixSettings ++ scalafixConfigure(Compile)
 
-  val sharedSettings: Seq[Def.Setting[_]] = headerSettings ++ formats ++ fixes
+  val sharedSettings: Seq[Def.Setting[_]] = formats ++ fixes ++ Seq(
+    headerLicense := Some(HeaderLicense.Custom(
+      s"""|Copyright (c) 2018 https://www.reactivedesignpatterns.com/ ${"\n"}
+          |Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+          |
+          |""".stripMargin
+    )
+    ))
 
 }

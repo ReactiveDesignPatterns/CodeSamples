@@ -1,6 +1,10 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
+
 package com.reactivedesignpatterns.chapter13
 
 import play.api.libs.json.JsValue

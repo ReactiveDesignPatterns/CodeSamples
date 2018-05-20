@@ -1,38 +1,34 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ * 
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
  */
-package com.reactivedesignpatterns.chapter14;
 
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import scala.PartialFunction;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
-import scala.concurrent.Promise;
-import scala.concurrent.duration.FiniteDuration;
-import scala.runtime.BoxedUnit;
+package chapter14;
+
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.dispatch.Futures;
 import akka.japi.pf.PFBuilder;
-import akka.japi.pf.ReceiveBuilder;
 import akka.pattern.CircuitBreaker;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.handlers.AsyncHandler;
 import com.amazonaws.services.ec2.AmazonEC2Async;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
-import com.amazonaws.services.ec2.model.TerminateInstancesResult;
+import com.amazonaws.services.ec2.model.*;
+import scala.PartialFunction;
+import scala.concurrent.ExecutionContext;
+import scala.concurrent.Future;
+import scala.concurrent.Promise;
+import scala.concurrent.duration.FiniteDuration;
+import scala.runtime.BoxedUnit;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This is not a completely runnable example but only a fully compiled

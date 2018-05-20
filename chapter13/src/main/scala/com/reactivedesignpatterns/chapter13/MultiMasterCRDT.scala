@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
+ */
+
 package com.reactivedesignpatterns.chapter13
 
 import akka.actor._
@@ -11,7 +18,7 @@ object MultiMasterCRDT {
 
   private var statusMap = Map.empty[String, Status]
 
-  final case class Status(val name: String)(_pred: => Set[Status], _succ: => Set[Status]) extends ReplicatedData {
+  final case class Status(val name: String)(_pred: ⇒ Set[Status], _succ: ⇒ Set[Status]) extends ReplicatedData {
     type T = Status
     def merge(that: Status): Status = mergeStatus(this, that)
 
@@ -41,14 +48,14 @@ object MultiMasterCRDT {
         candidate
       } else {
         val nextExclude = exclude + candidate
-        val branches = candidate.successors.map(succ => innerLoop(succ, nextExclude))
-        branches.reduce((l, r) => if (isSuccessor(l, r, nextExclude)) r else l)
+        val branches = candidate.successors.map(succ ⇒ innerLoop(succ, nextExclude))
+        branches.reduce((l, r) ⇒ if (isSuccessor(l, r, nextExclude)) r else l)
       }
     def isSuccessor(candidate: Status, fixed: Status, exclude: Set[Status]): Boolean =
       if (candidate == fixed) true
       else {
         val toSearch = candidate.predecessors -- exclude
-        toSearch.exists(pred => isSuccessor(pred, fixed, exclude))
+        toSearch.exists(pred ⇒ isSuccessor(pred, fixed, exclude))
       }
 
     innerLoop(right, Set.empty)
@@ -67,17 +74,17 @@ object MultiMasterCRDT {
     implicit val cluster: _root_.akka.cluster.Cluster = Cluster(context.system)
 
     def receive: PartialFunction[Any, Unit] = {
-      case Submit(job) =>
+      case Submit(job) ⇒
         log.info("submitting job {}", job)
         replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"submit $job"))(_ + (job -> New))
-      case Cancel(job) =>
+      case Cancel(job) ⇒
         log.info("cancelling job {}", job)
         replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"cancel $job"))(_ + (job -> Cancelled))
-      case r: Replicator.UpdateResponse[_] =>
+      case r: Replicator.UpdateResponse[_] ⇒
         log.info("received update result: {}", r)
-      case PrintStatus =>
+      case PrintStatus ⇒
         replicator ! Replicator.Get(StorageComponent, Replicator.ReadMajority(5.seconds))
-      case g: Replicator.GetSuccess[_] =>
+      case g: Replicator.GetSuccess[_] ⇒
         log.info("overall status: {}", g.get(StorageComponent))
     }
   }
@@ -91,23 +98,23 @@ object MultiMasterCRDT {
     replicator ! Replicator.Subscribe(StorageComponent, self)
 
     def receive: PartialFunction[Any, Unit] = {
-      case Execute(job) =>
+      case Execute(job) ⇒
         log.info("executing job {}", job)
-        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(job)) { map =>
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(job)) { map ⇒
           require(map.get(job) == Some(New))
           map + (job -> Executing)
         }
-      case Finish(job) =>
+      case Finish(job) ⇒
         log.info("job {} finished", job)
         replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds))(_ + (job -> Finished))
-      case Replicator.UpdateSuccess(StorageComponent, Some(job)) =>
+      case Replicator.UpdateSuccess(StorageComponent, Some(job)) ⇒
         log.info("starting job {}", job)
-      case r: Replicator.UpdateResponse[_] =>
+      case r: Replicator.UpdateResponse[_] ⇒
         log.info("received update result: {}", r)
-      case ch: Replicator.Changed[_] =>
+      case ch: Replicator.Changed[_] ⇒
         val current = ch.get(StorageComponent).entries
         for {
-          (job, status) <- current.iterator
+          (job, status) ← current.iterator
           if (status == Aborted)
           if (lastState.get(job) != Some(Aborted))
         } log.info("aborting job {}", job)

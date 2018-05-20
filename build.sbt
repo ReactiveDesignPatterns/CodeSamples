@@ -43,6 +43,8 @@ lazy val chapter03 = project
   .settings(Build.sharedSettings: _*)
 
 lazy val chapter07 = project
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings: _*)
 
 lazy val chapter11 = project.dependsOn(common)
   .enablePlugins(AutomateHeaderPlugin)
@@ -63,17 +65,32 @@ lazy val chapter12 = project.dependsOn(common)
     )
   )
 
-lazy val chapter13 = project dependsOn common
+lazy val chapter13 = project.dependsOn(common)
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings: _*)
 
-lazy val chapter14 = project dependsOn common
+lazy val chapter14 = project.dependsOn(common)
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings: _*)
 
 lazy val chapter15 = project.dependsOn(common)
   .enablePlugins(AutomateHeaderPlugin)
   .settings(Build.sharedSettings: _*)
 
-lazy val chapter16 = project dependsOn common
+lazy val chapter16 = project.dependsOn(common)
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings: _*)
 
-lazy val chapter17 = project dependsOn common
+lazy val chapter17 = project.dependsOn(common)
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(Build.sharedSettings: _*)
+
+headerLicense := Some(HeaderLicense.Custom(
+  s"""|Copyright (c) 2018 https://www.reactivedesignpatterns.com/ ${"\n"}
+     |Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+     |
+     |""".stripMargin
+))
 
 lazy val docs = project.aggregate(
   chapter02,

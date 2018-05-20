@@ -1,6 +1,10 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
+
 package chapter17
 
 import java.net.URI
@@ -23,33 +27,33 @@ class Manager(var shoppingCart: ShoppingCart) extends Actor {
   def this() = this(ShoppingCart.empty)
 
   def receive: PartialFunction[Any, Unit] = {
-    case ManagerCommand(cmd, id, replyTo) =>
+    case ManagerCommand(cmd, id, replyTo) ⇒
       try {
         val event = cmd match {
-          case SetOwner(cart, owner) =>
+          case SetOwner(cart, owner) ⇒
             shoppingCart = shoppingCart.setOwner(owner)
             OwnerChanged(cart, owner)
-          case AddItem(cart, item, count) =>
+          case AddItem(cart, item, count) ⇒
             shoppingCart = shoppingCart.addItem(item, count)
             ItemAdded(cart, item, count)
-          case RemoveItem(cart, item, count) =>
+          case RemoveItem(cart, item, count) ⇒
             shoppingCart = shoppingCart.removeItem(item, count)
             ItemRemoved(cart, item, count)
         }
         replyTo ! ManagerEvent(id, event)
       } catch {
-        case ex: IllegalArgumentException =>
+        case ex: IllegalArgumentException ⇒
           replyTo ! ManagerRejection(id, ex.getMessage)
       }
-    case ManagerQuery(cmd, id, replyTo) =>
+    case ManagerQuery(cmd, id, replyTo) ⇒
       try {
         val result = cmd match {
-          case GetItems(cart) =>
+          case GetItems(cart) ⇒
             GetItemsResult(cart, shoppingCart.items)
         }
         replyTo ! ManagerResult(id, result)
       } catch {
-        case ex: IllegalArgumentException =>
+        case ex: IllegalArgumentException ⇒
           replyTo ! ManagerRejection(id, ex.getMessage)
       }
   }
@@ -76,9 +80,9 @@ object ManagerExample extends App {
     manager ! ManagerQuery(GetItems(shoppingCart), 5, self)
 
     def receive: PartialFunction[Any, Unit] = {
-      case ManagerEvent(id, event) => log.info("success ({}): {}", id, event)
-      case ManagerRejection(id, msg) => log.warning("rejected ({}): {}", id, msg)
-      case ManagerResult(id, result) =>
+      case ManagerEvent(id, event)   ⇒ log.info("success ({}): {}", id, event)
+      case ManagerRejection(id, msg) ⇒ log.warning("rejected ({}): {}", id, msg)
+      case ManagerResult(id, result) ⇒
         log.info("result ({}): {}", id, result)
         context.system.terminate()
     }

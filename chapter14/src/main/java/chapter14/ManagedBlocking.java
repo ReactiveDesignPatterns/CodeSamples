@@ -1,5 +1,15 @@
-package com.reactivedesignpatterns.chapter14;
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ * 
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ */
 
+package chapter14;
+
+import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
+import akka.japi.pf.ReceiveBuilder;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.LinkedList;
@@ -9,10 +19,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import javax.sql.DataSource;
-import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.japi.pf.ReceiveBuilder;
 
 public interface ManagedBlocking {
 

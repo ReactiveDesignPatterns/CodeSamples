@@ -1,6 +1,10 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
+
 package chapter17
 
 import java.net.URI
@@ -19,8 +23,8 @@ object ShardSupport {
    * not match then the message is dropped
    */
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case mc @ ManagerCommand(cmd, _, _) => cmd.shoppingCart.id.toString -> mc
-    case mc @ ManagerQuery(query, _, _) => query.shoppingCart.id.toString -> mc
+    case mc @ ManagerCommand(cmd, _, _) ⇒ cmd.shoppingCart.id.toString -> mc
+    case mc @ ManagerQuery(query, _, _) ⇒ query.shoppingCart.id.toString -> mc
   }
 
   /*
@@ -29,8 +33,8 @@ object ShardSupport {
    * that are forwarded
    */
   val extractShardId: ShardRegion.ExtractShardId = {
-    case ManagerCommand(cmd, _, _) => toHex(cmd.shoppingCart.id.hashCode & 255)
-    case ManagerQuery(query, _, _) => toHex(query.shoppingCart.id.hashCode & 255)
+    case ManagerCommand(cmd, _, _) ⇒ toHex(cmd.shoppingCart.id.hashCode & 255)
+    case ManagerQuery(query, _, _) ⇒ toHex(query.shoppingCart.id.hashCode & 255)
   }
 
   private def toHex(b: Int) =
@@ -104,9 +108,9 @@ akka.cluster.sharding.state-store-mode = ddata
       manager ! ManagerQuery(GetItems(shoppingCart1), 5, self)
 
       def receive: PartialFunction[Any, Unit] = {
-        case ManagerEvent(id, event) => log.info("success ({}): {}", id, event)
-        case ManagerRejection(id, msg) => log.warning("rejected ({}): {}", id, msg)
-        case ManagerResult(id, result) =>
+        case ManagerEvent(id, event)   ⇒ log.info("success ({}): {}", id, event)
+        case ManagerRejection(id, msg) ⇒ log.warning("rejected ({}): {}", id, msg)
+        case ManagerResult(id, result) ⇒
           log.info("result ({}): {}", id, result)
 
           manager ! ManagerCommand(SetOwner(shoppingCart2, customer), 10, self)
@@ -119,9 +123,9 @@ akka.cluster.sharding.state-store-mode = ddata
           context.become(second)
       }
       def second: Receive = {
-        case ManagerEvent(id, event) => log.info("success ({}): {}", id, event)
-        case ManagerRejection(id, msg) => log.warning("rejected ({}): {}", id, msg)
-        case ManagerResult(id, result) =>
+        case ManagerEvent(id, event)   ⇒ log.info("success ({}): {}", id, event)
+        case ManagerRejection(id, msg) ⇒ log.warning("rejected ({}): {}", id, msg)
+        case ManagerResult(id, result) ⇒
           log.info("result ({}): {}", id, result)
           sys1.terminate()
           sys2.terminate()

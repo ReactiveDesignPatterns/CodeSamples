@@ -1,6 +1,10 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
+
 package chapter16
 
 import java.math.{ MathContext, RoundingMode }
@@ -28,10 +32,10 @@ object QueuePattern {
     var workQueue: Queue[Job] = Queue.empty[Job]
     var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
-    (1 to 8) foreach (_ => context.actorOf(Props(new Worker(self))))
+    (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self))))
 
     def receive: PartialFunction[Any, Unit] = {
-      case job @ Job(id, _, replyTo) =>
+      case job @ Job(id, _, replyTo) ⇒
         if (requestQueue.isEmpty) {
           if (workQueue.size < 1000) workQueue :+= job
           else replyTo ! JobRejected(id)
@@ -41,11 +45,11 @@ object QueuePattern {
           if (items > 1) worker ! DummyWork(items - 1)
           requestQueue = requestQueue.drop(1)
         }
-      case wr @ WorkRequest(worker, items) =>
+      case wr @ WorkRequest(worker, items) ⇒
         if (workQueue.isEmpty) {
           if (!requestQueue.contains(worker)) requestQueue :+= wr
         } else {
-          workQueue.iterator.take(items).foreach(job => worker ! job)
+          workQueue.iterator.take(items).foreach(job ⇒ worker ! job)
           if (workQueue.size < items) worker ! DummyWork(items - workQueue.size)
           workQueue = workQueue.drop(items)
         }
@@ -70,13 +74,13 @@ object QueuePattern {
     request()
 
     def receive: PartialFunction[Any, Unit] = {
-      case Job(id, data, replyTo) =>
+      case Job(id, data, replyTo) ⇒
         requested -= 1
         request()
         val sign = if ((data & 1) == 1) plus else minus
         val result = sign / data
         replyTo ! JobResult(id, result)
-      case DummyWork(count) =>
+      case DummyWork(count) ⇒
         requested -= count
         request()
     }
@@ -98,19 +102,19 @@ object QueuePattern {
     val calculator = sys.actorOf(Props(new Manager), "manager")
     implicit val timeout: Timeout = Timeout(10.seconds)
     val futures =
-      (1 to 1000000).map(i =>
+      (1 to 1000000).map(i ⇒
         (calculator ? (Job(i, i, _)))
           .collect {
-            case JobResult(_, report) => Report.success(report)
-            case _ => Report.failure
+            case JobResult(_, report) ⇒ Report.success(report)
+            case _                    ⇒ Report.failure
           })
     Future.reduce(futures)(_ + _)
-      .map(x => println(s"final result: $x"))
+      .map(x ⇒ println(s"final result: $x"))
       .recover {
-        case ex =>
+        case ex ⇒
           ex.printStackTrace()
       }
-      .foreach(_ => sys.terminate())
+      .foreach(_ ⇒ sys.terminate())
   }
 
 }

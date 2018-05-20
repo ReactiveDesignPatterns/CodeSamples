@@ -1,6 +1,10 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
+
 package chapter16
 
 import java.math.{ MathContext, RoundingMode }
@@ -36,10 +40,10 @@ object ThrottlingPattern {
     var workQueue: Queue[Job] = Queue.empty[Job]
     var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
-    (1 to 8) foreach (_ => context.actorOf(Props(new Worker(self)).withDispatcher(context.props.dispatcher)))
+    (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self)).withDispatcher(context.props.dispatcher)))
 
     def receive: PartialFunction[Any, Unit] = {
-      case job @ Job(id, _, replyTo) =>
+      case job @ Job(id, _, replyTo) ⇒
         if (requestQueue.isEmpty) {
           if (workQueue.size < 10000) workQueue :+= job
           else {
@@ -52,12 +56,12 @@ object ThrottlingPattern {
           if (items > 1) worker ! DummyWork(items - 1)
           requestQueue = requestQueue.drop(1)
         }
-      case wr @ WorkRequest(worker, items) =>
+      case wr @ WorkRequest(worker, items) ⇒
         if (Debug) println(s"${System.nanoTime}: received WorkRequest($items)")
         if (workQueue.isEmpty) {
           if (!requestQueue.contains(worker)) requestQueue :+= wr
         } else {
-          workQueue.iterator.take(items).foreach(job => worker ! job)
+          workQueue.iterator.take(items).foreach(job ⇒ worker ! job)
           if (workQueue.size < items) worker ! DummyWork(items - workQueue.size)
           workQueue = workQueue.drop(items)
         }
@@ -80,13 +84,13 @@ object ThrottlingPattern {
     request()
 
     def receive: PartialFunction[Any, Unit] = {
-      case Job(id, data, replyTo) =>
+      case Job(id, data, replyTo) ⇒
         requested -= 1
         request()
         val sign = if ((data & 1) == 1) plus else minus
         val result = sign / data
         replyTo ! JobResult(id, result)
-      case DummyWork(count) =>
+      case DummyWork(count) ⇒
         requested -= count
         request()
     }
@@ -107,20 +111,20 @@ object ThrottlingPattern {
     var start: Deadline = _
 
     val workStream: Iterator[Job] =
-      Iterator from 1 map (x => Job(x, x, self)) take N
+      Iterator from 1 map (x ⇒ Job(x, x, self)) take N
 
     var approximation: Report = Report.empty
     var outstandingWork = 0
 
     def receive: PartialFunction[Any, Unit] = {
-      case WorkRequest(worker, items) =>
+      case WorkRequest(worker, items) ⇒
         if (start == null) start = Deadline.now
-        workStream.take(items).foreach { job =>
+        workStream.take(items).foreach { job ⇒
           worker ! job
           outstandingWork += 1
         }
-      case JobResult(id, report) => registerReport(Report.success(report))
-      case JobRejected(id) => registerReport(Report.failure)
+      case JobResult(id, report) ⇒ registerReport(Report.success(report))
+      case JobRejected(id)       ⇒ registerReport(Report.failure)
     }
 
     def registerReport(r: Report) = {
@@ -139,11 +143,11 @@ object ThrottlingPattern {
 
   // #snip_16-4
   class CalculatorClient(
-    workSource: ActorRef,
-    calculator: ActorRef,
+    workSource:    ActorRef,
+    calculator:    ActorRef,
     ratePerSecond: Long,
-    bucketSize: Int,
-    batchSize: Int) extends Actor {
+    bucketSize:    Int,
+    batchSize:     Int) extends Actor {
     def now(): Long = System.nanoTime()
     val nanoSecondsBetweenTokens: Long = 1000000000L / ratePerSecond
 
@@ -195,7 +199,7 @@ object ThrottlingPattern {
     request(lastTokenTime)
 
     def receive: PartialFunction[Any, Unit] = {
-      case job: Job =>
+      case job: Job ⇒
         val time = now()
         if (Debug) if (requested == 1) println(s"$time: received job")
         consumeToken(time)
@@ -228,11 +232,11 @@ object ThrottlingPattern {
 
     // warm up the engine
     Source(1 to 100000)
-      .mapAsyncUnordered(1000)(i => manager ? (Job(i, i, _)))
+      .mapAsyncUnordered(1000)(i ⇒ manager ? (Job(i, i, _)))
       .runWith(Sink.ignore)
       .onComplete {
-        case Failure(ex) => sys.terminate()
-        case Success(_) =>
+        case Failure(ex) ⇒ sys.terminate()
+        case Success(_) ⇒
           // then run the actual computation
           println("starting the computation")
           sys.actorOf(Props(new CalculatorClient(source, manager, 50000, 1000, 100)), "client")

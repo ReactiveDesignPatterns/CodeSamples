@@ -1,6 +1,10 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
+
 package chapter17
 
 import java.net.URI
@@ -21,8 +25,8 @@ class ShoppingCartTagging(system: ExtendedActorSystem) extends WriteEventAdapter
 
   def toJournal(event: Any): Any =
     event match {
-      case s: ShoppingCartMessage => Tagged(event, Set("shoppingCart"))
-      case other => other
+      case s: ShoppingCartMessage ⇒ Tagged(event, Set("shoppingCart"))
+      case other                  ⇒ other
     }
 }
 //#snip_17-8
@@ -35,14 +39,14 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
     "banana",
     "plum",
     "pear",
-    "peach").map(f => ItemRef(new URI(f)))
+    "peach").map(f ⇒ ItemRef(new URI(f)))
   def pickItem() = items(rnd.nextInt(items.length))
 
   val customers: Array[CustomerRef] = Array(
     "alice",
     "bob",
     "charlie",
-    "mallory").map(c => CustomerRef(new URI(c)))
+    "mallory").map(c ⇒ CustomerRef(new URI(c)))
   def pickCustomer() = customers(rnd.nextInt(customers.length))
 
   val id: Iterator[Int] = Iterator from 0
@@ -65,9 +69,9 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
   self ! Cont(0)
 
   def receive: PartialFunction[Any, Unit] = {
-    case Cont(n) => driveCart(n)
-    case ManagerEvent(id, _) => if (id % 10000 == 0) log.info("done {} commands", id)
-    case ManagerResult(num, GetItemsResult(cart, items)) =>
+    case Cont(n)             ⇒ driveCart(n)
+    case ManagerEvent(id, _) ⇒ if (id % 10000 == 0) log.info("done {} commands", id)
+    case ManagerResult(num, GetItemsResult(cart, items)) ⇒
       context.stop(context.child(cart.id.toString).get)
       self ! Cont(num.toInt + 1)
   }
@@ -90,25 +94,25 @@ class TopProductListener extends Actor with ActorLogging {
       .readJournalFor[LeveldbReadJournal](LeveldbReadJournal.Identifier)
 
   readJournal.eventsByTag("shoppingCart", 0)
-    .collect { case EventEnvelope(_, _, _, add: ItemAdded) => add }
+    .collect { case EventEnvelope(_, _, _, add: ItemAdded) ⇒ add }
     .groupedWithin(100000, 1.second)
     .addAttributes(Attributes.asyncBoundary)
-    .runForeach { seq: Seq[ItemAdded] =>
+    .runForeach { seq: Seq[ItemAdded] ⇒
       val histogram = seq.foldLeft(Map.empty[ItemRef, IntHolder]) {
-        (map, event) =>
+        (map, event) ⇒
           map.get(event.item) match {
-            case Some(holder) => { holder.value += event.count; map }
-            case None => map.updated(event.item, new IntHolder(event.count))
+            case Some(holder) ⇒ { holder.value += event.count; map }
+            case None         ⇒ map.updated(event.item, new IntHolder(event.count))
           }
       }
-      self ! TopProducts(0, histogram.map(p => (p._1, p._2.value)))
+      self ! TopProducts(0, histogram.map(p ⇒ (p._1, p._2.value)))
     }
 
   var topProducts = Map.empty[ItemRef, Int]
 
   def receive: PartialFunction[Any, Unit] = {
-    case GetTopProducts(id, replyTo) => replyTo ! TopProducts(id, topProducts)
-    case TopProducts(_, products) =>
+    case GetTopProducts(id, replyTo) ⇒ replyTo ! TopProducts(id, topProducts)
+    case TopProducts(_, products) ⇒
       topProducts = products
       log.info("new {}", products)
   }

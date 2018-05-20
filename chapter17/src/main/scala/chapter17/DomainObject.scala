@@ -1,6 +1,10 @@
-/**
- * Copyright (C) 2015 Roland Kuhn <http://rolandkuhn.com>
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
+
 package chapter17
 
 import java.net.URI
@@ -35,9 +39,9 @@ case class ShoppingCart(items: Map[ItemRef, Int], owner: Option[CustomerRef]) {
 
   // 代码清单 17-6
   def applyEvent(event: Event): ShoppingCart = event match {
-    case OwnerChanged(_, owner) => setOwner(owner)
-    case ItemAdded(_, item, count) => addItem(item, count)
-    case ItemRemoved(_, item, count) => removeItem(item, count)
+    case OwnerChanged(_, owner)      ⇒ setOwner(owner)
+    case ItemAdded(_, item, count)   ⇒ addItem(item, count)
+    case ItemRemoved(_, item, count) ⇒ removeItem(item, count)
   }
   // 代码清单 17-6
 }
