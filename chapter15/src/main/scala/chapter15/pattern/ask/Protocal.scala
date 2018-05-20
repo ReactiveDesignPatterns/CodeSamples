@@ -22,11 +22,16 @@ import akka.typed.ActorRef
 import chapter15.StatusCode
 
 sealed trait MyCommands
+
 private case class MyEmailResult(correlationID: UUID, status: StatusCode, explanation: Option[String]) extends MyCommands
 
+// #snip
 case class StartVerificationProcess(userEmail: String, replyTo: ActorRef[VerificationProcessResponse]) extends MyCommands
 
 sealed trait VerificationProcessResponse
+
 case class VerificationProcessStarted(userEmail: String) extends VerificationProcessResponse
+
 case class VerificationProcessFailed(userEmail: String) extends VerificationProcessResponse
+// #snip
 

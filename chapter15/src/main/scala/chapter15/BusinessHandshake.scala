@@ -44,11 +44,14 @@ object BusinessHandshake extends App {
   val bob = sys.deadLetters
   val sam = sys.actorOf(Props(new Sam(alice, bob, 1)), "sam")
 
+  // #snip_15-18
   case class ChangeBudget(amount: BigDecimal, replyTo: ActorRef)
   case object ChangeBudgetDone
   case class CannotChangeBudget(reason: String)
 
-  class Sam(alice: ActorRef, bob: ActorRef, amount: BigDecimal) extends Actor {
+  class Sam(alice: ActorRef,
+            bob: ActorRef,
+            amount: BigDecimal) extends Actor {
     def receive: Receive = talkToAlice()
 
     def talkToAlice(): Receive = {
@@ -86,6 +89,8 @@ object BusinessHandshake extends App {
         alreadyDone -= saga
     }
   }
+  // #snip_15-18
+
 }
 
 object PersistentBusinessHandshake extends App {
@@ -130,10 +135,14 @@ object PersistentBusinessHandshake extends App {
   case object ChangeBudgetDone
   case class CannotChangeBudget(reason: String)
 
+  // #snip_15-19
   case class AliceConfirmedChange(deliveryId: Long)
   case class AliceDeniedChange(deliveryId: Long)
 
-  class PersistentSam(alice: ActorPath, bob: ActorPath, amount: BigDecimal, override val persistenceId: String)
+  class PersistentSam(alice: ActorPath,
+                      bob: ActorPath,
+                      amount: BigDecimal,
+                      override val persistenceId: String)
     extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
 
     def receiveCommand: Actor.emptyBehavior.type = Actor.emptyBehavior
@@ -142,19 +151,11 @@ object PersistentBusinessHandshake extends App {
       context.become(talkToAlice())
     }
 
-    def receiveRecover = LoggingReceive {
-      case AliceConfirmedChange(deliveryId) ⇒
-        confirmDelivery(deliveryId)
-        context.become(talkToBob())
-      case AliceDeniedChange(deliveryId) ⇒
-        confirmDelivery(deliveryId)
-        context.stop(self)
-    }
-
     def talkToAlice(): Receive = {
       log.debug("talking to Alice")
       var deliveryId: Long = 0
-      deliver(alice)(id ⇒ { deliveryId = id; ChangeBudget(-amount, self, persistenceId) })
+      deliver(alice)(id ⇒ { deliveryId = id;
+        ChangeBudget(-amount, self, persistenceId) })
 
       LoggingReceive({
         case ChangeBudgetDone ⇒
@@ -174,8 +175,19 @@ object PersistentBusinessHandshake extends App {
       context.system.terminate()
       Actor.emptyBehavior
     }
-  }
 
+    def receiveRecover = LoggingReceive {
+      case AliceConfirmedChange(deliveryId) ⇒
+        confirmDelivery(deliveryId)
+        context.become(talkToBob())
+      case AliceDeniedChange(deliveryId) ⇒
+        confirmDelivery(deliveryId)
+        context.stop(self)
+    }
+  }
+  // #snip_15-19
+
+  // #snip_15-20
   case class BudgetChanged(amount: BigDecimal, persistenceId: String)
   case object CleanupDoneList
   case class ChangeDone(persistenceId: String)
@@ -183,13 +195,14 @@ object PersistentBusinessHandshake extends App {
   class PersistentAlice extends PersistentActor with ActorLogging {
     def persistenceId: String = "Alice"
 
-    implicit val mat: _root_.akka.stream.ActorMaterializer = ActorMaterializer()
+    implicit val mat: ActorMaterializer = ActorMaterializer()
     import context.dispatcher
 
     var alreadyDone: Set[String] = Set.empty
     var budget: BigDecimal = 10
 
-    val cleanupTimer: Cancellable = context.system.scheduler.schedule(1.hour, 1.hour, self, CleanupDoneList)
+    val cleanupTimer: Cancellable = context.system.scheduler.
+      schedule(1.hour, 1.hour, self, CleanupDoneList)
 
     def receiveCommand = LoggingReceive {
       case ChangeBudget(amount, replyTo, id) if alreadyDone(id) ⇒
@@ -203,9 +216,13 @@ object PersistentBusinessHandshake extends App {
       case ChangeBudget(_, replyTo, _) ⇒
         replyTo ! CannotChangeBudget("insufficient budget")
       case CleanupDoneList ⇒
-        val journal = PersistenceQuery(context.system).readJournalFor[LeveldbReadJournal](LeveldbReadJournal.Identifier)
+        val journal = PersistenceQuery(context.system)
+          .readJournalFor[LeveldbReadJournal](LeveldbReadJournal.Identifier)
         for (persistenceId ← alreadyDone) {
-          val stream = journal.currentEventsByPersistenceId(persistenceId).map(_.event).collect {
+          val stream = journal
+            .currentEventsByPersistenceId(persistenceId)
+            .map(_.event)
+            .collect {
             case AliceConfirmedChange(_) ⇒ ChangeDone(persistenceId)
           }
           stream.runWith(Sink.head).pipeTo(self)
@@ -228,5 +245,6 @@ object PersistentBusinessHandshake extends App {
       cleanupTimer.cancel()
     }
   }
+  // #snip_15-20
 
 }
