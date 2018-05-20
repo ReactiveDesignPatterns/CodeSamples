@@ -6,7 +6,7 @@
 * [第一部分 简介](part1.md)
     * [第1章——为什么需要反应式](chapter-01/index.md)
     * [第2章——反应式宣言概览](chapter-02/index.md)
-    * [第3章——行业主流工具](chapter-03/index.md)
+    * [第3章——行业工具](chapter-03/index.md)
 * [第二部分 微言大义](part2.md)
     * [第4章——消息传递](chapter-04/index.md)
     * [第5章——位置透明性](chapter-05/index.md)
