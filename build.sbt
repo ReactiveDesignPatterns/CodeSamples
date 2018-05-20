@@ -19,7 +19,8 @@ enablePlugins(spray.boilerplate.BoilerplatePlugin)
 
 enablePlugins(AutomateHeaderPlugin)
 
-lazy val ReactiveDesignPatterns = (project in file(".")).dependsOn(docs)
+lazy val ReactiveDesignPatterns = (project in file("."))
+  .dependsOn(docs)
   .enablePlugins(AutomateHeaderPlugin)
   .settings(Build.sharedSettings: _*)
 
