@@ -5,14 +5,14 @@
  *
  */
 
-package com.reactivedesignpatterns.chapter13
+package chapter13
 
 import akka.actor._
+import akka.cluster.Cluster
 import akka.cluster.ddata._
+import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.duration._
-import akka.cluster.Cluster
-import com.typesafe.config.{ Config, ConfigFactory }
 
 object MultiMasterCRDT {
 

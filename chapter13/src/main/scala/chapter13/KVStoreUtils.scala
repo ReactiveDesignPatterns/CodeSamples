@@ -5,13 +5,13 @@
  *
  */
 
-package com.reactivedesignpatterns.chapter13
+package chapter13
 
-import play.api.libs.json.JsValue
 import java.io.File
-import sbt.io.IO
-import play.api.libs.json.Json
+
 import akka.actor.ActorRef
+import play.api.libs.json.{ JsValue, Json, OFormat }
+import sbt.io.IO
 
 object ReplicationProtocol {
   sealed trait Command
@@ -26,7 +26,7 @@ object ReplicationProtocol {
 
 object Persistence {
   case class Database(seq: Int, kv: Map[String, JsValue])
-  object Database { implicit val format: _root_.play.api.libs.json.OFormat[_root_.com.reactivedesignpatterns.chapter13.Persistence.Database] = Json.format[Database] }
+  object Database { implicit val format: OFormat[Database] = Json.format[Database] }
 
   def persist(name: String, seq: Int, kv: Map[String, JsValue]): Unit = {
     val bytes = Json.stringify(Json.toJson(Database(seq, kv)))

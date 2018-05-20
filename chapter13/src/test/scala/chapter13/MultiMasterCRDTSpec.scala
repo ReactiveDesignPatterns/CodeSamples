@@ -1,8 +1,7 @@
-package com.reactivedesignpatterns.chapter13
+package chapter13
 
-import org.scalatest.WordSpec
-import org.scalatest.Matchers
 import org.scalactic.ConversionCheckedTripleEquals
+import org.scalatest.{Matchers, WordSpec}
 
 class MultiMasterCRDTSpec extends WordSpec with Matchers with ConversionCheckedTripleEquals {
   import MultiMasterCRDT._

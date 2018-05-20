@@ -5,17 +5,17 @@
  *
  */
 
-package com.reactivedesignpatterns.chapter13
+package chapter13
 
 import akka.actor._
 import play.api.libs.json.JsValue
+
+import scala.annotation.tailrec
 import scala.collection.immutable.TreeMap
 import scala.concurrent.duration._
-import scala.annotation.tailrec
 
 object ActiveActive {
   import ReplicationProtocol._
-  import Persistence._
 
   private case class SeqCommand(seq: Int, cmd: Command, replyTo: ActorRef)
   private case class SeqResult(seq: Int, res: Result, replica: ActorRef, replyTo: ActorRef)

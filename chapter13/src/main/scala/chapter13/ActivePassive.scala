@@ -5,30 +5,25 @@
  *
  */
 
-package com.reactivedesignpatterns.chapter13
+package chapter13
 
-import play.api.libs.json._
 import akka.actor._
-
-import scala.collection.mutable.Queue
 import akka.cluster.Cluster
-
-import scala.concurrent.duration._
-import scala.collection.immutable.TreeMap
-import scala.util.Random
-import akka.cluster.singleton.ClusterSingletonManager
-import akka.cluster.singleton.ClusterSingletonProxy
-import akka.cluster.singleton.ClusterSingletonManagerSettings
-import akka.cluster.singleton.ClusterSingletonProxySettings
+import akka.cluster.singleton.{ ClusterSingletonManager, ClusterSingletonManagerSettings, ClusterSingletonProxy, ClusterSingletonProxySettings }
 import com.typesafe.config.{ Config, ConfigFactory }
+import play.api.libs.json._
 
 import scala.collection.immutable
+import scala.collection.immutable.TreeMap
+import scala.collection.mutable.Queue
 import scala.concurrent.Await
+import scala.concurrent.duration._
 import scala.io.StdIn
+import scala.util.Random
 
 object ActivePassive {
-  import ReplicationProtocol._
   import Persistence._
+  import ReplicationProtocol._
 
   private case class Replicate(seq: Int, key: String, value: JsValue, replyTo: ActorRef)
   private case class Replicated(seq: Int)
