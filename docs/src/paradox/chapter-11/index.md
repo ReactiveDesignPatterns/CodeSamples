@@ -48,13 +48,11 @@
 
 > 代码清单 11-8 验证没有收到额外的消息
 
-@@snip[代码清单11-12](../../../../chapter11/src/test/scala/chapter11/SchedulerSpec.scala){ #snip_11-12 }
+@@snip[代码清单11-8](../../../../chapter11/src/test/scala/chapter11/SchedulerSpec.scala){ #snip_11-12 }
 
-## 代码清单11-13
+> 代码清单 11-9 对具有关联 ID 的请求匹配响应
 
-Listing 11.9 Matching responses to requests with a correlation ID
-
-@@snip[代码清单11-13](../../../../chapter11/src/test/scala/chapter11/DataIngesterSpec.scala){ #snip }
+@@snip[代码清单11-9](../../../../chapter11/src/test/scala/chapter11/DataIngesterSpec.scala){ #snip }
 
 
 
