@@ -50,7 +50,9 @@ object TranslationService {
   /**
    * Simplistic version 1 of the protocol: the reply will just be a String.
    */
+  // #snip_11-17
   case class TranslateV1(query: String, replyTo: ActorRef)
+  // #snip_11-17
 
   /**
    * Implementation of the TranslateV1 protocol.
@@ -74,11 +76,25 @@ object TranslationService {
    * these would be modeled as a proper Language type (statically known
    * enumeration or based on runtime registration of values).
    */
-  case class TranslateV2(phrase: String, inputLanguage: String, outputLanguage: String, replyTo: ActorRef)
+  // #snip_11-18
+  case class TranslateV2(
+    phrase:         String,
+    inputLanguage:  String,
+    outputLanguage: String,
+    replyTo:        ActorRef)
 
   sealed trait TranslationResponseV2
-  case class TranslationV2(inputPhrase: String, outputPhrase: String, inputLanguage: String, outputLanguage: String)
-  case class TranslationErrorV2(inputPhrase: String, inputLanguage: String, outputLanguage: String, errorMessage: String)
+  case class TranslationV2(
+    inputPhrase:    String,
+    outputPhrase:   String,
+    inputLanguage:  String,
+    outputLanguage: String)
+  case class TranslationErrorV2(
+    inputPhrase:    String,
+    inputLanguage:  String,
+    outputLanguage: String,
+    errorMessage:   String)
+  // #snip_11-18
 
   /**
    * Implementation of the TranslateV2 protocol based on TranslatorV1.

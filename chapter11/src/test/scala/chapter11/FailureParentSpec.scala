@@ -15,6 +15,9 @@ import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
+// #snip_11-26
+case object TestFailureParentMessage
+
 class FailureParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
   implicit val system: ActorSystem = ActorSystem()
 
@@ -32,9 +35,9 @@ class FailureParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
     Await.ready(terminated, Duration.Inf)
   }
 }
+// #snip_11-26
 
-case object TestFailureParentMessage
-
+// #snip_11-25
 class FailureParent(failures: ActorRef) extends Actor {
   val props: Props = Props[MyFailureParentActor]
   val child: ActorRef = context.actorOf(props, "child")
@@ -45,6 +48,7 @@ class FailureParent(failures: ActorRef) extends Actor {
     case msg ⇒ child forward msg
   }
 }
+// #snip_11-25
 
 class MyFailureParentActor extends Actor {
   def receive: PartialFunction[Any, Unit] = {

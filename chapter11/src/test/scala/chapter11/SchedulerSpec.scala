@@ -40,11 +40,9 @@ class SchedulerSpec extends FlatSpec with BeforeAndAfterAll {
     // #snip
   }
 
-  // 代码清单11-12
   // Listing 11.8 Verifying that no additional messages are received
-
   it should "Verifying that no additional messages are received" in {
-    // #snip_11-12
+    // #snip_11-8
     import scala.concurrent.duration._
     val scheduler = system.actorOf(Scheduler.props)
 
@@ -55,7 +53,7 @@ class SchedulerSpec extends FlatSpec with BeforeAndAfterAll {
     scheduler ! CancelSchedule(token, probe.ref)
     probe.expectMsg(100.millis, ScheduleCanceled)
     probe.expectNoMessage(2.seconds)
-    // #snip_11-12
+    // #snip_11-8
   }
 
   override def afterAll(): Unit = {

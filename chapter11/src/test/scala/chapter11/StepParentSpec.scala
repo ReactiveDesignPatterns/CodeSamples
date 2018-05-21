@@ -15,6 +15,7 @@ import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
+// #snip_11-24
 class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
   implicit val system: ActorSystem = ActorSystem()
 
@@ -22,8 +23,9 @@ class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
     "Result in the supervisor returning a reference to that actor" in {
       val testProbe = TestProbe()
       val parent = system.actorOf(Props[StepParent], "stepParent")
-      parent.tell(Props[MyStepParentActor], testProbe.ref)
+      parent.tell(Props[MyActor], testProbe.ref)
       val child = testProbe.expectMsgType[ActorRef]
+      // Test whatever we want in the actor
     }
   }
 
@@ -32,7 +34,9 @@ class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
     Await.ready(terminated, Duration.Inf)
   }
 }
+// #snip_11-24
 
+// #snip_11-23
 class StepParent extends Actor {
   override val supervisorStrategy: OneForOneStrategy = OneForOneStrategy() {
     case thr ⇒ Restart
@@ -42,9 +46,12 @@ class StepParent extends Actor {
       sender ! context.actorOf(p, "child")
   }
 }
+// #snip_11-23
 
-class MyStepParentActor extends Actor {
+// #snip_11-22
+class MyActor extends Actor {
   def receive: PartialFunction[Any, Unit] = {
     case _ ⇒ throw new NullPointerException
   }
 }
+// #snip_11-22

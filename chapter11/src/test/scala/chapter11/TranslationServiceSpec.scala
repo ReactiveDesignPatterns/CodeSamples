@@ -20,6 +20,7 @@ import scala.util.Success
 object TranslationServiceSpec {
   import TranslationService._
 
+  // #snip_11-20
   case object ExpectNominal
   case object ExpectError
   case class Unexpected(msg: Any)
@@ -48,6 +49,7 @@ object TranslationServiceSpec {
         context.become(initial)
     }
   }
+  // #snip_11-20
 
   def mockV1props(reporter: ActorRef): Props = Props(new MockV1(reporter))
 
@@ -61,11 +63,14 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
     "correctly translate from Swedish" when {
 
       "using SynchronousEventLoop" in {
+        // #snip_11-10
         val tr = new TranslationService
         val input = "Hur mår du?"
         val output = "How are you?"
         val ec = SynchronousEventLoop
-        tr.translate(input, ec).value.get should be(Success(output))
+        val future = tr.translate(input, ec)
+        future.value.get should be(Success(output))
+        // #snip_11-10
       }
 
       "using Await.result" in {
@@ -77,6 +82,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
       }
 
       "using eventually()" in {
+        // #snip_11-12
         val tr = new TranslationService
         val input = "Hur mår du?"
         val output = "How are you?"
@@ -84,6 +90,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
         eventually {
           future.value.get should be(Success(output))
         }
+        // #snip_11-12
       }
 
     }
@@ -110,6 +117,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
     import TranslationService._
 
     "translate requests" in {
+      // #snip_11-19
       val v1 = TestProbe()
       val v2 = system.actorOf(propsV2(v1.ref))
       val client = TestProbe()
@@ -136,9 +144,11 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
       client.expectMsg(TranslationErrorV2("Hur är läget?", "sv", "en", "cannot parse input 'sv:en:Hur är läget?'"))
 
       v1.expectNoMessage(1.second)
+      // #snip_11-19
     }
 
     "translate requests with async error reporting" in {
+      // #snip_11-21
       val asyncErrors = TestProbe()
       val v1 = system.actorOf(mockV1props(asyncErrors.ref))
       val v2 = system.actorOf(propsV2(v1))
@@ -161,6 +171,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
 
       // final check for async errors
       asyncErrors.expectNoMessage(1.second)
+      // #snip_11-21
     }
 
   }

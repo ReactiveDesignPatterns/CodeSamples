@@ -52,7 +52,8 @@ lazy val chapter11 = project.dependsOn(common)
   .settings(
     libraryDependencies ++= Seq(
       Build.akkaTestkit,
-      Build.scalatest
+      Build.scalatest,
+      Build.scalaAsync
     )
   )
 
