@@ -1,60 +1,52 @@
 # 第11章——测试反应式应用程序
 
-## 代码清单11-1
+## 11.3 异步测试
 
-Listing 11.1 Testing a purely synchronous translation function
+> 代码清单 11-1 测试一个完全同步的翻译函数
 
 @@snip[代码清单11-1](../../../../chapter11/src/test/scala/chapter11/SynchronousSpec.scala){ #snip }
 
-## 代码清单11-2
+> AsyncSpec.scala
 
-@@snip[代码清单11-2](../../../../chapter11/src/test/scala/chapter11/AsyncSpec.scala){ #snip }
+@@snip[AsyncSpec.scala](../../../../chapter11/src/test/scala/chapter11/AsyncSpec.scala){ #snip }
 
-## 代码清单11-3
+> ActorSpec.scala
 
-@@snip[代码清单11-3](../../../../chapter11/src/test/scala/chapter11/ActorSpec.scala){ #snip }
+@@snip[ActorSpec.scala](../../../../chapter11/src/test/scala/chapter11/ActorSpec.scala){ #snip }
 
-## 代码清单11-4
+> AsyncSpecWithWhile.scala
 
-@@snip[代码清单11-4](../../../../chapter11/src/test/scala/chapter11/AsyncSpecWithWhile.scala){ #snip }
+@@snip[AsyncSpecWithWhile.scala](../../../../chapter11/src/test/scala/chapter11/AsyncSpecWithWhile.scala){ #snip }
 
-## 代码清单11-5
+> AsyncSpecWithWhileLoopIterationsBounded.scala
 
-@@snip[代码清单11-5](../../../../chapter11/src/test/scala/chapter11/AsyncSpecWithWhileLoopIterationsBounded.scala){ #snip }
+@@snip[AsyncSpecWithWhileLoopIterationsBounded.scala](../../../../chapter11/src/test/scala/chapter11/AsyncSpecWithWhileLoopIterationsBounded.scala){ #snip }
 
-## 代码清单11-6
+> 代码清单 11-2 等待结果的动作在翻译过程中同步阻塞
 
-Listing 11.2 Awaiting the result blocks synchronously on the translation
+@@snip[代码清单11-2](../../../../chapter11/src/test/scala/chapter11/AsyncSpecWithAwait.scala){ #snip }
 
-@@snip[代码清单11-6](../../../../chapter11/src/test/scala/chapter11/AsyncSpecWithAwait.scala){ #snip }
+> 代码清单 11-3 使用 TestProbe 预期答复
 
-## 代码清单11-7
+@@snip[代码清单11-3](../../../../chapter11/src/test/scala/chapter11/ActorSpecWithExpectMsg.scala){ #snip }
 
-Listing 11.3 Expecting replies with a TestProbe
+> 代码清单 11-4 使用 TestProbe 接收调度程序的响应
 
-@@snip[代码清单11-7](../../../../chapter11/src/test/scala/chapter11/ActorSpecWithExpectMsg.scala){ #snip }
+@@snip[代码清单11-4](../../../../chapter11/src/test/scala/chapter11/SchedulerSpec.scala){ #snip }
 
-## 代码清单11-8
+> 代码清单 11-5 确定第 95 百分位的延迟
 
-Listing 11.4 Using a TestProbe to receive the response from the scheduler
+@@snip[代码清单11-5](../../../../chapter11/src/test/scala/chapter11/EchoServiceSpec.scala){ #snip_11-9 }
 
-@@snip[代码清单11-8](../../../../chapter11/src/test/scala/chapter11/SchedulerSpec.scala){ #snip }
+> 代码清单 11-6 用 Ask 模式并行地生成测试样本
 
-## 代码清单11-9
+@@snip[代码清单11-6](../../../../chapter11/src/test/scala/chapter11/EchoServiceSpec.scala){ #snip_11-10 }
 
-Listing 11.5 Determining 95th percentile latency
+> 代码清单 11-7 使用自定义 Actor 来限制并行测试样本的数量
 
-@@snip[代码清单11-9](../../../../chapter11/src/test/scala/chapter11/EchoServiceSpec.scala){ #snip_11-9 }
+@@snip[代码清单11-7](../../../../chapter11/src/test/scala/chapter11/EchoServiceSpec.scala){ #snip_11-11 }
 
-## 代码清单11-10
-
-Listing 11.6 Generating the test samples in parallel with the Ask pattern
-
-@@snip[代码清单11-10](../../../../chapter11/src/test/scala/chapter11/EchoServiceSpec.scala){ #snip_11-10 }
-
-## 代码清单11-12
-
-Listing 11.8 Verifying that no additional messages are received
+> 代码清单 11-8 验证没有收到额外的消息
 
 @@snip[代码清单11-12](../../../../chapter11/src/test/scala/chapter11/SchedulerSpec.scala){ #snip_11-12 }
 
