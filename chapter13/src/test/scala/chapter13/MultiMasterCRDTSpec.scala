@@ -1,7 +1,14 @@
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
+ */
+
 package chapter13
 
 import org.scalactic.ConversionCheckedTripleEquals
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 class MultiMasterCRDTSpec extends WordSpec with Matchers with ConversionCheckedTripleEquals {
   import MultiMasterCRDT._
@@ -50,8 +57,8 @@ class MultiMasterCRDTSpec extends WordSpec with Matchers with ConversionCheckedT
 
     "have a symmetrical mergeStatus function" in {
       for {
-        left <- allStatus
-        right <- allStatus
+        left ← allStatus
+        right ← allStatus
       } withClue(s"mergeStatus($left, $right): ") {
         mergeStatus(left, right) should ===(mergeStatus(right, left))
       }
@@ -59,7 +66,7 @@ class MultiMasterCRDTSpec extends WordSpec with Matchers with ConversionCheckedT
 
     "merge Finished always to Finished" in {
       for {
-        other <- allStatus
+        other ← allStatus
       } withClue(s"mergeStatus(Finished, $other): ") {
         mergeStatus(Finished, other) should ===(Finished)
       }
