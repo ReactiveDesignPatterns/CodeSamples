@@ -35,15 +35,19 @@ import java.util.stream.Collectors;
  * collection of code snippets used in section 13.1.
  */
 public class ResourceEncapsulation {
+  // #snip_14-1
   public Instance startInstance(AWSCredentials credentials) {
     AmazonEC2Client amazonEC2Client = new AmazonEC2Client(credentials);
 
-    RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
-        .withImageId("").withInstanceType("m1.small").withMinCount(1)
-        .withMaxCount(1);
+    RunInstancesRequest runInstancesRequest =
+        new RunInstancesRequest()
+            .withImageId("")
+            .withInstanceType("m1.small")
+            .withMinCount(1)
+            .withMaxCount(1);
 
-    RunInstancesResult runInstancesResult = amazonEC2Client
-        .runInstances(runInstancesRequest);
+    RunInstancesResult runInstancesResult =
+        amazonEC2Client.runInstances(runInstancesRequest);
 
     Reservation reservation = runInstancesResult.getReservation();
     List<Instance> instances = reservation.getInstances();
@@ -53,57 +57,88 @@ public class ResourceEncapsulation {
     return instances.get(0);
   }
 
+  // #snip_14-1
+
+  // #snip_14-2
   private ExecutionContext executionContext;
   private CircuitBreaker circuitBreaker;
 
   public Future<Instance> startInstanceAsync(AWSCredentials credentials) {
-		Future<Instance> f = circuitBreaker.callWithCircuitBreaker(() ->
-			Futures.future(() -> startInstance(credentials), executionContext));
-		PartialFunction<Throwable, Future<Instance>> recovery =
-			new PFBuilder<Throwable, Future<Instance>>()
-				.match(AmazonClientException.class,
-					   ex -> ex.isRetryable(),
-					   ex -> startInstanceAsync(credentials))
-				.build();
-		return f.recoverWith(recovery, executionContext);
-	}
+    Future<Instance> f = circuitBreaker.callWithCircuitBreaker(
+      () -> Futures.future(
+        () -> startInstance(credentials), executionContext));
 
-  public Future<RunInstancesResult> runInstancesAsync(RunInstancesRequest request,
+    PartialFunction<Throwable, Future<Instance>> recovery =
+      new PFBuilder<Throwable, Future<Instance>>()
+        .match(AmazonClientException.class,
+               ex -> ex.isRetryable(),
+               ex -> startInstanceAsync(credentials))
+        .build();
+
+    return f.recoverWith(recovery, executionContext);
+  }
+
+  // #snip_14-2
+
+  // #snip_14-3
+  public Future<RunInstancesResult> runInstancesAsync(
+      RunInstancesRequest request,
       AmazonEC2Async client) {
-    Promise<RunInstancesResult> promise = Futures.promise();
-    client.runInstancesAsync(request, new AsyncHandler<RunInstancesRequest, RunInstancesResult>() {
-      @Override
-      public void onSuccess(RunInstancesRequest request, RunInstancesResult result) {
-        promise.success(result);
-      }
 
-      @Override
-      public void onError(Exception exception) {
-        promise.failure(exception);
-      }
-    });
+    Promise<RunInstancesResult> promise = Futures.promise();
+    client.runInstancesAsync(
+        request,
+        new AsyncHandler<RunInstancesRequest, RunInstancesResult>() {
+
+          @Override
+          public void onSuccess(RunInstancesRequest request,
+              RunInstancesResult result) {
+            promise.success(result);
+          }
+
+          @Override
+          public void onError(Exception exception) {
+            promise.failure(exception);
+          }
+        });
     return promise.future();
   }
 
-  public Future<TerminateInstancesResult> terminateInstancesAsync(AmazonEC2Client client, Instance... instances) {
-		List<String> ids = Arrays.stream(instances).map(i -> i.getInstanceId()).collect(Collectors.toList());
-		TerminateInstancesRequest request = new TerminateInstancesRequest(ids);
-		Future<TerminateInstancesResult> f = circuitBreaker.callWithCircuitBreaker(() ->
-			Futures.future(() -> client.terminateInstances(request), executionContext));
-		PartialFunction<Throwable, Future<TerminateInstancesResult>> recovery =
-			new PFBuilder<Throwable, Future<TerminateInstancesResult>>()
-				.match(AmazonClientException.class,
-					   ex -> ex.isRetryable(),
-					   ex -> terminateInstancesAsync(client, instances))
-				.build();
-		return f.recoverWith(recovery, executionContext);
-	}
+  // #snip_14-3
+
+  // #snip_14-4
+  public Future<TerminateInstancesResult> terminateInstancesAsync(
+    AmazonEC2Client client, Instance... instances) {
+
+    List<String> ids = Arrays
+      .stream(instances)
+      .map(i -> i.getInstanceId())
+      .collect(Collectors.toList());
+    TerminateInstancesRequest request = new TerminateInstancesRequest(ids);
+
+    Future<TerminateInstancesResult> f =
+      circuitBreaker.callWithCircuitBreaker(
+        () -> Futures.future(() -> client.terminateInstances(request),
+                             executionContext));
+
+    PartialFunction<Throwable, Future<TerminateInstancesResult>> recovery =
+      new PFBuilder<Throwable, Future<TerminateInstancesResult>>()
+        .match(AmazonClientException.class,
+               ex -> ex.isRetryable(),
+               ex -> terminateInstancesAsync(client, instances))
+        .build();
+
+    return f.recoverWith(recovery, executionContext);
+  }
+
+  // #snip_14-4
 
   static interface WorkerNodeMessage {
     public long id();
 
     public ActorRef replyTo();
   }
+
   static class WorkerCommandFailed {
     public final String reason;
     public final long id;
@@ -113,16 +148,20 @@ public class ResourceEncapsulation {
       this.id = id;
     }
   }
+
   static class DoHealthCheck {
     static public DoHealthCheck instance = new DoHealthCheck();
   }
+
   static class Shutdown {
     static public Shutdown instance = new Shutdown();
   }
+
   static class WorkerNodeReady {
     static public WorkerNodeReady instance = new WorkerNodeReady();
   }
 
+  // #snip_14-5
   class WorkerNode extends AbstractActor {
     private final Cancellable checkTimer;
 
@@ -131,25 +170,28 @@ public class ResourceEncapsulation {
           getContext()
               .system()
               .scheduler()
-              .schedule(checkInterval, checkInterval, self(), DoHealthCheck.instance,
+              .schedule(checkInterval, checkInterval, self(),
+                  DoHealthCheck.instance,
                   getContext().dispatcher(), self());
     }
 
     @Override
-		public Receive createReceive() {
-			List<WorkerNodeMessage> msgs = new ArrayList<>();
-			return receiveBuilder().match(WorkerNodeMessage.class, msgs::add)
-					.match(DoHealthCheck.class, dhc -> { /* perform check */ })
-					.match(Shutdown.class, s -> {
-						msgs.stream().forEach(msg -> msg.replyTo().tell(new WorkerCommandFailed("shutting down", msg.id()), self()));
-						/* ask Resource Pool to shut down this instance */
-					})
-					.match(WorkerNodeReady.class, wnr -> {
-						/* send msgs to the worker */
-						getContext().become(initialized());
-					})
-					.build();
-		}
+    public Receive createReceive() {
+      List<WorkerNodeMessage> msgs = new ArrayList<>();
+      return receiveBuilder().match(WorkerNodeMessage.class, msgs::add)
+        .match(DoHealthCheck.class, dhc -> { /* perform check */ })
+        .match(Shutdown.class, s -> {
+          msgs.stream().forEach(
+            msg -> msg.replyTo().tell(
+              new WorkerCommandFailed("shutting down", msg.id()), self()));
+          /* ask Resource Pool to shut down this instance */
+        })
+        .match(WorkerNodeReady.class, wnr -> {
+          /* send msgs to the worker */
+          getContext().become(initialized());
+        })
+        .build();
+    }
 
     private PartialFunction<Object, BoxedUnit> initialized() {
       /* forward commands and deal with responses from worker node */
@@ -161,5 +203,6 @@ public class ResourceEncapsulation {
       checkTimer.cancel();
     }
   }
+  // #snip_14-5
 
 }

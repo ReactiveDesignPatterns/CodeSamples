@@ -1,0 +1,17 @@
+/*
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
+ *
+ * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ */
+
+// #snip
+FOREACH Car (_, _, year, price)
+SELECT year ? 1950 && year < 1960
+MEDIAN OF price
+REMEMBER AS p
+
+FOREACH Car (make, model, _, price)
+SELECT price > p
+DISTINCT VALUES OF (make, model)
+RETURN AS RESULT
+// #snip
