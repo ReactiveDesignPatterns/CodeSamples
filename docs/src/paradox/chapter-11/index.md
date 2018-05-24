@@ -102,6 +102,8 @@
 
 @@snip[代码清单11-21](../../../../chapter11/src/test/scala/chapter11/TranslationServiceSpec.scala){ #snip_11-21 }
 
+## 11.6 测试回弹性
+
 > 代码清单 11-22 要测试的基本 Actor
 
 @@snip[代码清单11-22](../../../../chapter11/src/test/scala/chapter11/StepParentSpec.scala){ #snip_11-22 }
