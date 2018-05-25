@@ -70,6 +70,6 @@ object Build {
           |
           |""".stripMargin
     )
-    ))
-
+  )
+  )
 }
