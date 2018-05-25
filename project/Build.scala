@@ -20,22 +20,22 @@ object Build {
   val akkaPersistence = "com.typesafe.akka" %% "akka-persistence" % akkaVersion
   val akkaPersistenceQuery = "com.typesafe.akka" %% "akka-persistence-query-experimental" % akkaVersion
 
-  val levelDb = "org.iq80.leveldb" % "leveldb" % "0.7"
+  val levelDb = "org.iq80.leveldb" % "leveldb" % "0.10"
 
-  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.109"
+  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.336"
 
-  val sbtIO = "org.scala-sbt" %% "io" % "1.1.3"
+  val sbtIO = "org.scala-sbt" %% "io" % "1.1.8"
 
   val scalaAsync = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
-  val scalaJava8 = "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
+  val scalaJava8 = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
 
-  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.1.7"
+  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.1.14"
 
-  val playJson = "com.typesafe.play" %% "play-json" % "2.6.8"
+  val playJson = "com.typesafe.play" %% "play-json" % "2.6.9"
 
-  val scalatest = "org.scalatest" %% "scalatest" % "3.0.4" % "test"
+  val scalatest = "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
-  val junit = "junit" % "junit" % "4.11" % "test"
+  val junit = "junit" % "junit" % "4.12" % "test"
 
   val guava = "com.google.guava" % "guava" % "23.0"
 
