@@ -46,7 +46,7 @@ object LatencyTestSupport {
   private case class RunMeasurement(count: Int, maxParallelism: Int, ec: ExecutionContext, f: Int ⇒ SingleResult[_], replyTo: ActorRef)
 
   private class Supervisor extends Actor {
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case r: RunMeasurement ⇒ context.actorOf(runnerProps(r))
     }
   }
@@ -86,7 +86,7 @@ object LatencyTestSupport {
       sent += 1
     }
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case TestSuccess(timing) ⇒
         results :+= timing
         nextOrFinish()

@@ -19,9 +19,10 @@ class StorageComponent(system: ActorSystem) {
   // #snip
   private object StorageFailed extends RuntimeException
 
+  import akka.rdpextras.ExecutionContexts.sameThreadExecutionContext
+
   private def sendToStorage(job: Job): Future[StorageStatus] = {
-    import akka.rdpextras.ExecutionContexts.sameThreadExecutionContext
-    val f: Future[StorageStatus] = ???
+    val f: Future[StorageStatus] = ??? //...
     f.map {
       case StorageStatus.Failed => throw StorageFailed
       case other => other
@@ -38,7 +39,6 @@ class StorageComponent(system: ActorSystem) {
   )
 
   def persist(job: Job): Future[StorageStatus] = {
-    import akka.rdpextras.ExecutionContexts.sameThreadExecutionContext
     breaker
       .withCircuitBreaker(sendToStorage(job))
       .recover {

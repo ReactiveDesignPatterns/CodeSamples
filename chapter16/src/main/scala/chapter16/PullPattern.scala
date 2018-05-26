@@ -32,7 +32,7 @@ object PullPattern {
 
     (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self))))
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case WorkRequest(worker, items) ⇒
         workStream.take(items).foreach {
           job ⇒
@@ -67,7 +67,7 @@ object PullPattern {
 
     request()
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case Job(id, data, replyTo) ⇒
         requested -= 1
         request()

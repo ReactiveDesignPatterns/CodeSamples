@@ -115,7 +115,7 @@ object PersistentBusinessHandshake extends App {
   class FakeSam(override val persistenceId: String) extends PersistentActor {
     def receiveRecover: Actor.emptyBehavior.type = Actor.emptyBehavior
 
-    def receiveCommand: PartialFunction[Any, Unit] = {
+    def receiveCommand: Receive = {
       case _ ⇒
         deleteMessages(Long.MaxValue)
         context.become(waiting(sender()))

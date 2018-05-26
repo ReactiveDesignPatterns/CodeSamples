@@ -34,7 +34,7 @@ object ActiveActive {
   class Replica extends Actor with Stash {
     var map = Map.empty[String, JsValue]
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case InitialData(m) ⇒
         map = m
         context.become(initialized)
@@ -74,8 +74,10 @@ object ActiveActive {
   }
 
   private case class Unknown(
-    deadline: Deadline, replies: Set[SeqResult],
-    missing: Set[ActorRef], quorum: Int) extends ReplyState {
+    deadline: Deadline,
+    replies:  Set[SeqResult],
+    missing:  Set[ActorRef],
+    quorum:   Int) extends ReplyState {
 
     override def add(res: SeqResult): ReplyState = {
       val nextReplies = replies + res
@@ -83,7 +85,9 @@ object ActiveActive {
       if (nextReplies.size >= quorum) {
         val answer =
           replies.toSeq.groupBy(_.res)
-            .collectFirst { case (k, s) if s.size >= quorum ⇒ s.head }
+            .collectFirst {
+              case (k, s) if s.size >= quorum ⇒ s.head
+            }
 
         if (answer.isDefined) {
           val right = answer.get
@@ -91,8 +95,9 @@ object ActiveActive {
             case SeqResult(_, res, replica, _) if res != right ⇒ replica
           }
           Known(deadline, right, wrong, nextMissing)
-        } else if (nextMissing.isEmpty) Known.fromUnknown(deadline, nextReplies)
-        else Unknown(deadline, nextReplies, nextMissing, quorum)
+        } else if (nextMissing.isEmpty) {
+          Known.fromUnknown(deadline, nextReplies)
+        } else Unknown(deadline, nextReplies, nextMissing, quorum)
       } else Unknown(deadline, nextReplies, nextMissing, quorum)
     }
   }
@@ -102,7 +107,10 @@ object ActiveActive {
     wrong: Set[ActorRef], missing: Set[ActorRef]) extends ReplyState {
 
     override def add(res: SeqResult): ReplyState = {
-      val nextWrong = if (res.res == reply.res) wrong else wrong + res.replica
+      val nextWrong = if (res.res == reply.res)
+        wrong
+      else
+        wrong + res.replica
       Known(deadline, reply, nextWrong, missing - res.replica)
     }
   }
@@ -138,7 +146,7 @@ object ActiveActive {
     // schedule timeout messages for quiescent periods
     context.setReceiveTimeout(1.second)
 
-    def receive: PartialFunction[Any, Unit] = ({
+    def receive: Receive = ({
       case cmd: Command ⇒
         val c = SeqCommand(seqNr.next, cmd, self)
         replicas foreach (_ ! c)
@@ -158,6 +166,7 @@ object ActiveActive {
       evictFinished()
     }
 
+    //...
     // #snip_13-18
     private def doTimeouts(): Unit = {
       val now = Deadline.now

@@ -45,7 +45,7 @@ object ThrottlingPattern {
 
     (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self)).withDispatcher(context.props.dispatcher)))
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case job @ Job(id, _, replyTo) ⇒
         if (requestQueue.isEmpty) {
           if (workQueue.size < 10000) workQueue :+= job
@@ -87,7 +87,7 @@ object ThrottlingPattern {
 
     request()
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case Job(id, data, replyTo) ⇒
         requested -= 1
         request()
@@ -122,7 +122,7 @@ object ThrottlingPattern {
     var approximation: Report = Report.empty
     var outstandingWork = 0
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case WorkRequest(worker, items) ⇒
         if (start == null) start = Deadline.now
         workStream.take(items).foreach { job ⇒
@@ -208,7 +208,7 @@ object ThrottlingPattern {
 
     request(lastTokenTime)
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case job: Job ⇒
         val time = now()
         if (Debug) if (requested == 1) println(s"$time: received job")

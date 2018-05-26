@@ -73,7 +73,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
 
   self ! Cont(0)
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case Cont(n)             ⇒ driveCart(n)
     case ManagerEvent(id, _) ⇒ if (id % 10000 == 0) log.info("done {} commands", id)
     case ManagerResult(num, GetItemsResult(cart, items)) ⇒
@@ -123,7 +123,7 @@ class TopProductListener extends Actor with ActorLogging {
 
   var topProducts = Map.empty[ItemRef, Int]
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case GetTopProducts(id, replyTo) ⇒ replyTo ! TopProducts(id, topProducts)
     case TopProducts(_, products) ⇒
       topProducts = products

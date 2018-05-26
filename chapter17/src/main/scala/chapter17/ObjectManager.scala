@@ -30,7 +30,7 @@ class Manager(var shoppingCart: ShoppingCart) extends Actor {
    */
   def this() = this(ShoppingCart.empty)
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case ManagerCommand(cmd, id, replyTo) ⇒
       try {
         val event = cmd match {
@@ -84,7 +84,7 @@ object ManagerExample extends App {
     manager ! ManagerCommand(RemoveItem(shoppingCart, item1, 3), 4, self)
     manager ! ManagerQuery(GetItems(shoppingCart), 5, self)
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case ManagerEvent(id, event)   ⇒ log.info("success ({}): {}", id, event)
       case ManagerRejection(id, msg) ⇒ log.warning("rejected ({}): {}", id, msg)
       case ManagerResult(id, result) ⇒

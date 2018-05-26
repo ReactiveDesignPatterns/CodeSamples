@@ -29,7 +29,7 @@ class SupervisorActor extends Actor with ActorLogging {
   private val actor2 = context.actorOf(Props[SecondActor], "second-actor")
   private val actor1 = context.actorOf(Props(new FirstActor(actor2)), "first-actor")
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case Start ⇒ actor1 ! Start
   }
 }
@@ -37,7 +37,7 @@ class SupervisorActor extends Actor with ActorLogging {
 class AbstractCounterActor extends Actor with ActorLogging {
   protected var counterValue = 0
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case _ ⇒
   }
 

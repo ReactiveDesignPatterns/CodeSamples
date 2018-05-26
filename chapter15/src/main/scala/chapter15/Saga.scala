@@ -39,7 +39,7 @@ object Saga {
 
     override val persistenceId: String = s"transaction-$id"
 
-    override def receiveCommand: PartialFunction[Any, Unit] = {
+    override def receiveCommand: Receive = {
       case Transfer(amount, x, y) ⇒
         persist(TransferStarted(amount, x, y))(withdrawMoney)
     }
@@ -71,13 +71,13 @@ object Saga {
         persist(RolledBack)(_ ⇒ context.stop(self))
     }
 
-    override def receiveRecover: PartialFunction[Any, Unit] = {
+    override def receiveRecover: Receive = {
       var start: TransferStarted = null
       var last: Event = null
 
       {
         case t: TransferStarted ⇒ {
-          start = t;
+          start = t
           last = t
         }
         case e: Event ⇒ last = e

@@ -13,9 +13,8 @@ import akka.cluster.singleton.{ ClusterSingletonManager, ClusterSingletonManager
 import com.typesafe.config.{ Config, ConfigFactory }
 import play.api.libs.json._
 
-import scala.collection.immutable
 import scala.collection.immutable.TreeMap
-import scala.collection.mutable.Queue
+import scala.collection.{ immutable, mutable }
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.StdIn
@@ -51,7 +50,7 @@ object ActivePassive {
       log.info("taking over from local replica")
       localReplica ! TakeOver(self)
 
-      def receive: PartialFunction[Any, Unit] = {
+      def receive: Receive = {
         case InitialState(m, s) ⇒
           log.info("took over at sequence {}", s)
           theStore = m
@@ -61,7 +60,7 @@ object ActivePassive {
         case _ ⇒ stash()
       }
 
-      val running: Receive = ???
+      val running: Receive = ??? //...
     }
 
     // #snip_13-1
@@ -74,12 +73,12 @@ object ActivePassive {
       localReplica:      ActorRef,
       replicationFactor: Int,
       maxQueueSize:      Int) extends Actor with Stash with ActorLogging {
-
+      // ...
       private val MaxOutstanding = maxQueueSize / 2
 
       private var theStore: Map[String, JsValue] = _
       private var seqNr: Iterator[Int] = _
-      private val toReplicate = Queue.empty[Replicate]
+      private val toReplicate = mutable.Queue.empty[Replicate]
       private var replicating = TreeMap.empty[Int, (Replicate, Int)]
 
       private var rejected = 0
@@ -93,7 +92,7 @@ object ActivePassive {
       log.info("taking over from local replica")
       localReplica ! TakeOver(self)
 
-      def receive: PartialFunction[Any, Unit] = {
+      def receive: Receive = {
         case InitialState(m, s) ⇒
           log.info("took over at sequence {}", s)
           theStore = m
@@ -116,7 +115,7 @@ object ActivePassive {
           replyTo ! GetResult(key, theStore get key)
         case Tick ⇒
           replicating.valuesIterator foreach {
-            case (replicate, count) ⇒ disseminate(replicate)
+            case (replicate, _) ⇒ disseminate(replicate)
           }
           if (rejected > 0) {
             log.info("rejected {} PUT requests", rejected)
@@ -149,9 +148,9 @@ object ActivePassive {
       }
 
       private def replicaOn(addr: Address): ActorSelection =
-        context.actorSelection(localReplica.path.toStringWithAddress(addr))
+        context.actorSelection(
+          localReplica.path.toStringWithAddress(addr))
     }
-
     // #snip_13-2
   }
 
@@ -169,7 +168,7 @@ object ActivePassive {
       askAroundInterval: FiniteDuration,
       maxLag:            Int) extends Actor with ActorLogging {
 
-      private val applied = Queue.empty[Replicate]
+      private val applied = mutable.Queue.empty[Replicate]
 
       val name: String =
         Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
@@ -229,7 +228,7 @@ object ActivePassive {
       askAroundInterval: FiniteDuration,
       maxLag:            Int) extends Actor with ActorLogging {
 
-      private val applied = Queue.empty[Replicate]
+      private val applied = mutable.Queue.empty[Replicate]
       private var awaitingInitialState = Option.empty[ActorRef]
 
       val name: String =
@@ -259,11 +258,11 @@ object ActivePassive {
 
       def upToDate(theStore: Map[String, JsValue], expectedSeq: Int): Receive = {
         // Cases shown previously elided
-        case TakeOver(active)                                   ⇒ ???
-        case Replicate(s, _, _, replyTo) if s - expectedSeq < 0 ⇒ ???
-        case r: Replicate if r.seq == expectedSeq               ⇒ ???
-        case r: Replicate                                       ⇒ ???
-        case GetSingle(s, replyTo)                              ⇒ ???
+        case TakeOver(active)                                   ⇒ ??? //...
+        case Replicate(s, _, _, replyTo) if s - expectedSeq < 0 ⇒ ??? //...
+        case r: Replicate if r.seq == expectedSeq               ⇒ ??? //...
+        case r: Replicate                                       ⇒ ??? //...
+        case GetSingle(s, replyTo)                              ⇒ ??? //...
         case GetFull(replyTo) ⇒
           log.info("sending full info to {}", replyTo)
           replyTo ! InitialState(theStore, expectedSeq)
@@ -300,7 +299,7 @@ object ActivePassive {
         theStore:    Map[String, JsValue],
         expectedSeq: Int,
         askedFor:    Set[Int],
-        waiting:     TreeMap[Int, Replicate]): Unit = ???
+        waiting:     TreeMap[Int, Replicate]): Unit = ??? //...
 
       private def getMembers(n: Int): Seq[Address] = {
         // using .iterator to avoid one intermediate collection to be created
@@ -326,7 +325,7 @@ object ActivePassive {
       askAroundInterval: FiniteDuration,
       maxLag:            Int) extends Actor with ActorLogging {
 
-      private val applied = Queue.empty[Replicate]
+      private val applied = mutable.Queue.empty[Replicate]
       private var awaitingInitialState = Option.empty[ActorRef]
 
       val name: String =
@@ -342,7 +341,7 @@ object ActivePassive {
           askAroundInterval, self, DoConsolidate)(context.dispatcher))
       }
 
-      def receive: Receive = ???
+      def receive: Receive = ??? //...
 
       // #snip_13-6
       private val matches = (p: (Int, Int)) ⇒ p._1 == p._2
@@ -355,9 +354,12 @@ object ActivePassive {
 
         // calculate applicable prefix length
         val prefix = waiting.keysIterator
-          .zip(Iterator from expectedSeq).takeWhile(matches).size
+          .zip(Iterator from expectedSeq)
+          .takeWhile(matches)
+          .size
 
-        val nextStore = waiting.valuesIterator.take(prefix)
+        val nextStore = waiting.valuesIterator
+          .take(prefix)
           .foldLeft(theStore) { (store, replicate) ⇒
             persist(name, replicate.seq, theStore)
             replicate.replyTo ! Replicated(replicate.seq)
@@ -374,7 +376,8 @@ object ActivePassive {
           // check if we fell behind by too much
           if (nextWaiting.lastKey - nextExpectedSeq > maxLag)
             fallBehind(nextExpectedSeq, nextWaiting)
-          else missingSomeUpdates(nextStore, nextExpectedSeq, askedFor, nextWaiting)
+          else missingSomeUpdates(nextStore, nextExpectedSeq,
+            askedFor, nextWaiting)
         } else caughtUp(nextStore, nextExpectedSeq)
       }
 
@@ -404,23 +407,26 @@ object ActivePassive {
       askAroundInterval: FiniteDuration,
       maxLag:            Int) extends Actor with ActorLogging {
 
-      private val applied = Queue.empty[Replicate]
+      private val applied = mutable.Queue.empty[Replicate]
       private var awaitingInitialState = Option.empty[ActorRef]
 
       // ... Initialization elided
-      def receive: Receive = ???
+      def receive: Receive = ??? //...
 
       def upToDate(theStore: Map[String, JsValue], expectedSeq: Int): Receive = {
-        case TakeOver(active)                                   ⇒ ???
-        case Replicate(s, _, _, replyTo) if s - expectedSeq < 0 ⇒ ???
-        case r: Replicate if r.seq == expectedSeq               ⇒ ???
-        case r: Replicate                                       ⇒ ???
-        case GetFull(replyTo)                                   ⇒ ???
+        case TakeOver(active)                                   ⇒ ??? //...
+        case Replicate(s, _, _, replyTo) if s - expectedSeq < 0 ⇒ ??? //...
+        case r: Replicate if r.seq == expectedSeq               ⇒ ??? //...
+        case r: Replicate                                       ⇒ ??? //...
+        case GetFull(replyTo)                                   ⇒ ??? //...
         case GetSingle(s, replyTo) ⇒
           log.info("GetSingle from {}", replyTo)
-          if (applied.nonEmpty && applied.head.seq <= s && applied.last.seq >= s)
+          if (applied.nonEmpty &&
+            applied.head.seq <= s && applied.last.seq >= s) {
             replyTo ! applied.find(_.seq == s).get
-          else if (s < expectedSeq) replyTo ! InitialState(theStore, expectedSeq)
+          } else if (s < expectedSeq) {
+            replyTo ! InitialState(theStore, expectedSeq)
+          }
       }
 
       def missingSomeUpdates(
@@ -430,16 +436,24 @@ object ActivePassive {
         waiting:         TreeMap[Int, Replicate]): Unit = {
 
         val askFor = (expectedSeq to waiting.lastKey).iterator
-          .filterNot(seq ⇒ waiting.contains(seq) ||
-            prevOutstanding.contains(seq)).toList
+          .filterNot(seq ⇒
+            waiting.contains(seq) ||
+              prevOutstanding.contains(seq)).toList
+
         askFor foreach askAround
-        if (prevOutstanding.isEmpty) scheduleTick()
+
+        if (prevOutstanding.isEmpty) {
+          scheduleTick()
+        }
         val outstanding = prevOutstanding ++ askFor
+
         context.become {
           case Replicate(s, _, _, replyTo) if s < expectedSeq ⇒
             replyTo ! Replicated(s)
-          case r: Replicate ⇒ consolidate(theStore, expectedSeq,
-            outstanding - r.seq, waiting + (r.seq -> r))
+          case r: Replicate ⇒
+            consolidate(theStore, expectedSeq,
+              outstanding - r.seq,
+              waiting + (r.seq -> r))
           case TakeOver(active) ⇒
             log.info(
               "delaying active replica takeOver, at seq {} while highest is {}",
@@ -447,9 +461,13 @@ object ActivePassive {
             awaitingInitialState = Some(active)
           case GetSingle(s, replyTo) ⇒
             log.info("GetSingle from {}", replyTo)
-            if (applied.nonEmpty && applied.head.seq <= s && applied.last.seq >= s)
+            if (applied.nonEmpty &&
+              applied.head.seq <= s &&
+              applied.last.seq >= s) {
               replyTo ! applied.find(_.seq == s).get
-            else if (s < expectedSeq) replyTo ! InitialState(theStore, expectedSeq)
+            } else if (s < expectedSeq) {
+              replyTo ! InitialState(theStore, expectedSeq)
+            }
           case GetFull(replyTo) ⇒
             log.info("sending full info to {}", replyTo)
             replyTo ! InitialState(theStore, expectedSeq)
@@ -488,7 +506,7 @@ object ActivePassive {
     askAroundInterval: FiniteDuration,
     maxLag:            Int) extends Actor with ActorLogging {
 
-    private val applied = Queue.empty[Replicate]
+    private val applied = mutable.Queue.empty[Replicate]
     private var awaitingInitialState = Option.empty[ActorRef]
 
     val name: String =
@@ -723,7 +741,7 @@ object ActivePassive {
     useStorage ! Run(0)
 
     sys.actorOf(Props(new Actor {
-      def receive: PartialFunction[Any, Unit] = {
+      def receive: Receive = {
         case Run ⇒
           StdIn.readLine()
           useStorage ! Stop
@@ -775,7 +793,7 @@ object ActivePassive {
     val rnd = new Random
     var lastOutstandingCount = 0
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case Run(0) ⇒
         db ! Get("initial", self)
       case GetResult("initial", _) ⇒

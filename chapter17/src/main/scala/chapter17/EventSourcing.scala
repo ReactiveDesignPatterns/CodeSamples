@@ -21,7 +21,7 @@ class PersistentObjectManager extends PersistentActor {
 
   var shoppingCart: ShoppingCart = ShoppingCart.empty
 
-  def receiveCommand: PartialFunction[Any, Unit] = {
+  def receiveCommand: Receive = {
     case ManagerCommand(cmd, id, replyTo) ⇒
       try {
         val event = cmd match {
@@ -50,7 +50,7 @@ class PersistentObjectManager extends PersistentActor {
       }
   }
 
-  def receiveRecover: PartialFunction[Any, Unit] = {
+  def receiveRecover: Receive = {
     case e: Event ⇒ shoppingCart = shoppingCart.applyEvent(e)
   }
 }
@@ -91,7 +91,7 @@ akka.persistence.snapshot-store.plugin = "akka.persistence.no-snapshot-store"
     manager ! ManagerCommand(RemoveItem(shoppingCart, item1, 3), 4, self)
     manager ! ManagerQuery(GetItems(shoppingCart), 5, self)
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case ManagerEvent(id, event)   ⇒ log.info("success ({}): {}", id, event)
       case ManagerRejection(id, msg) ⇒ log.warning("rejected ({}): {}", id, msg)
       case ManagerResult(id, result) ⇒

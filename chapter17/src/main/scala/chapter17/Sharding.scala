@@ -109,7 +109,7 @@ akka.cluster.sharding.state-store-mode = ddata
       manager ! ManagerCommand(RemoveItem(shoppingCart1, item1, 3), 4, self)
       manager ! ManagerQuery(GetItems(shoppingCart1), 5, self)
 
-      def receive: PartialFunction[Any, Unit] = {
+      def receive: Receive = {
         case ManagerEvent(id, event)   ⇒ log.info("success ({}): {}", id, event)
         case ManagerRejection(id, msg) ⇒ log.warning("rejected ({}): {}", id, msg)
         case ManagerResult(id, result) ⇒

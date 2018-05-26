@@ -44,7 +44,8 @@ class KVStore extends StateMachine {
     map = Serializer.deserialize[Map[String, String]](byteBuffer.array())
   }
 
-  def takeSnapshot(): ByteBuffer = ByteBuffer.wrap(Serializer.serialize(map))
+  def takeSnapshot(): ByteBuffer =
+    ByteBuffer.wrap(Serializer.serialize(map))
 
 }
 

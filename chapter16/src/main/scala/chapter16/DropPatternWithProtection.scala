@@ -43,7 +43,7 @@ object DropPatternWithProtection {
   private class IncomingQueue(manager: ActorRef) extends Actor {
     var workQueue: Queue[WorkEnvelope] = Queue.empty[WorkEnvelope]
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case job: Job ⇒
         workQueue = workQueue.dropWhile(_.consumed)
         if (workQueue.size < 1000) {
@@ -64,7 +64,7 @@ object DropPatternWithProtection {
       Props(new IncomingQueue(manager))
         .withMailbox("bounded-mailbox"), "incomingQueue")
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case GetIncomingRef(replyTo) ⇒ replyTo ! incomingQueue
     }
   }
@@ -87,7 +87,7 @@ object DropPatternWithProtection {
 
     (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self))))
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case envelope @ WorkEnvelope(job @ Job(id, _, replyTo)) ⇒
         envelope.consumed = true
         if (requestQueue.isEmpty) {
@@ -127,7 +127,7 @@ object DropPatternWithProtection {
 
     request()
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case Job(id, data, replyTo) ⇒
         requested -= 1
         request()

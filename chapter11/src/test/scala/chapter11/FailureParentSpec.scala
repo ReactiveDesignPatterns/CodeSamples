@@ -55,7 +55,7 @@ class FailureParent(failures: ActorRef) extends Actor {
 // #snip_11-25
 
 class MyFailureParentActor extends Actor {
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case _ ⇒ throw new NullPointerException
   }
 }

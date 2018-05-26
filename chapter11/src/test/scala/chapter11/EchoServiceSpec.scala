@@ -92,7 +92,7 @@ object EchoServiceSpec {
 
   // timestamp received replies in a dedicated actor to keep timing distortions low
   private class ParallelSLATestReceiver(controller: ActorRef) extends Actor {
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case r: Response ⇒ controller ! TimedResponse(r, Timestamp.now)
     }
   }

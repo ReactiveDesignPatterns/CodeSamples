@@ -21,7 +21,7 @@ class EchoService extends Actor {
 
   import EchoService._
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case Request(tag, ref) ⇒ ref ! Response(tag)
   }
 }

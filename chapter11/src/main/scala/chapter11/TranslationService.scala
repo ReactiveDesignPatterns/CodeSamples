@@ -42,7 +42,7 @@ object TranslationService {
   case class Translate(query: String, replyTo: ActorRef)
 
   private class Translator extends Actor {
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case Translate(query, replyTo) ⇒ query match {
         case "Hur mår du?" ⇒
           replyTo ! "How are you?"
@@ -66,7 +66,7 @@ object TranslationService {
    * Implementation of the TranslateV1 protocol.
    */
   private class TranslatorV1 extends Actor {
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case TranslateV1(query, replyTo) ⇒
         if (query == "sv:en:Hur mår du?") {
           replyTo ! "How are you?"
@@ -115,7 +115,7 @@ object TranslationService {
 
     import context.dispatcher
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case TranslateV2(phrase, in, out, replyTo) ⇒
         v1 ? (TranslateV1(s"$in:$out:$phrase", _)) collect {
           case str: String ⇒

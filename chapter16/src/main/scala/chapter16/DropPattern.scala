@@ -52,7 +52,7 @@ object DropPattern {
 
     (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self))))
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       // #snip_2
       case job @ Job(id, _, replyTo) ⇒
         if (requestQueue.isEmpty) {
@@ -93,7 +93,7 @@ object DropPattern {
 
     request()
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case Job(id, data, replyTo) ⇒
         requested -= 1
         request()
