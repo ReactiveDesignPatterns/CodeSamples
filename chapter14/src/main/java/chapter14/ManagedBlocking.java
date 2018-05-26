@@ -65,7 +65,8 @@ public interface ManagedBlocking {
       this.db = db;
       pool = new ThreadPoolExecutor(
           0, poolSize,
-          60, SECONDS, new LinkedBlockingDeque<>(queueSize));
+          60, SECONDS,
+          new LinkedBlockingDeque<>(queueSize));
     }
 
     @Override
@@ -92,13 +93,15 @@ public interface ManagedBlocking {
         CheckAccess ca, ActorRef self) {
       try (Connection conn = db.getConnection()) {
         final ResultSet result =
-            conn.createStatement().executeQuery("<figure out access rights>");
+            conn.createStatement().executeQuery("<get access rights>");
         final List<AccessRights> rights = new LinkedList<>();
         while (result.next()) {
           rights.add(AccessRights.valueOf(result.getString(0)));
         }
         ca.replyTo.tell(
-            new CheckAccessResult(ca, rights.toArray(AccessRights.EMPTY)), self);
+            new CheckAccessResult(
+                ca, rights.toArray(AccessRights.EMPTY)),
+            self);
       } catch (Exception e) {
         ca.replyTo.tell(new CheckAccessResult(ca, AccessRights.EMPTY), self);
       }

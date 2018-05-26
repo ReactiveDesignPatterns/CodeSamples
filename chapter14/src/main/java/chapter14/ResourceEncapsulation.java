@@ -60,8 +60,8 @@ public class ResourceEncapsulation {
   // #snip_14-1
 
   // #snip_14-2
-  private ExecutionContext executionContext;
-  private CircuitBreaker circuitBreaker;
+  private ExecutionContext executionContext; // value from somewhere
+  private CircuitBreaker circuitBreaker; // value from somewhere
 
   public Future<Instance> startInstanceAsync(AWSCredentials credentials) {
     Future<Instance> f = circuitBreaker.callWithCircuitBreaker(
@@ -71,7 +71,7 @@ public class ResourceEncapsulation {
     PartialFunction<Throwable, Future<Instance>> recovery =
       new PFBuilder<Throwable, Future<Instance>>()
         .match(AmazonClientException.class,
-          ex -> ex.isRetryable(),
+          AmazonClientException::isRetryable,
           ex -> startInstanceAsync(credentials))
         .build();
 
@@ -91,7 +91,8 @@ public class ResourceEncapsulation {
         new AsyncHandler<RunInstancesRequest, RunInstancesResult>() {
 
           @Override
-          public void onSuccess(RunInstancesRequest request,
+          public void onSuccess(
+              RunInstancesRequest request,
               RunInstancesResult result) {
             promise.success(result);
           }
@@ -110,21 +111,21 @@ public class ResourceEncapsulation {
   public Future<TerminateInstancesResult> terminateInstancesAsync(
     AmazonEC2Client client, Instance... instances) {
 
-    List<String> ids = Arrays
-      .stream(instances)
-      .map(i -> i.getInstanceId())
+    List<String> ids = Arrays.stream(instances)
+      .map(Instance::getInstanceId)
       .collect(Collectors.toList());
     TerminateInstancesRequest request = new TerminateInstancesRequest(ids);
 
     Future<TerminateInstancesResult> f =
       circuitBreaker.callWithCircuitBreaker(
-        () -> Futures.future(() -> client.terminateInstances(request),
+        () -> Futures.future(() ->
+            client.terminateInstances(request),
           executionContext));
 
     PartialFunction<Throwable, Future<TerminateInstancesResult>> recovery =
       new PFBuilder<Throwable, Future<TerminateInstancesResult>>()
         .match(AmazonClientException.class,
-          ex -> ex.isRetryable(),
+          AmazonClientException::isRetryable,
           ex -> terminateInstancesAsync(client, instances))
         .build();
 
@@ -178,11 +179,12 @@ public class ResourceEncapsulation {
     @Override
     public Receive createReceive() {
       List<WorkerNodeMessage> msgs = new ArrayList<>();
-      return receiveBuilder().match(WorkerNodeMessage.class, msgs::add)
+      return receiveBuilder()
+        .match(WorkerNodeMessage.class, msgs::add)
         .match(DoHealthCheck.class, dhc -> { /* perform check */ })
         .match(Shutdown.class, s -> {
-          msgs.stream().forEach(
-            msg -> msg.replyTo().tell(
+          msgs.forEach(msg ->
+            msg.replyTo().tell(
               new WorkerCommandFailed("shutting down", msg.id()), self()));
           /* ask Resource Pool to shut down this instance */
         })
@@ -195,6 +197,7 @@ public class ResourceEncapsulation {
 
     private PartialFunction<Object, BoxedUnit> initialized() {
       /* forward commands and deal with responses from worker node */
+      //...
       return null;
     }
 

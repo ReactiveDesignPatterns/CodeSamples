@@ -75,7 +75,8 @@ public interface ComplexCommand {
     public final String mergeLogic;
 
     public BatchJobJS(String dataSelector,
-                      String processingLogic, String mergeLogic) {
+                      String processingLogic,
+                      String mergeLogic) {
       this.dataSelector = dataSelector;
       this.processingLogic = processingLogic;
       this.mergeLogic = mergeLogic;
@@ -87,9 +88,10 @@ public interface ComplexCommand {
   }
 
   public class WorkerJS {
+    private static final ScriptEngine engine =
+      new ScriptEngineManager().getEngineByName("nashorn");
+
     public PartialResult runJob(BatchJobJS job) {
-      ScriptEngine engine =
-        new ScriptEngineManager().getEngineByName("nashorn");
       Invocable invocable = (Invocable) engine;
 
       try {
@@ -126,7 +128,8 @@ public interface ComplexCommand {
     public final MergeLogic mergeLogic;
 
     public BatchJob(String dataSelector,
-                    ProcessingLogic processingLogic, MergeLogic mergeLogic) {
+                    ProcessingLogic processingLogic,
+                    MergeLogic mergeLogic) {
       this.dataSelector = dataSelector;
       this.processingLogic = processingLogic;
       this.mergeLogic = mergeLogic;

@@ -28,7 +28,7 @@ public class ResourceLoan {
       return receiveBuilder()
         .match(WorkerNodeMessage.class, msgs::add)
         .match(Shutdown.class, s -> {
-          msgs.stream().forEach(msg -> {
+          msgs.forEach(msg -> {
             WorkerCommandFailed failMsg =
               new WorkerCommandFailed("shutting down", msg.id());
             msg.replyTo().tell(failMsg, self());
@@ -42,6 +42,7 @@ public class ResourceLoan {
 
     private PartialFunction<Object, BoxedUnit> initialized() {
       /* forward commands and deal with responses from worker node */
+      //...
       return null;
     }
   }
@@ -49,11 +50,16 @@ public class ResourceLoan {
   class WorkNodeForResourcePool extends AbstractActor {
     private final Cancellable checkTimer;
 
-    public WorkNodeForResourcePool(InetAddress address,
+    public WorkNodeForResourcePool(
+        InetAddress address,
         FiniteDuration checkInterval) {
       checkTimer = getContext().system().scheduler()
-          .schedule(checkInterval, checkInterval, self(),
-              DoHealthCheck.instance, getContext().dispatcher(), self());
+          .schedule(
+              checkInterval,
+              checkInterval,
+              self(),
+              DoHealthCheck.instance,
+              getContext().dispatcher(), self());
 
     }
 
