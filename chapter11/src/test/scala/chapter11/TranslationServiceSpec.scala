@@ -150,7 +150,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
       client.expectMsg(TranslationErrorV2("Hur är läget?", "sv", "en",
         "cannot parse input 'sv:en:Hur är läget?'"))
 
-      v1.expectNoMessage(1.second)
+      v1.expectNoMessage(3.second)
       // #snip_11-19
     }
 

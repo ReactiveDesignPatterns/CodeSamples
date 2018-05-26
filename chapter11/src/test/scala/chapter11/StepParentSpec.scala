@@ -25,6 +25,7 @@ class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
       val parent = system.actorOf(Props[StepParent], "stepParent")
       parent.tell(Props[MyActor], testProbe.ref)
       val child = testProbe.expectMsgType[ActorRef]
+      // ...
       // Test whatever we want in the actor
     }
   }
@@ -43,19 +44,17 @@ class StepParent extends Actor {
     case thr ⇒ Restart
   }
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case p: Props ⇒
       sender ! context.actorOf(p, "child")
   }
 }
-
 // #snip_11-23
 
 // #snip_11-22
 class MyActor extends Actor {
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case _ ⇒ throw new NullPointerException
   }
 }
-
 // #snip_11-22

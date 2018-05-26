@@ -18,7 +18,8 @@ import scala.concurrent.duration.Duration
 // #snip_11-26
 case object TestFailureParentMessage
 
-class FailureParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
+class FailureParentSpec extends WordSpec
+  with Matchers with BeforeAndAfterAll {
   implicit val system: ActorSystem = ActorSystem()
 
   "Using a FailureParent" must {
@@ -46,7 +47,7 @@ class FailureParent(failures: ActorRef) extends Actor {
     case f ⇒ failures ! f; Stop
   }
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case msg ⇒ child forward msg
   }
 }

@@ -147,6 +147,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
     "keep its SLA" in {
       // #snip_11-5
       val probe = TestProbe()
+
       val echo = echoService("keepSLA")
       val N = 200
       val timings = for (i ← 1 to N) yield {
@@ -162,16 +163,19 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
       val SLA = if (Helpers.isCiTest) 25.milliseconds else 1.millisecond
+
       ninetyfifthPercentile.toFiniteDuration should be <= SLA
       // #snip_11-5
     }
 
     // Listing 11.6 Generating the test samples in parallel with the Ask pattern
+    //TODO sync with 11.6
     "keep its SLA when used in parallel with Futures" in {
       implicit val timeout: Timeout = Timeout(500.millis)
       import system.dispatcher
       // #snip_11-6
       val echo = echoService("keepSLAfuture")
+
       val N = 10000
       val timingFutures = for (i ← 1 to N) yield {
         val string = s"test$i"
@@ -180,28 +184,34 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
           case Response(`string`) ⇒ Timestamp.now - start
         }
       }
+
       val futureOfTimings = Future.sequence(timingFutures)
       val timings = Await.result(futureOfTimings, 5.seconds)
       // discard top 5%
       val sorted = timings.sorted
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
+
       val SLA = if (Helpers.isCiTest) 500.milliseconds else 100.milliseconds
+
       ninetyfifthPercentile.toFiniteDuration should be < SLA
       // #snip_11-6
     }
 
     // Listing 11.7 Using a custom Actor to bound the number of parallel test samples
+    //TODO sync with 11.7
     "keep its SLA when used in parallel" in {
       // #snip_11-7
       val echo = echoService("keepSLAparallel")
       val probe = TestProbe()
+
       val N = 10000
       val maxParallelism = 500
       val controller = system.actorOf(
         Props[ParallelSLATester],
         "keepSLAparallelController")
       controller ! TestSLA(echo, N, maxParallelism, probe.ref)
+
       val result = Try(probe.expectMsgType[SLAResponse]).recover {
         case ae: AssertionError ⇒
           controller ! AbortSLATest
@@ -209,11 +219,13 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
           info(s"controller timed out, state so far is $result")
           throw ae
       }.get
+
       // discard top 5%
       val sorted = result.timings.sorted
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
       val SLA = if (Helpers.isCiTest) 25.milliseconds else 2.milliseconds
+
       ninetyfifthPercentile should be < SLA
       // #snip_11-7
     }
@@ -228,12 +240,15 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val controller = system.actorOf(
         Props[ParallelSLATester],
         "keepSLAparallelController")
+
       val future = controller ? (TestSLA(echo, N, maxParallelism, _))
       for (SLAResponse(timings, outstanding) ← future) yield {
+
         val sorted = timings.sorted
         val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
         info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
         val SLA = if (Helpers.isCiTest) 25.milliseconds else 2.milliseconds
+
         ninetyfifthPercentile should be > SLA
       }
       // #snip_11-13
@@ -243,21 +258,30 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
 
   "An EchoService (with LatencyTestSupport)" should {
 
+    import scala.async.Async._
     "keep its SLA" in {
       implicit val timeout: Timeout = Timeout(5.seconds)
       import system.dispatcher
       // #snip_11-16
-      val echo = echoService("keepSLAwithSupport")
-      val latencySupport = new LatencyTestSupport(system)
-      val latencies = latencySupport.measure(count = 10000, maxParallelism = 500) { i ⇒
-        val message = s"test$i"
-        SingleResult((echo ? (Request(message, _))), Response(message))
+      async {
+        val echo = echoService("keepSLAwithSupport")
+        val latencySupport = new LatencyTestSupport(system)
+        val latenciesFuture = latencySupport.measure(
+          count = 10000,
+          maxParallelism = 500) { i ⇒
+          val message = s"test$i"
+          SingleResult((echo ? (Request(message, _))), Response(message))
+        }
+        val latencies = await(akka.pattern.after(
+          20.seconds,
+          system.scheduler)(latenciesFuture))
+
+        info(s"latency info: $latencies")
+        latencies.failureCount should be(0)
+        val SLA = if (Helpers.isCiTest) 50.milliseconds else 10.milliseconds
+        latencies.quantile(0.99) should be < SLA
       }
-      val lat = Await.result(latencies, 20.seconds)
-      info(s"latency info: $lat")
-      lat.failureCount should be(0)
-      val SLA = if (Helpers.isCiTest) 50.milliseconds else 10.milliseconds
-      lat.quantile(0.99) should be < SLA
+
       // #snip_11-16
     }
 

@@ -29,10 +29,13 @@ class SchedulerSpec extends FlatSpec with BeforeAndAfterAll {
     val scheduler = system.actorOf(Scheduler.props)
     // #snip
     val probe = TestProbe()
+
     val start = Timestamp.now
     scheduler ! Schedule(probe.ref, "tick", 1.second)
     probe.expectMsg(2.seconds, "tick")
+
     val stop = Timestamp.now
+
     val duration = stop - start
     assert(duration > 950.millis, "tick came in early")
     assert(duration < 1050.millis, "tick came in late")

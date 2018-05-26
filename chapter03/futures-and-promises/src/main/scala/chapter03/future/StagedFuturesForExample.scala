@@ -9,7 +9,7 @@ package chapter03.future
 
 import java.util.concurrent.ForkJoinPool
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.postfixOps
 
 // 代码清单 3-12
@@ -26,7 +26,8 @@ class StagedFuturesForExample(inventoryService: InventoryService) {
    * inventory is a Map of Warehouse ID to count.
    */
   // #snip
-  implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(ForkJoinPool.commonPool())
+  implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(
+    ForkJoinPool.commonPool())
 
   def getProductInventoryByPostalCode(
     productSku: Long,
