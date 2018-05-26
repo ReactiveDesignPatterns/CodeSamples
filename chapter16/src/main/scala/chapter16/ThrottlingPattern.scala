@@ -156,13 +156,15 @@ object ThrottlingPattern {
     batchSize:     Int) extends Actor {
     def now(): Long = System.nanoTime()
 
-    val nanoSecondsBetweenTokens: Long = 1000000000L / ratePerSecond
+    private val nanoSecondsBetweenTokens: Long =
+      1000000000L / ratePerSecond
 
-    var tokenBucket: Int = bucketSize
-    var lastTokenTime: Long = now()
+    private var tokenBucket: Int = bucketSize
+    private var lastTokenTime: Long = now()
 
     def refillBucket(time: Long): Unit = {
-      val accrued = (time - lastTokenTime) * ratePerSecond / 1000000000L
+      val accrued = (time -
+        lastTokenTime) * ratePerSecond / 1000000000L
       if (tokenBucket + accrued >= bucketSize) {
         tokenBucket = bucketSize
         lastTokenTime = time
@@ -173,11 +175,15 @@ object ThrottlingPattern {
     }
 
     def consumeToken(time: Long): Unit = {
+      // always refill first since we do it upon activity and not scheduled
       refillBucket(time)
       tokenBucket -= 1
     }
 
-    var requested = 0
+    /**
+     * second part: managing the pull pattern’s demand
+     */
+    private var requested = 0
 
     def request(time: Long): Unit =
       if (tokenBucket - requested >= batchSize) {
@@ -186,32 +192,41 @@ object ThrottlingPattern {
         if (tokenBucket > 0) {
           sendRequest(time, tokenBucket)
         } else {
-          val timeForNextToken = lastTokenTime + nanoSecondsBetweenTokens - time
+          val timeForNextToken =
+            lastTokenTime + nanoSecondsBetweenTokens - time
           context.system.scheduler
             .scheduleOnce(
               timeForNextToken.nanos,
               workSource,
               WorkRequest(self, 1))(context.dispatcher)
           requested = 1
-          if (Debug)
+          if (Debug) {
             println(s"$time: request(1) scheduled for ${time + timeForNextToken}")
+          }
         }
-      } else if (Debug)
+      } else if (Debug) {
         println(s"$time: not requesting (requested=$requested tokenBucket=$tokenBucket)")
+      }
 
     def sendRequest(time: Long, items: Int): Unit = {
-      if (Debug)
+      if (Debug) {
         println(s"$time: requesting $items items (requested=$requested tokenBucket=$tokenBucket)")
+      }
       workSource ! WorkRequest(self, items)
       requested += items
     }
 
     request(lastTokenTime)
 
+    /**
+     * third part: using the above for rate-regulated message forwarding
+     */
     def receive: Receive = {
       case job: Job ⇒
         val time = now()
-        if (Debug) if (requested == 1) println(s"$time: received job")
+        if (Debug && requested == 1) {
+          println(s"$time: received job")
+        }
         consumeToken(time)
         requested -= 1
         request(time)

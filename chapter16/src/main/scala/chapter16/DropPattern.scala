@@ -38,7 +38,7 @@ object DropPattern {
 
     // #snip_1
     val queueThreshold = 1000
-    val dropThreshold = 1500
+    val dropThreshold = 1384
 
     def random: ThreadLocalRandom = ThreadLocalRandom.current
 
@@ -57,8 +57,11 @@ object DropPattern {
       case job @ Job(id, _, replyTo) ⇒
         if (requestQueue.isEmpty) {
           val atSize = workQueue.size
-          if (shallEnqueue(atSize)) workQueue :+= job
-          else if (atSize < dropThreshold) replyTo ! JobRejected(id)
+          if (shallEnqueue(atSize)) {
+            workQueue :+= job
+          } else if (atSize < dropThreshold) {
+            replyTo ! JobRejected(id)
+          }
         } else {
           // #snip_2
           val WorkRequest(worker, items) = requestQueue.head

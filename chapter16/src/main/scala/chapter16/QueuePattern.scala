@@ -45,15 +45,20 @@ object QueuePattern {
         } else {
           val WorkRequest(worker, items) = requestQueue.head
           worker ! job
-          if (items > 1) worker ! DummyWork(items - 1)
+          if (items > 1) {
+            worker ! DummyWork(items - 1)
+          }
           requestQueue = requestQueue.drop(1)
         }
       case wr @ WorkRequest(worker, items) ⇒
         if (workQueue.isEmpty) {
-          if (!requestQueue.contains(worker)) requestQueue :+= wr
+          requestQueue :+= wr
         } else {
           workQueue.iterator.take(items).foreach(job ⇒ worker ! job)
-          if (workQueue.size < items) worker ! DummyWork(items - workQueue.size)
+          val sent = Math.min(workQueue.size, items)
+          if (sent < items) {
+            worker ! DummyWork(items - sent)
+          }
           workQueue = workQueue.drop(items)
         }
     }

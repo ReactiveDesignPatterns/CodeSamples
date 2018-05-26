@@ -41,7 +41,7 @@ object DropPatternWithProtection {
   }
 
   private class IncomingQueue(manager: ActorRef) extends Actor {
-    var workQueue: Queue[WorkEnvelope] = Queue.empty[WorkEnvelope]
+    private var workQueue: Queue[WorkEnvelope] = Queue.empty[WorkEnvelope]
 
     def receive: Receive = {
       case job: Job ⇒
@@ -58,9 +58,9 @@ object DropPatternWithProtection {
 
   class Protector extends Actor {
 
-    val manager: ActorRef = context.actorOf(Props(new Manager), "manager")
+    private val manager: ActorRef = context.actorOf(Props(new Manager), "manager")
 
-    val incomingQueue: ActorRef = context.actorOf(
+    private val incomingQueue: ActorRef = context.actorOf(
       Props(new IncomingQueue(manager))
         .withMailbox("bounded-mailbox"), "incomingQueue")
 

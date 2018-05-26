@@ -19,45 +19,13 @@ object PullPattern {
 
   case class WorkRequest(worker: ActorRef, items: Int)
 
-  // #snip_16-2
-  class Manager extends Actor {
-
-    val workStream: Iterator[Job] =
-      Iterator from 1 map (x ⇒ Job(x, x, self)) take 1000000
-
-    val aggregator: (BigDecimal, BigDecimal) ⇒ BigDecimal = (x: BigDecimal, y: BigDecimal) ⇒ x + y
-    var approximation = BigDecimal(0, new MathContext(10000, RoundingMode.HALF_EVEN))
-
-    var outstandingWork = 0
-
-    (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self))))
-
-    def receive: Receive = {
-      case WorkRequest(worker, items) ⇒
-        workStream.take(items).foreach {
-          job ⇒
-            worker ! job
-            outstandingWork += 1
-        }
-      case JobResult(id, report) ⇒
-        approximation = aggregator(approximation, report)
-        outstandingWork -= 1
-        if (outstandingWork == 0 && workStream.isEmpty) {
-          println("final result: " + approximation)
-          context.system.terminate()
-        }
-    }
-  }
-
-  // #snip_16-2
-
   // #snip_16-1
   class Worker(manager: ActorRef) extends Actor {
-    val mc = new MathContext(100, RoundingMode.HALF_EVEN)
-    val plus = BigDecimal(1, mc)
-    val minus = BigDecimal(-1, mc)
+    private val mc = new MathContext(100, RoundingMode.HALF_EVEN)
+    private val plus = BigDecimal(1, mc)
+    private val minus = BigDecimal(-1, mc)
 
-    var requested = 0
+    private var requested = 0
 
     def request(): Unit =
       if (requested < 5) {
@@ -78,6 +46,38 @@ object PullPattern {
   }
 
   // #snip_16-1
+
+  // #snip_16-2
+  class Manager extends Actor {
+
+    private val workStream: Iterator[Job] =
+      Iterator from 1 map (x ⇒ Job(x, x, self)) take 1000000
+
+    private val aggregator: (BigDecimal, BigDecimal) ⇒ BigDecimal = (x: BigDecimal, y: BigDecimal) ⇒ x + y
+    private val mc = new MathContext(10000, RoundingMode.HALF_EVEN)
+    private var approximation = BigDecimal(0, mc)
+
+    private var outstandingWork = 0
+
+    (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self))))
+
+    def receive: Receive = {
+      case WorkRequest(worker, items) ⇒
+        workStream.take(items).foreach { job ⇒
+          worker ! job
+          outstandingWork += 1
+        }
+      case JobResult(id, report) ⇒
+        approximation = aggregator(approximation, report)
+        outstandingWork -= 1
+        if (outstandingWork == 0 && workStream.isEmpty) {
+          println("final result: " + approximation)
+          context.system.terminate()
+        }
+    }
+  }
+
+  // #snip_16-2
 
   def main(args: Array[String]): Unit = {
     val sys = ActorSystem("pi")
