@@ -23,8 +23,10 @@ object ShardSupport {
    * not match then the message is dropped
    */
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case mc @ ManagerCommand(cmd, _, _) ⇒ cmd.shoppingCart.id.toString -> mc
-    case mc @ ManagerQuery(query, _, _) ⇒ query.shoppingCart.id.toString -> mc
+    case mc @ ManagerCommand(cmd, _, _) ⇒
+      cmd.shoppingCart.id.toString -> mc
+    case mc @ ManagerQuery(query, _, _) ⇒
+      query.shoppingCart.id.toString -> mc
   }
 
   /*
@@ -33,8 +35,10 @@ object ShardSupport {
    * that are forwarded
    */
   val extractShardId: ShardRegion.ExtractShardId = {
-    case ManagerCommand(cmd, _, _) ⇒ toHex(cmd.shoppingCart.id.hashCode & 255)
-    case ManagerQuery(query, _, _) ⇒ toHex(query.shoppingCart.id.hashCode & 255)
+    case ManagerCommand(cmd, _, _) ⇒
+      toHex(cmd.shoppingCart.id.hashCode & 255)
+    case ManagerQuery(query, _, _) ⇒
+      toHex(query.shoppingCart.id.hashCode & 255)
   }
 
   private def toHex(b: Int) =

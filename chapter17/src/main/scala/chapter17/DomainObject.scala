@@ -19,24 +19,32 @@ case class ShoppingCartRef(id: URI)
 // #snip
 
 // #snip_17-1
-case class ShoppingCart(items: Map[ItemRef, Int], owner: Option[CustomerRef]) {
+case class ShoppingCart(
+  items: Map[ItemRef, Int],
+  owner: Option[CustomerRef]) {
   def setOwner(customer: CustomerRef): ShoppingCart = {
     require(owner.isEmpty, "owner cannot be overwritten")
     copy(owner = Some(customer))
   }
 
   def addItem(item: ItemRef, count: Int): ShoppingCart = {
-    require(count > 0, s"count must be positive (trying to add $item with count $count)")
-    val currentCount = items.get(item).getOrElse(0)
+    require(
+      count > 0,
+      s"count must be positive (trying to add $item with count $count)")
+    val currentCount = items.getOrElse(item, 0)
     copy(items = items.updated(item, currentCount + count))
   }
 
   def removeItem(item: ItemRef, count: Int): ShoppingCart = {
-    require(count > 0, s"count must be positive (trying to remove $item with count $count)")
-    val currentCount = items.get(item).getOrElse(0)
+    require(
+      count > 0,
+      s"count must be positive (trying to remove $item with count $count)")
+    val currentCount = items.getOrElse(item, 0)
     val newCount = currentCount - count
-    if (newCount <= 0) copy(items = items - item)
-    else copy(items = items.updated(item, newCount))
+    if (newCount <= 0)
+      copy(items = items - item)
+    else
+      copy(items = items.updated(item, newCount))
   }
 
   // 代码清单 17-6

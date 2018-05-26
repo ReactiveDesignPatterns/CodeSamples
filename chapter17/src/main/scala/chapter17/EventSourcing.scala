@@ -19,7 +19,7 @@ class PersistentObjectManager extends PersistentActor {
   // we expect the name to be the shopping card ID
   override def persistenceId: String = context.self.path.name
 
-  var shoppingCart: ShoppingCart = ShoppingCart.empty
+  private var shoppingCart: ShoppingCart = ShoppingCart.empty
 
   def receiveCommand: Receive = {
     case ManagerCommand(cmd, id, replyTo) ⇒

@@ -20,8 +20,9 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
 
 //#snip_17-8
-class ShoppingCartTagging(system: ExtendedActorSystem) extends WriteEventAdapter {
-  def manifest(event: Any): String = ""
+class ShoppingCartTagging(system: ExtendedActorSystem)
+  extends WriteEventAdapter {
+  def manifest(event: Any): String = "" // no additional manifest needed
 
   def toJournal(event: Any): Any =
     event match {
@@ -97,9 +98,9 @@ class TopProductListener extends Actor with ActorLogging {
 
   import TopProductListener._
 
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  private implicit val materializer = ActorMaterializer()
 
-  val readJournal: LeveldbReadJournal =
+  private val readJournal: LeveldbReadJournal =
     PersistenceQuery(context.system)
       .readJournalFor[LeveldbReadJournal](LeveldbReadJournal.Identifier)
 
@@ -111,11 +112,11 @@ class TopProductListener extends Actor with ActorLogging {
       val histogram = seq.foldLeft(Map.empty[ItemRef, IntHolder]) {
         (map, event) ⇒
           map.get(event.item) match {
-            case Some(holder) ⇒ {
-              holder.value += event.count;
+            case Some(holder) ⇒
+              holder.value += event.count
               map
-            }
-            case None ⇒ map.updated(event.item, new IntHolder(event.count))
+            case None ⇒
+              map.updated(event.item, new IntHolder(event.count))
           }
       }
       self ! TopProducts(0, histogram.map(p ⇒ (p._1, p._2.value)))
@@ -124,7 +125,8 @@ class TopProductListener extends Actor with ActorLogging {
   var topProducts = Map.empty[ItemRef, Int]
 
   def receive: Receive = {
-    case GetTopProducts(id, replyTo) ⇒ replyTo ! TopProducts(id, topProducts)
+    case GetTopProducts(id, replyTo) ⇒
+      replyTo ! TopProducts(id, topProducts)
     case TopProducts(_, products) ⇒
       topProducts = products
       log.info("new {}", products)

@@ -40,8 +40,8 @@ object ThrottlingPattern {
 
   class Manager extends Actor {
 
-    var workQueue: Queue[Job] = Queue.empty[Job]
-    var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
+    private var workQueue: Queue[Job] = Queue.empty[Job]
+    private var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
     (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self)).withDispatcher(context.props.dispatcher)))
 
@@ -71,13 +71,13 @@ object ThrottlingPattern {
     }
   }
 
-  val mc = new MathContext(100, RoundingMode.HALF_EVEN)
+  private val mc = new MathContext(100, RoundingMode.HALF_EVEN)
 
   class Worker(manager: ActorRef) extends Actor {
-    val plus = BigDecimal(1, mc)
-    val minus = BigDecimal(-1, mc)
+    private val plus = BigDecimal(1, mc)
+    private val minus = BigDecimal(-1, mc)
 
-    var requested = 0
+    private var requested = 0
 
     def request(): Unit =
       if (requested < 50) {
@@ -113,14 +113,14 @@ object ThrottlingPattern {
   }
 
   class WorkSource extends Actor {
-    val N = 1000000
-    var start: Deadline = _
+    private val N = 1000000
+    private var start: Deadline = _
 
-    val workStream: Iterator[Job] =
+    private val workStream: Iterator[Job] =
       Iterator from 1 map (x ⇒ Job(x, x, self)) take N
 
-    var approximation: Report = Report.empty
-    var outstandingWork = 0
+    private var approximation: Report = Report.empty
+    private var outstandingWork = 0
 
     def receive: Receive = {
       case WorkRequest(worker, items) ⇒
