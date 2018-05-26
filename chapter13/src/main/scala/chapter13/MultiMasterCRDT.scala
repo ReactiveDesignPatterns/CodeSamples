@@ -16,26 +16,33 @@ import scala.concurrent.duration._
 
 object MultiMasterCRDT {
 
-  private var statusMap = Map.empty[String, Status]
+  // #snip_13-10
+  final case class Status(name: String)(
+    _pred: ⇒ Set[Status], _succ: ⇒ Set[Status]) extends ReplicatedData {
 
-  final case class Status(val name: String)(_pred: ⇒ Set[Status], _succ: ⇒ Set[Status]) extends ReplicatedData {
     type T = Status
     def merge(that: Status): Status = mergeStatus(this, that)
 
     @volatile lazy val predecessors: Set[Status] = _pred
     @volatile lazy val successors: Set[Status] = _succ
 
-    if (!statusMap.contains(name)) statusMap += name -> this
-    private def readResolve: AnyRef = statusMap(name)
   }
 
-  val New: Status = Status("new")(Set.empty, Set(Scheduled, Cancelled))
-  val Scheduled: Status = Status("scheduled")(Set(New), Set(Executing, Cancelled))
-  val Executing: Status = Status("executing")(Set(Scheduled), Set(Aborted, Finished))
-  val Finished: Status = Status("finished")(Set(Executing, Aborted), Set.empty)
-  val Cancelled: Status = Status("cancelled")(Set(New, Scheduled), Set(Aborted))
-  val Aborted: Status = Status("aborted")(Set(Cancelled, Executing), Set(Finished))
+  val New: Status =
+    Status("new")(Set.empty, Set(Scheduled, Cancelled))
+  val Scheduled: Status =
+    Status("scheduled")(Set(New), Set(Executing, Cancelled))
+  val Executing: Status =
+    Status("executing")(Set(Scheduled), Set(Aborted, Finished))
+  val Finished: Status =
+    Status("finished")(Set(Executing, Aborted), Set.empty)
+  val Cancelled: Status =
+    Status("cancelled")(Set(New, Scheduled), Set(Aborted))
+  val Aborted: Status =
+    Status("aborted")(Set(Cancelled, Executing), Set(Finished))
+  // #snip_13-10
 
+  // #snip_13-11
   def mergeStatus(left: Status, right: Status): Status = {
     /*
      * Keep the left Status in hand and determine whether it is a predecessor of
@@ -48,10 +55,12 @@ object MultiMasterCRDT {
         candidate
       } else {
         val nextExclude = exclude + candidate
-        val branches = candidate.successors.map(succ ⇒ innerLoop(succ, nextExclude))
+        val branches =
+          candidate.successors.map(succ ⇒ innerLoop(succ, nextExclude))
         branches.reduce((l, r) ⇒ if (isSuccessor(l, r, nextExclude)) r else l)
       }
-    def isSuccessor(candidate: Status, fixed: Status, exclude: Set[Status]): Boolean =
+    def isSuccessor(candidate: Status,
+      fixed: Status, exclude: Set[Status]): Boolean =
       if (candidate == fixed) true
       else {
         val toSearch = candidate.predecessors -- exclude
@@ -60,6 +69,7 @@ object MultiMasterCRDT {
 
     innerLoop(right, Set.empty)
   }
+  // #snip_13-11
 
   object StorageComponent extends Key[ORMap[Status]]("StorageComponent")
 
@@ -69,6 +79,7 @@ object MultiMasterCRDT {
   case class Finish(job: String)
   case object PrintStatus
 
+  // #snip_13-12
   class ClientInterface extends Actor with ActorLogging {
     val replicator: ActorRef = DistributedData(context.system).replicator
     implicit val cluster: _root_.akka.cluster.Cluster = Cluster(context.system)
@@ -76,19 +87,27 @@ object MultiMasterCRDT {
     def receive: PartialFunction[Any, Unit] = {
       case Submit(job) ⇒
         log.info("submitting job {}", job)
-        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"submit $job"))(_ + (job -> New))
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status],
+          Replicator.WriteMajority(5.seconds),
+          Some(s"submit $job"))(_ + (job -> New))
       case Cancel(job) ⇒
         log.info("cancelling job {}", job)
-        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(s"cancel $job"))(_ + (job -> Cancelled))
+        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status],
+          Replicator.WriteMajority(5.seconds),
+          Some(s"cancel $job"))(_ + (job -> Cancelled))
       case r: Replicator.UpdateResponse[_] ⇒
         log.info("received update result: {}", r)
       case PrintStatus ⇒
-        replicator ! Replicator.Get(StorageComponent, Replicator.ReadMajority(5.seconds))
+        replicator ! Replicator.Get(
+          StorageComponent,
+          Replicator.ReadMajority(5.seconds))
       case g: Replicator.GetSuccess[_] ⇒
         log.info("overall status: {}", g.get(StorageComponent))
     }
   }
+  // #snip_13-12
 
+  // #snip_13-13
   class Executor extends Actor with ActorLogging {
     val replicator: ActorRef = DistributedData(context.system).replicator
     implicit val cluster: _root_.akka.cluster.Cluster = Cluster(context.system)
@@ -100,13 +119,17 @@ object MultiMasterCRDT {
     def receive: PartialFunction[Any, Unit] = {
       case Execute(job) ⇒
         log.info("executing job {}", job)
-        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds), Some(job)) { map ⇒
-          require(map.get(job) == Some(New))
-          map + (job -> Executing)
-        }
+        replicator ! Replicator.Update(
+          StorageComponent, ORMap.empty[Status],
+          Replicator.WriteMajority(5.seconds), Some(job)) { map ⇒
+            require(map.get(job) == Some(New))
+            map + (job -> Executing)
+          }
       case Finish(job) ⇒
         log.info("job {} finished", job)
-        replicator ! Replicator.Update(StorageComponent, ORMap.empty[Status], Replicator.WriteMajority(5.seconds))(_ + (job -> Finished))
+        replicator ! Replicator.Update(
+          StorageComponent, ORMap.empty[Status],
+          Replicator.WriteMajority(5.seconds))(_ + (job -> Finished))
       case Replicator.UpdateSuccess(StorageComponent, Some(job)) ⇒
         log.info("starting job {}", job)
       case r: Replicator.UpdateResponse[_] ⇒
@@ -121,6 +144,7 @@ object MultiMasterCRDT {
         lastState = current
     }
   }
+  // #snip_13-13
 
   val commonConfig: Config = ConfigFactory.parseString("""
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
@@ -154,7 +178,8 @@ object MultiMasterCRDT {
 
     awaitMembers(sys1, 2)
 
-    val clientInterface = sys1.actorOf(Props(new ClientInterface), "clientInterface")
+    val clientInterface =
+      sys1.actorOf(Props(new ClientInterface), "clientInterface")
     val executor = sys2.actorOf(Props(new Executor), "executor")
 
     clientInterface ! Submit("alpha")

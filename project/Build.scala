@@ -8,6 +8,7 @@ import scalariform.formatter.preferences._
 object Build {
   val akkaVersion = "2.4.20"
   val akka25Version = "2.5.12"
+  val ckiteVersion = "0.2.1"
 
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akka25Actor = "com.typesafe.akka" %% "akka-actor" % akka25Version
@@ -38,6 +39,16 @@ object Build {
   val junit = "junit" % "junit" % "4.12" % "test"
 
   val guava = "com.google.guava" % "guava" % "23.0"
+
+  val finagle = "com.twitter" %% "finagle-http" % "18.5.0"
+  val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.5"
+
+  val ckites = Seq(
+    "io.ckite" % "ckite-core" % ckiteVersion,
+    "io.ckite" % "ckite-finagle" % ckiteVersion,
+    "io.ckite" % "ckite-mapdb" % ckiteVersion
+  )
+
 
   //
   //  private val headerSettings = Seq(
