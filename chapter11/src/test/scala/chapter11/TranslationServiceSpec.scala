@@ -9,12 +9,12 @@ package chapter11
 
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import akka.testkit.TestProbe
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 import org.scalatest.concurrent.Eventually
+import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 
-import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._
 import scala.concurrent.rdpextras.SynchronousEventLoop
+import scala.concurrent.{ Await, ExecutionContext }
 import scala.util.Success
 
 object TranslationServiceSpec {

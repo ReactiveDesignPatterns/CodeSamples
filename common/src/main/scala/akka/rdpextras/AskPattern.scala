@@ -9,8 +9,9 @@ package akka.rdpextras
 
 import akka.actor._
 import akka.pattern._
-import scala.concurrent.Future
 import akka.util.Timeout
+
+import scala.concurrent.Future
 
 object AskPattern {
 

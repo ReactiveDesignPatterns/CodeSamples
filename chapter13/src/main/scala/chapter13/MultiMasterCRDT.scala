@@ -59,8 +59,9 @@ object MultiMasterCRDT {
           candidate.successors.map(succ ⇒ innerLoop(succ, nextExclude))
         branches.reduce((l, r) ⇒ if (isSuccessor(l, r, nextExclude)) r else l)
       }
-    def isSuccessor(candidate: Status,
-      fixed: Status, exclude: Set[Status]): Boolean =
+    def isSuccessor(
+      candidate: Status,
+      fixed:     Status, exclude: Set[Status]): Boolean =
       if (candidate == fixed) true
       else {
         val toSearch = candidate.predecessors -- exclude

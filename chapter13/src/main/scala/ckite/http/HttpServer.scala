@@ -10,6 +10,7 @@ package ckite.http
 import java.net.InetSocketAddress
 
 import ckite.CKite
+import com.twitter.finagle.Http
 import com.twitter.util.Closable
 import com.typesafe.config.ConfigFactory
 
@@ -24,7 +25,6 @@ class HttpServer(ckite: CKite) {
         .getString("ckite.listen-address").split(":")(1).toInt + 1000
 
     val adminServerPort = restServerPort + 1000
-    import com.twitter.finagle.Http
     server =
       Http.serve(new InetSocketAddress(restServerPort), new HttpService(ckite))
   }

@@ -10,7 +10,7 @@ package chapter11
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props, actorRef2Scala }
 import akka.pattern.pipe
 import akka.util.Timeout
-import com.reactivedesignpatterns.Defaults.{ AskableActorRef, Timestamp }
+import com.reactivedesignpatterns.Defaults.AskableActorRef
 
 import scala.collection.immutable
 import scala.concurrent.duration.FiniteDuration
@@ -114,3 +114,4 @@ class LatencyTestSupport(system: ActorSystem) {
   }
 
 }
+

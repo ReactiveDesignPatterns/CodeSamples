@@ -582,7 +582,7 @@ object ActivePassive {
     private val matches = (p: (Int, Int)) ⇒ p._1 == p._2
 
     private def consolidate(theStore: Map[String, JsValue], expectedSeq: Int,
-      askedFor: Set[Int], waiting: TreeMap[Int, Replicate]): Unit = {
+                            askedFor: Set[Int], waiting: TreeMap[Int, Replicate]): Unit = {
       // calculate applicable prefix length
       val prefix = waiting.keysIterator
         .zip(Iterator from expectedSeq).takeWhile(matches).size
@@ -650,7 +650,8 @@ object ActivePassive {
   }
 
   def start(port: Option[Int]): ActorSystem = {
-    val system = ActorSystem("ActivePassive",
+    val system = ActorSystem(
+      "ActivePassive",
       roleConfig("backend", port) withFallback commonConfig)
     val localReplica = system.actorOf(Props(
       new Passive(3, 3.seconds, 100)), "passive")
@@ -670,7 +671,8 @@ object ActivePassive {
     val seedNode = Cluster(systems(0)).selfAddress
     systems foreach (Cluster(_).join(seedNode))
 
-    val sys = ActorSystem("ActivePassive",
+    val sys = ActorSystem(
+      "ActivePassive",
       ConfigFactory.parseString("akka.loglevel=INFO") withFallback commonConfig)
     Cluster(sys).join(seedNode)
 

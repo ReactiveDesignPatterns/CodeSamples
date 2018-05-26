@@ -12,8 +12,8 @@ import java.util.concurrent.TimeoutException
 import akka.actor.ActorSystem
 import org.scalatest.{ Matchers, WordSpec }
 
-import scala.concurrent.Future
 import scala.async.Async.{ async, await }
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 // 代码清单 11-14

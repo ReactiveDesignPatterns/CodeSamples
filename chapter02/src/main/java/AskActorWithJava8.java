@@ -9,8 +9,6 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.japi.Creator;
-import akka.pattern.Patterns.*;
-import akka.pattern.PatternsCS;
 import akka.util.Timeout;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;

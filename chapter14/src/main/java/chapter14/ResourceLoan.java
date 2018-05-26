@@ -8,29 +8,14 @@ package chapter14;
 
 import akka.actor.AbstractActor;
 import akka.actor.Cancellable;
-import chapter14.ResourceEncapsulation.DoHealthCheck;
+import chapter14.ResourceEncapsulation.*;
 import chapter14.ResourceEncapsulation.Shutdown;
-import chapter14.ResourceEncapsulation.WorkerCommandFailed;
-import chapter14.ResourceEncapsulation.WorkerNodeMessage;
-import chapter14.ResourceEncapsulation.WorkerNodeReady;
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.handlers.AsyncHandler;
-import com.amazonaws.services.ec2.AmazonEC2Async;
-import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.*;
-import com.amazonaws.services.opsworks.model.ShutdownEventConfiguration;
 import scala.PartialFunction;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
-import scala.concurrent.Promise;
 import scala.concurrent.duration.FiniteDuration;
 import scala.runtime.BoxedUnit;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ResourceLoan {
 

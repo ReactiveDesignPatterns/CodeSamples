@@ -7,9 +7,9 @@
 
 package chapter11
 
-import akka.actor.{ ActorRef, ActorSystem }
+import akka.actor.ActorSystem
 import akka.testkit.TestProbe
-import chapter11.TranslationService.{ Translate, TranslateV1 }
+import chapter11.TranslationService.Translate
 import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 
 import scala.concurrent.Await

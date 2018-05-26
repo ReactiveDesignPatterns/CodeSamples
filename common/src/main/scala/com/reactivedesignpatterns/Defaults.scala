@@ -7,12 +7,11 @@
 
 package com.reactivedesignpatterns
 
-import scala.concurrent.duration._
 import akka.actor.ActorRef
-
-import scala.concurrent.Future
 import akka.util.Timeout
 
+import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.Success
 
 object Defaults {

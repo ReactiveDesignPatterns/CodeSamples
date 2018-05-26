@@ -11,8 +11,8 @@
 // #snip
 package chapter03.actor
 
-import akka.actor._
 import akka.actor.SupervisorStrategy.Restart
+import akka.actor._
 import akka.event.LoggingReceive
 
 case object Start

@@ -16,8 +16,8 @@ import com.reactivedesignpatterns.Helpers
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 
-import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.{ Duration, DurationInt, FiniteDuration }
+import scala.concurrent.{ Await, Future }
 import scala.util.Try
 
 object EchoServiceSpec {

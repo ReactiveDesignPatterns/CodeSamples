@@ -7,13 +7,14 @@
 
 package chapter03.future
 
+import java.util.concurrent.ForkJoinPool
+
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor }
-import java.util.concurrent.ForkJoinPool
 
 @RunWith(classOf[JUnit4])
 class StagedFuturesForExampleTest {

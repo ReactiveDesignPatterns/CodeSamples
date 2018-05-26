@@ -44,18 +44,10 @@ object Build {
   val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.5"
 
   val ckites = Seq(
-    "io.ckite" % "ckite-core" % ckiteVersion,
-    "io.ckite" % "ckite-finagle" % ckiteVersion,
-    "io.ckite" % "ckite-mapdb" % ckiteVersion
+    "io.ckite" % "ckite-core" % ckiteVersion exclude("org.apache.thrift","libthrift"),
+    "io.ckite" % "ckite-finagle" % ckiteVersion exclude("org.apache.thrift","libthrift"),
+    "io.ckite" % "ckite-mapdb" % ckiteVersion exclude("org.apache.thrift","libthrift")
   )
-
-
-  //
-  //  private val headerSettings = Seq(
-  //    startYear := Some(2018),
-  //    organization := "https://www.reactivedesignpatterns.com/ & http://rdp.reactiveplatform.xyz/"
-  //  )
-
 
   private def setPreferences(preferences: IFormattingPreferences): IFormattingPreferences = preferences
     .setPreference(RewriteArrowSymbols, true)
