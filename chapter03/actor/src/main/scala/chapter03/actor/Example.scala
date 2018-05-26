@@ -16,7 +16,9 @@ import akka.actor._
 import akka.event.LoggingReceive
 
 case object Start
+
 case class CounterMessage(counterValue: Int)
+
 case class CounterTooLargeException(message: String) extends Exception(message)
 
 class SupervisorActor extends Actor with ActorLogging {
@@ -72,4 +74,5 @@ object Example extends App {
   val supervisor = system.actorOf(Props[SupervisorActor])
   supervisor ! Start
 }
+
 // #snip

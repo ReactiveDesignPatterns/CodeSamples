@@ -20,6 +20,7 @@ class SynchronousSpec extends WordSpec with Matchers {
     import scala.concurrent.duration._
     Await.result(tr.translate(input), 2.seconds)
   }
+
   " Testing a purely synchronous translation function" in {
     // #snip
     val input = "Hur mår du?"

@@ -24,5 +24,6 @@ sealed trait VerificationProcessResponse
 case class VerificationProcessStarted(userEmail: String) extends VerificationProcessResponse
 
 case class VerificationProcessFailed(userEmail: String) extends VerificationProcessResponse
+
 // #snip
 

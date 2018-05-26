@@ -21,15 +21,18 @@ import scala.concurrent.{ Await, Future }
 import scala.util.Try
 
 object EchoServiceSpec {
+
   import EchoService._
 
   case class TestSLA(echo: ActorRef, n: Int, maxParallelism: Int, reportTo: ActorRef)
+
   case object AbortSLATest
+
   case class SLAResponse(timings: Seq[FiniteDuration], outstanding: Map[String, Timestamp])
 
   class ParallelSLATester extends Actor {
 
-    def receive: PartialFunction[Any, Unit] = {
+    def receive: Receive = {
       case TestSLA(echo, n, maxParallelism, reportTo) ⇒
         val receiver = context.actorOf(receiverProps(self))
         // prime the request pipeline
@@ -84,6 +87,7 @@ object EchoServiceSpec {
   }
 
   private def receiverProps(controller: ActorRef) = Props(new ParallelSLATestReceiver(controller))
+
   private case class TimedResponse(r: Response, d: Timestamp)
 
   // timestamp received replies in a dedicated actor to keep timing distortions low
@@ -96,11 +100,13 @@ object EchoServiceSpec {
 }
 
 class EchoServiceSpec extends WordSpec with Matchers with BeforeAndAfterAll {
+
   import EchoService._
   import EchoServiceSpec._
 
   // implicitly picked up to create TestProbes, lazy to only start when used
-  implicit lazy val system: ActorSystem = ActorSystem("EchoServiceSpec", ConfigFactory.parseString("""
+  implicit lazy val system: ActorSystem = ActorSystem("EchoServiceSpec", ConfigFactory.parseString(
+    """
 akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
 """))
 

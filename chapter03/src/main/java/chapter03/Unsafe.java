@@ -9,6 +9,7 @@ package chapter03;
 
 // Listing 3.1 Unsafe, mutable message class, which may hide unexpected behavior
 // #snip
+
 import java.util.Date;
 
 public class Unsafe {

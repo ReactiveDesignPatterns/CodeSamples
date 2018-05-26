@@ -23,12 +23,12 @@ public class ParallelRetrievalExample {
   }
 
   public Object retrieveCustomer(final long id) {
-        final CompletableFuture<Object> cacheFuture = CompletableFuture
-                .supplyAsync(() -> cacheRetriever.getCustomer(id));
-        final CompletableFuture<Object> dbFuture = CompletableFuture
-                .supplyAsync(() -> dbRetriever.getCustomer(id));
+    final CompletableFuture<Object> cacheFuture = CompletableFuture
+      .supplyAsync(() -> cacheRetriever.getCustomer(id));
+    final CompletableFuture<Object> dbFuture = CompletableFuture
+      .supplyAsync(() -> dbRetriever.getCustomer(id));
 
-        return CompletableFuture.anyOf(cacheFuture, dbFuture);
-    }
+    return CompletableFuture.anyOf(cacheFuture, dbFuture);
+  }
 }
 // #snip

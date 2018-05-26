@@ -22,12 +22,15 @@ class RateLimiter(requests: Int, period: FiniteDuration) {
     Array.fill(requests)(onePeriodAgo)
   }
   private var position = 0
+
   private def lastTime = startTimes(position)
+
   private def enqueue(time: Deadline): Unit = {
     startTimes(position) = time
     position += 1
     if (position == requests) position = 0
   }
+
   def call[T](block: ⇒ Future[T]): Future[T] = {
     val now = Deadline.now
     if ((now - lastTime) < period) {
@@ -38,4 +41,5 @@ class RateLimiter(requests: Int, period: FiniteDuration) {
     }
   }
 }
+
 // #snip

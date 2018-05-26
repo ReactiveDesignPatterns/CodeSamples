@@ -14,6 +14,7 @@ import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 object PullPattern {
 
   case class Job(id: Long, input: Int, replyTo: ActorRef)
+
   case class JobResult(id: Long, report: BigDecimal)
 
   case class WorkRequest(worker: ActorRef, items: Int)
@@ -47,6 +48,7 @@ object PullPattern {
         }
     }
   }
+
   // #snip_16-2
 
   // #snip_16-1
@@ -56,6 +58,7 @@ object PullPattern {
     val minus = BigDecimal(-1, mc)
 
     var requested = 0
+
     def request(): Unit =
       if (requested < 5) {
         manager ! WorkRequest(self, 10)
@@ -73,6 +76,7 @@ object PullPattern {
         replyTo ! JobResult(id, result)
     }
   }
+
   // #snip_16-1
 
   def main(args: Array[String]): Unit = {

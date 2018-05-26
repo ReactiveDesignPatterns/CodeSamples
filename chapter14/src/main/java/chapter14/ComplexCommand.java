@@ -139,7 +139,6 @@ public interface ComplexCommand {
   // #snip_14-7
 
 
-
   class InRange implements Predicate<DataElement> {
     private static final long serialVersionUID = 1L;
     public final String fieldname;

@@ -17,18 +17,24 @@ object Saga {
 
   trait Account {
     def withdraw(amount: BigDecimal, id: Long): Future[Unit]
+
     def deposit(amount: BigDecimal, id: Long): Future[Unit]
   }
 
   case class Transfer(amount: BigDecimal, x: Account, y: Account)
 
   sealed trait Event
+
   case class TransferStarted(amount: BigDecimal, x: Account, y: Account) extends Event
+
   case object MoneyWithdrawn extends Event
+
   case object MoneyDeposited extends Event
+
   case object RolledBack extends Event
 
   class TransferSaga(id: Long) extends PersistentActor {
+
     import context.dispatcher
 
     override val persistenceId: String = s"transaction-$id"
@@ -70,8 +76,11 @@ object Saga {
       var last: Event = null
 
       {
-        case t: TransferStarted ⇒ { start = t; last = t }
-        case e: Event           ⇒ last = e
+        case t: TransferStarted ⇒ {
+          start = t;
+          last = t
+        }
+        case e: Event ⇒ last = e
         case RecoveryCompleted ⇒
           last match {
             case null               ⇒ // wait for initialization

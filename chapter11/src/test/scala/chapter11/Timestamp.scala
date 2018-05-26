@@ -14,11 +14,14 @@ import scala.concurrent.duration.FiniteDuration
 case class Timestamp(time: Long) {
   def -(that: Timestamp): Timestamp = new Timestamp(time - that.time)
 }
+
 object Timestamp {
+
   implicit object TimestampOrdering extends Ordering[Timestamp] {
     override def compare(x: Timestamp, y: Timestamp): Int =
       x.time.compare(y.time)
   }
+
   implicit class TimestampOps(val timestamp: Timestamp) extends AnyVal {
     def toFiniteDuration: FiniteDuration = FiniteDuration(
       timestamp.time,
@@ -32,5 +35,6 @@ object Timestamp {
 
     def <(that: FiniteDuration): Boolean = timestamp.time < that.toMillis
   }
+
   def now: Timestamp = new Timestamp(System.currentTimeMillis())
 }

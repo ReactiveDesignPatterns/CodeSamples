@@ -23,4 +23,5 @@ case class SendEmail(
   replyTo:       ActorRef[SendEmailResult])(body: Source[String]) extends StreamedRequest {
   override def payload: Source[String] = body
 }
+
 // #snip

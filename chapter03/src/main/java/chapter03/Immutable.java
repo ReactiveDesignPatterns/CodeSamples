@@ -9,6 +9,7 @@ package chapter03;
 // Listing 3.2 Immutable message class that behaves predictably and is easier to reason about
 
 // #snip
+
 import java.util.Date;
 
 public class Immutable {

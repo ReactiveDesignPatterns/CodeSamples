@@ -15,10 +15,12 @@ import scala.collection.immutable.TreeMap
 import scala.concurrent.duration._
 
 object ActiveActive {
+
   import ReplicationProtocol._
 
   // #snip_13-14
   private case class SeqCommand(seq: Int, cmd: Command, replyTo: ActorRef)
+
   private case class SeqResult(
     seq:     Int,
     res:     Result,
@@ -26,6 +28,7 @@ object ActiveActive {
     replyTo: ActorRef)
 
   private case class SendInitialData(toReplica: ActorRef)
+
   private case class InitialData(map: Map[String, JsValue])
 
   class Replica extends Actor with Stash {
@@ -52,6 +55,7 @@ object ActiveActive {
       case SendInitialData(toReplica) ⇒ toReplica ! InitialData(map)
     }
   }
+
   // #snip_13-14
 
   object Replica {
@@ -61,10 +65,14 @@ object ActiveActive {
   // #snip_13-15
   private sealed trait ReplyState {
     def deadline: Deadline
+
     def missing: Set[ActorRef]
+
     def add(res: SeqResult): ReplyState
+
     def isFinished: Boolean = missing.isEmpty
   }
+
   private case class Unknown(
     deadline: Deadline, replies: Set[SeqResult],
     missing: Set[ActorRef], quorum: Int) extends ReplyState {
@@ -88,6 +96,7 @@ object ActiveActive {
       } else Unknown(deadline, nextReplies, nextMissing, quorum)
     }
   }
+
   private case class Known(
     deadline: Deadline, reply: SeqResult,
     wrong: Set[ActorRef], missing: Set[ActorRef]) extends ReplyState {
@@ -97,6 +106,7 @@ object ActiveActive {
       Known(deadline, reply, nextWrong, missing - res.replica)
     }
   }
+
   private object Known {
     def fromUnknown(deadline: Deadline, replies: Set[SeqResult]): Known = {
       // did not reach consensus on this one, pick simple majority
@@ -109,6 +119,7 @@ object ActiveActive {
       Known(deadline, winners.head, losers, Set.empty)
     }
   }
+
   // #snip_13-15
 
   // #snip_13-16
@@ -161,6 +172,7 @@ object ActiveActive {
         }
       }
     }
+
     // #snip_13-18
 
     // #snip_13-17
@@ -172,6 +184,7 @@ object ActiveActive {
           sendReplies()
         case _ ⇒
       }
+
     // #snip_13-17
 
     // #snip_13-19
@@ -192,8 +205,10 @@ object ActiveActive {
         replicas.head ! SendInitialData(replica)
         replicas += replica
       }
+
     // #snip_13-19
   }
+
   // #snip_13-16
 
 }

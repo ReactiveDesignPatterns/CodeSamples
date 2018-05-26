@@ -72,6 +72,7 @@ object Aggregator {
       FrontPageResult(user, css.get, allNews)
     }
   }
+
   //#snip_15-16
 
   //#snip_15-15
@@ -105,6 +106,7 @@ object Aggregator {
           ctx.schedule(1.second, childRef, ReceiveTimeout)
       }
     }
+
   //#snip_15-15
 
   //#snip_15-14

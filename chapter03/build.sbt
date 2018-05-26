@@ -3,8 +3,8 @@ lazy val eventloop = project
   .settings(Build.sharedSettings: _*)
   .settings(headerLicense := Some(HeaderLicense.Custom(
     s"""|Copyright (c) 2018 https://www.reactivedesignpatterns.com/${"\n"}
-       |Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
-       |
+        |Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+        |
        |""".stripMargin
   )
   ))
@@ -14,8 +14,8 @@ lazy val csp = project
   .settings(Build.sharedSettings: _*)
   .settings(headerLicense := Some(HeaderLicense.Custom(
     s"""|Copyright (c) 2018 https://www.reactivedesignpatterns.com/${"\n"}
-       |Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
-       |
+        |Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+        |
        |""".stripMargin
   )
   ))

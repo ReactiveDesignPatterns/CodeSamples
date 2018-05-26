@@ -7,8 +7,10 @@
 public class SequentialExecution {
   public static class ReplyA {
   }
+
   public static class ReplyB {
   }
+
   public static class ReplyC {
   }
 

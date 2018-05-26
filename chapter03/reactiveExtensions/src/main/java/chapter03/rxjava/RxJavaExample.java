@@ -12,9 +12,9 @@ import io.reactivex.Observable;
 
 public class RxJavaExample {
   public void observe(String[] strings) {
-        Observable.fromArray(strings).subscribe((s) -> {
-                System.out.println("Received " + s);
-        });
-    }
+    Observable.fromArray(strings).subscribe((s) -> {
+      System.out.println("Received " + s);
+    });
+  }
 }
 // #snip

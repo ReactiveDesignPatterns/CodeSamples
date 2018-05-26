@@ -65,6 +65,7 @@ object AskPattern {
           }
       }
     }.narrow[StartVerificationProcess]
+
   // #snip_15-13
 
   // #snip_15-11
@@ -112,6 +113,7 @@ object AskPattern {
           emailGateway ! request
       }
     }
+
   // #snip_15-11
 
   // #snip_15-12
@@ -157,6 +159,7 @@ object AskPattern {
           }.foreach(result ⇒ replyTo ! result)
       }
     }
+
   // #snip_15-12
 
   private def constructBody(userEmail: String, corrID: UUID): String = ???

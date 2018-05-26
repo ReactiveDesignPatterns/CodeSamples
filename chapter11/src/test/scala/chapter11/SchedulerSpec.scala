@@ -63,18 +63,26 @@ class SchedulerSpec extends FlatSpec with BeforeAndAfterAll {
 }
 
 object SchedulerSpec {
+
   sealed trait SchedulerCommand
+
   final case class Schedule(replyTo: ActorRef, msg: Any, delay: FiniteDuration) extends SchedulerCommand
+
   final case class ScheduleRepeatedly(replyTo: ActorRef, delay: FiniteDuration, msg: String) extends SchedulerCommand
+
   final case class CancelSchedule(token: SchedulerToken, replyTo: ActorRef) extends SchedulerCommand
 
   sealed trait SchedulerEvent
+
   final case class SchedulerToken(token: String) extends SchedulerEvent
+
   final case object ScheduleCanceled extends SchedulerEvent
+
   final case class ScheduleNotFound(token: SchedulerToken) extends SchedulerEvent
 
   class Scheduler extends Actor {
     private var schedulerTokens = Map.empty[SchedulerToken, Cancellable]
+
     override def receive: Receive = {
       case Schedule(replyTo, msg, delay) ⇒
         import context.dispatcher

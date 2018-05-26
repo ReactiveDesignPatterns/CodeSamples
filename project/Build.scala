@@ -44,9 +44,9 @@ object Build {
   val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.5"
 
   val ckites = Seq(
-    "io.ckite" % "ckite-core" % ckiteVersion exclude("org.apache.thrift","libthrift"),
-    "io.ckite" % "ckite-finagle" % ckiteVersion exclude("org.apache.thrift","libthrift"),
-    "io.ckite" % "ckite-mapdb" % ckiteVersion exclude("org.apache.thrift","libthrift")
+    "io.ckite" % "ckite-core" % ckiteVersion exclude("org.apache.thrift", "libthrift"),
+    "io.ckite" % "ckite-finagle" % ckiteVersion exclude("org.apache.thrift", "libthrift"),
+    "io.ckite" % "ckite-mapdb" % ckiteVersion exclude("org.apache.thrift", "libthrift")
   )
 
   private def setPreferences(preferences: IFormattingPreferences): IFormattingPreferences = preferences
@@ -73,6 +73,6 @@ object Build {
           |
           |""".stripMargin
     )
-  )
+    )
   )
 }

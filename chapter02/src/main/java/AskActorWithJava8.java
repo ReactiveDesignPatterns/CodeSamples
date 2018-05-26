@@ -27,17 +27,19 @@ public class AskActorWithJava8 {
       return reqId;
     }
   }
+
   public static class Response {
   }
+
   public static class MyActor extends AbstractActor {
     @Override
-        public Receive createReceive() {
-            return receiveBuilder()
-                    .matchAny((msg) -> {
-                        getSender().tell(new Response(),getSelf());
-                    })
-                    .build();
-        }
+    public Receive createReceive() {
+      return receiveBuilder()
+        .matchAny((msg) -> {
+          getSender().tell(new Response(), getSelf());
+        })
+        .build();
+    }
   }
 
   public static void processIt(Response response) {
@@ -47,16 +49,16 @@ public class AskActorWithJava8 {
   private static final ActorSystem ACTOR_SYSTEM = ActorSystem.create();
 
   public static void main(String[] args) {
-        ActorRef actorRef = ACTOR_SYSTEM.actorOf(Props.create(MyActor.class, (Creator<MyActor>) MyActor::new));
-        Request request = new Request(1);
-        Timeout timeout = Timeout.apply(1, TimeUnit.SECONDS);
+    ActorRef actorRef = ACTOR_SYSTEM.actorOf(Props.create(MyActor.class, (Creator<MyActor>) MyActor::new));
+    Request request = new Request(1);
+    Timeout timeout = Timeout.apply(1, TimeUnit.SECONDS);
 
-        // #snip
-        CompletionStage<Response> future =
-                ask(actorRef, request, timeout)
-                        .thenApply(Response.class::cast);
-        future.thenAccept(response -> AskActorWithJava8.processIt(response));
-        // #snip
+    // #snip
+    CompletionStage<Response> future =
+      ask(actorRef, request, timeout)
+        .thenApply(Response.class::cast);
+    future.thenAccept(response -> AskActorWithJava8.processIt(response));
+    // #snip
 
-    }
+  }
 }

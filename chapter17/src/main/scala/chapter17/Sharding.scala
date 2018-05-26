@@ -47,10 +47,12 @@ object ShardSupport {
 
   val RegionName = "ShoppingCart"
 }
+
 //#snip_17-4
 
 object ShardingExample extends App {
-  val clusterConfig = ConfigFactory.parseString("""
+  val clusterConfig = ConfigFactory.parseString(
+    """
 akka.loglevel = INFO
 akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
 akka.actor.warn-about-java-serializer-usage = off
@@ -122,6 +124,7 @@ akka.cluster.sharding.state-store-mode = ddata
 
           context.become(second)
       }
+
       def second: Receive = {
         case ManagerEvent(id, event)   ⇒ log.info("success ({}): {}", id, event)
         case ManagerRejection(id, msg) ⇒ log.warning("rejected ({}): {}", id, msg)

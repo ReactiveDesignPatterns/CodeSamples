@@ -21,6 +21,7 @@ object MultiMasterCRDT {
     _pred: ⇒ Set[Status], _succ: ⇒ Set[Status]) extends ReplicatedData {
 
     type T = Status
+
     def merge(that: Status): Status = mergeStatus(this, that)
 
     @volatile lazy val predecessors: Set[Status] = _pred
@@ -59,6 +60,7 @@ object MultiMasterCRDT {
           candidate.successors.map(succ ⇒ innerLoop(succ, nextExclude))
         branches.reduce((l, r) ⇒ if (isSuccessor(l, r, nextExclude)) r else l)
       }
+
     def isSuccessor(
       candidate: Status,
       fixed:     Status, exclude: Set[Status]): Boolean =
@@ -70,14 +72,19 @@ object MultiMasterCRDT {
 
     innerLoop(right, Set.empty)
   }
+
   // #snip_13-11
 
   object StorageComponent extends Key[ORMap[Status]]("StorageComponent")
 
   case class Submit(job: String)
+
   case class Cancel(job: String)
+
   case class Execute(job: String)
+
   case class Finish(job: String)
+
   case object PrintStatus
 
   // #snip_13-12
@@ -106,6 +113,7 @@ object MultiMasterCRDT {
         log.info("overall status: {}", g.get(StorageComponent))
     }
   }
+
   // #snip_13-12
 
   // #snip_13-13
@@ -145,9 +153,11 @@ object MultiMasterCRDT {
         lastState = current
     }
   }
+
   // #snip_13-13
 
-  val commonConfig: Config = ConfigFactory.parseString("""
+  val commonConfig: Config = ConfigFactory.parseString(
+    """
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp {
       host = "127.0.0.1"
@@ -164,8 +174,10 @@ object MultiMasterCRDT {
     """)
 
   object sleep
+
   implicit object waitConvert extends DurationConversions.Classifier[sleep.type] {
     type R = Unit
+
     def convert(d: FiniteDuration): Unit = Thread.sleep(d.toMillis)
   }
 

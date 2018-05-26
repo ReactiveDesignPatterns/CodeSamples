@@ -37,7 +37,9 @@ object BusinessHandshake extends App {
 
   // #snip_15-18
   case class ChangeBudget(amount: BigDecimal, replyTo: ActorRef)
+
   case object ChangeBudgetDone
+
   case class CannotChangeBudget(reason: String)
 
   class Sam(
@@ -81,6 +83,7 @@ object BusinessHandshake extends App {
         alreadyDone -= saga
     }
   }
+
   // #snip_15-18
 
 }
@@ -111,11 +114,13 @@ object PersistentBusinessHandshake extends App {
 
   class FakeSam(override val persistenceId: String) extends PersistentActor {
     def receiveRecover: Actor.emptyBehavior.type = Actor.emptyBehavior
+
     def receiveCommand: PartialFunction[Any, Unit] = {
       case _ ⇒
         deleteMessages(Long.MaxValue)
         context.become(waiting(sender()))
     }
+
     def waiting(replyTo: ActorRef): Receive = {
       case d @ (_: DeleteMessagesSuccess | _: DeleteMessagesFailure) ⇒
         replyTo ! d
@@ -124,11 +129,14 @@ object PersistentBusinessHandshake extends App {
   }
 
   case class ChangeBudget(amount: BigDecimal, replyTo: ActorRef, id: String)
+
   case object ChangeBudgetDone
+
   case class CannotChangeBudget(reason: String)
 
   // #snip_15-19
   case class AliceConfirmedChange(deliveryId: Long)
+
   case class AliceDeniedChange(deliveryId: Long)
 
   class PersistentSam(
@@ -180,17 +188,21 @@ object PersistentBusinessHandshake extends App {
         context.stop(self)
     }
   }
+
   // #snip_15-19
 
   // #snip_15-20
   case class BudgetChanged(amount: BigDecimal, persistenceId: String)
+
   case object CleanupDoneList
+
   case class ChangeDone(persistenceId: String)
 
   class PersistentAlice extends PersistentActor with ActorLogging {
     def persistenceId: String = "Alice"
 
     implicit val mat: ActorMaterializer = ActorMaterializer()
+
     import context.dispatcher
 
     var alreadyDone: Set[String] = Set.empty
@@ -240,6 +252,7 @@ object PersistentBusinessHandshake extends App {
       cleanupTimer.cancel()
     }
   }
+
   // #snip_15-20
 
 }

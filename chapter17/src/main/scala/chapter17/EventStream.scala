@@ -29,6 +29,7 @@ class ShoppingCartTagging(system: ExtendedActorSystem) extends WriteEventAdapter
       case other                  ⇒ other
     }
 }
+
 //#snip_17-8
 
 class ShoppingCartSimulator extends Actor with ActorLogging {
@@ -40,6 +41,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
     "plum",
     "pear",
     "peach").map(f ⇒ ItemRef(new URI(f)))
+
   def pickItem() = items(rnd.nextInt(items.length))
 
   val customers: Array[CustomerRef] = Array(
@@ -47,9 +49,11 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
     "bob",
     "charlie",
     "mallory").map(c ⇒ CustomerRef(new URI(c)))
+
   def pickCustomer() = customers(rnd.nextInt(customers.length))
 
   val id: Iterator[Int] = Iterator from 0
+
   def command(cmd: Command) = ManagerCommand(cmd, id.next, self)
 
   def driveCart(num: Int): Unit = {
@@ -66,6 +70,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
   }
 
   case class Cont(id: Int)
+
   self ! Cont(0)
 
   def receive: PartialFunction[Any, Unit] = {
@@ -78,15 +83,20 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
 }
 
 case class GetTopProducts(id: Long, replyTo: ActorRef)
+
 case class TopProducts(id: Long, products: Map[ItemRef, Int])
 
 //#snip_17-9
 object TopProductListener {
+
   private class IntHolder(var value: Int)
+
 }
 
 class TopProductListener extends Actor with ActorLogging {
+
   import TopProductListener._
+
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   val readJournal: LeveldbReadJournal =
@@ -101,8 +111,11 @@ class TopProductListener extends Actor with ActorLogging {
       val histogram = seq.foldLeft(Map.empty[ItemRef, IntHolder]) {
         (map, event) ⇒
           map.get(event.item) match {
-            case Some(holder) ⇒ { holder.value += event.count; map }
-            case None         ⇒ map.updated(event.item, new IntHolder(event.count))
+            case Some(holder) ⇒ {
+              holder.value += event.count;
+              map
+            }
+            case None ⇒ map.updated(event.item, new IntHolder(event.count))
           }
       }
       self ! TopProducts(0, histogram.map(p ⇒ (p._1, p._2.value)))
@@ -117,10 +130,12 @@ class TopProductListener extends Actor with ActorLogging {
       log.info("new {}", products)
   }
 }
+
 //#snip_17-9
 
 object EventStreamExample extends App {
-  val config = ConfigFactory.parseString("""
+  val config = ConfigFactory.parseString(
+    """
 akka.loglevel = INFO
 akka.actor.debug.unhandled = on
 akka.actor.warn-about-java-serializer-usage = off

@@ -27,6 +27,7 @@ class StagedFuturesForExampleTest {
       def currentInventoryInWarehouse(productSku: Long, postalCode: String): Long = {
         5
       }
+
       def currentInventoryOverallByWarehouse(productSku: Long): Map[String, Long] = {
         Map("212" -> 407L, "312" -> 81L, "412" -> 6L)
       }

@@ -12,8 +12,10 @@ import java.util.concurrent.Future;
 public class ParallelExecutionWithJavaFuture {
   public static class ReplyA {
   }
+
   public static class ReplyB {
   }
+
   public static class ReplyC {
   }
 
@@ -36,17 +38,17 @@ public class ParallelExecutionWithJavaFuture {
   private final static ExecutorService EXECUTOR_SERVICE =
       Executors.newFixedThreadPool(3);
 
-  public static Future<ReplyA> taskA(){
-        return EXECUTOR_SERVICE.submit(ReplyA::new); // return from compute
-    }
+  public static Future<ReplyA> taskA() {
+    return EXECUTOR_SERVICE.submit(ReplyA::new); // return from compute
+  }
 
-  public static Future<ReplyB> taskB(){
-        return EXECUTOR_SERVICE.submit(ReplyB::new); //return from compute
-    }
+  public static Future<ReplyB> taskB() {
+    return EXECUTOR_SERVICE.submit(ReplyB::new); //return from compute
+  }
 
-  public static Future<ReplyC> taskC(){
-        return EXECUTOR_SERVICE.submit(ReplyC::new); //return from compute
-    }
+  public static Future<ReplyC> taskC() {
+    return EXECUTOR_SERVICE.submit(ReplyC::new); //return from compute
+  }
 
   public static void main(String[] args) throws ExecutionException, InterruptedException {
     // #snip

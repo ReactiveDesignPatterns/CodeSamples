@@ -34,6 +34,7 @@ class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
     Await.ready(terminated, Duration.Inf)
   }
 }
+
 // #snip_11-24
 
 // #snip_11-23
@@ -41,11 +42,13 @@ class StepParent extends Actor {
   override val supervisorStrategy: OneForOneStrategy = OneForOneStrategy() {
     case thr ⇒ Restart
   }
+
   def receive: PartialFunction[Any, Unit] = {
     case p: Props ⇒
       sender ! context.actorOf(p, "child")
   }
 }
+
 // #snip_11-23
 
 // #snip_11-22
@@ -54,4 +57,5 @@ class MyActor extends Actor {
     case _ ⇒ throw new NullPointerException
   }
 }
+
 // #snip_11-22

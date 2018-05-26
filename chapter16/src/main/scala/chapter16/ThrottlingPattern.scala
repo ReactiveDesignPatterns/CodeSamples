@@ -29,10 +29,13 @@ object ThrottlingPattern {
   final val Debug = false
 
   case class Job(id: Long, input: Int, replyTo: ActorRef)
+
   case class JobRejected(id: Long)
+
   case class JobResult(id: Long, report: BigDecimal)
 
   case class WorkRequest(worker: ActorRef, items: Int)
+
   case class DummyWork(count: Int)
 
   class Manager extends Actor {
@@ -75,6 +78,7 @@ object ThrottlingPattern {
     val minus = BigDecimal(-1, mc)
 
     var requested = 0
+
     def request(): Unit =
       if (requested < 50) {
         manager ! WorkRequest(self, 100)
@@ -100,8 +104,10 @@ object ThrottlingPattern {
     def +(other: Report) =
       Report(success + other.success, failure + other.failure, value + other.value)
   }
+
   object Report {
     def success(v: BigDecimal) = Report(1, 0, v)
+
     val failure = Report(0, 1, BigDecimal(0, mc))
     val empty = Report(0, 0, BigDecimal(0, mc))
   }
@@ -149,6 +155,7 @@ object ThrottlingPattern {
     bucketSize:    Int,
     batchSize:     Int) extends Actor {
     def now(): Long = System.nanoTime()
+
     val nanoSecondsBetweenTokens: Long = 1000000000L / ratePerSecond
 
     var tokenBucket: Int = bucketSize
@@ -164,12 +171,14 @@ object ThrottlingPattern {
         lastTokenTime += accrued * nanoSecondsBetweenTokens
       }
     }
+
     def consumeToken(time: Long): Unit = {
       refillBucket(time)
       tokenBucket -= 1
     }
 
     var requested = 0
+
     def request(time: Long): Unit =
       if (tokenBucket - requested >= batchSize) {
         sendRequest(time, batchSize)
@@ -189,6 +198,7 @@ object ThrottlingPattern {
         }
       } else if (Debug)
         println(s"$time: not requesting (requested=$requested tokenBucket=$tokenBucket)")
+
     def sendRequest(time: Long, items: Int): Unit = {
       if (Debug)
         println(s"$time: requesting $items items (requested=$requested tokenBucket=$tokenBucket)")
@@ -208,6 +218,7 @@ object ThrottlingPattern {
         calculator ! job
     }
   }
+
   // #snip_16-4
 
   def main(args: Array[String]): Unit = {

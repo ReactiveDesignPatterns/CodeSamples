@@ -1,11 +1,10 @@
-
 // 代码清单15-5
 // Listing 15.5 Request–response based on a one-way messaging protocol
 
 // #snip
 var amqp = require('amqplib/callback_api');
-amqp.connect('amqp://localhost', function(err, conn) {
-    conn.createChannel(function(err, ch) {
+amqp.connect('amqp://localhost', function (err, conn) {
+    conn.createChannel(function (err, ch) {
         var q = 'rpc_queue';
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);

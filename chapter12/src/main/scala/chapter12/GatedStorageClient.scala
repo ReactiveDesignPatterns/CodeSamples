@@ -15,7 +15,9 @@ import scala.concurrent.Future
 // 代码清单 12-4
 // Listing 12.4 Gating a client
 class GatedStorageClient(system: ActorSystem) {
+
   import scala.concurrent.duration._
+
   // #snip
   private val limiter = new RateLimiter(100, 2.seconds)
   private val breaker = CircuitBreaker(
@@ -31,6 +33,7 @@ class GatedStorageClient(system: ActorSystem) {
         case _: CircuitBreakerOpenException ⇒ StorageStatus.Gated
       }
   }
+
   // #snip
   def persist(job: Job): Future[StorageStatus] = ??? // remote call
 }

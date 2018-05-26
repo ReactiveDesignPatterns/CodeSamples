@@ -39,11 +39,15 @@ class DataIngesterSpec extends WordSpec with Matchers with BeforeAndAfterAll {
 }
 
 object DataIngesterSpec {
+
   sealed trait DataIngesterCommand
+
   final case class Retrieve(url: URL, dataId: String, replyTo: ActorRef) extends DataIngesterCommand
 
   sealed trait DataIngesterEvent
+
   final case class Record(dataId: String, data: Any) extends DataIngesterEvent
+
   final case object EOF extends DataIngesterEvent
 
   class DataIngester extends Actor {
@@ -60,4 +64,5 @@ object DataIngesterSpec {
   object DataIngester {
     val props: Props = Props[DataIngester]
   }
+
 }

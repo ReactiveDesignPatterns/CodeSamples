@@ -20,4 +20,5 @@ case class SendEmail(
   recipients: List[String],
   body:       String, correlationID: UUID,
   replyTo: ActorRef[SendEmailResult])
+
 // #snip

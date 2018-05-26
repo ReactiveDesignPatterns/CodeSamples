@@ -71,8 +71,8 @@ public class ResourceEncapsulation {
     PartialFunction<Throwable, Future<Instance>> recovery =
       new PFBuilder<Throwable, Future<Instance>>()
         .match(AmazonClientException.class,
-               ex -> ex.isRetryable(),
-               ex -> startInstanceAsync(credentials))
+          ex -> ex.isRetryable(),
+          ex -> startInstanceAsync(credentials))
         .build();
 
     return f.recoverWith(recovery, executionContext);
@@ -119,13 +119,13 @@ public class ResourceEncapsulation {
     Future<TerminateInstancesResult> f =
       circuitBreaker.callWithCircuitBreaker(
         () -> Futures.future(() -> client.terminateInstances(request),
-                             executionContext));
+          executionContext));
 
     PartialFunction<Throwable, Future<TerminateInstancesResult>> recovery =
       new PFBuilder<Throwable, Future<TerminateInstancesResult>>()
         .match(AmazonClientException.class,
-               ex -> ex.isRetryable(),
-               ex -> terminateInstancesAsync(client, instances))
+          ex -> ex.isRetryable(),
+          ex -> terminateInstancesAsync(client, instances))
         .build();
 
     return f.recoverWith(recovery, executionContext);

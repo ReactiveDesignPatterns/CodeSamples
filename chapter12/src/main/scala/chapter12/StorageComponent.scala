@@ -14,7 +14,8 @@ import scala.concurrent.{Future, TimeoutException}
 
 // 代码清单 12-1
 // Listing 12.1 Using a circuit breaker to give a failed component time to recover
-class StorageComponent(system:ActorSystem) {
+class StorageComponent(system: ActorSystem) {
+
   // #snip
   private object StorageFailed extends RuntimeException
 
@@ -28,6 +29,7 @@ class StorageComponent(system:ActorSystem) {
   }
 
   import scala.concurrent.duration._
+
   private val breaker = CircuitBreaker(
     system.scheduler,
     5,
@@ -45,5 +47,6 @@ class StorageComponent(system:ActorSystem) {
         case _: CircuitBreakerOpenException => StorageStatus.Failed
       }
   }
+
   // #snip
 }

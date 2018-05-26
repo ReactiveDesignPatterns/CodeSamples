@@ -11,6 +11,7 @@ import org.scalactic.ConversionCheckedTripleEquals
 import org.scalatest.{ Matchers, WordSpec }
 
 class MultiMasterCRDTSpec extends WordSpec with Matchers with ConversionCheckedTripleEquals {
+
   import MultiMasterCRDT._
 
   "A CRDT" must {

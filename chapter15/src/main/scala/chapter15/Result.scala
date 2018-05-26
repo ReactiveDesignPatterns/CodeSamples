@@ -21,5 +21,6 @@ case class SendEmailResult(
   correlationID: UUID,
   status:        StatusCode,
   explanation:   Option[String]) extends Result
+
 // #snip
 

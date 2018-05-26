@@ -10,14 +10,19 @@ import scala.concurrent.Future
 object ParallelExecutionWithScalaFuture {
 
   class ReplyA
+
   class ReplyB
+
   class ReplyC
+
   class Result
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
   def taskA(): Future[ReplyA] = Future(new ReplyA)
+
   def taskB(): Future[ReplyB] = Future(new ReplyB)
+
   def taskC(): Future[ReplyC] = Future(new ReplyC)
 
   def aggregate(a: ReplyA, b: ReplyB, c: ReplyC): Result = ???

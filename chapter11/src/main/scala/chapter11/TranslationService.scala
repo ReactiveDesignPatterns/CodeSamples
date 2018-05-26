@@ -17,12 +17,19 @@ import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 
 class TranslationService {
+
   import ExecutionContext.Implicits.global
 
-  def translate(input: String): Future[String] = Future { Thread.sleep(100); "How are you?" }
+  def translate(input: String): Future[String] = Future {
+    Thread.sleep(100);
+    "How are you?"
+  }
 
   def translate(input: String, ec: ExecutionContext): Future[String] =
-    Future { Thread.sleep(100); "How are you?" }(ec)
+    Future {
+      Thread.sleep(100);
+      "How are you?"
+    }(ec)
 }
 
 /**
@@ -52,6 +59,7 @@ object TranslationService {
    */
   // #snip_11-17
   case class TranslateV1(query: String, replyTo: ActorRef)
+
   // #snip_11-17
 
   /**
@@ -84,16 +92,19 @@ object TranslationService {
     replyTo:        ActorRef)
 
   sealed trait TranslationResponseV2
+
   case class TranslationV2(
     inputPhrase:    String,
     outputPhrase:   String,
     inputLanguage:  String,
     outputLanguage: String)
+
   case class TranslationErrorV2(
     inputPhrase:    String,
     inputLanguage:  String,
     outputLanguage: String,
     errorMessage:   String)
+
   // #snip_11-18
 
   /**
@@ -101,6 +112,7 @@ object TranslationService {
    */
   private class TranslatorV2(v1: ActorRef) extends Actor {
     implicit val timeout: Timeout = Timeout(5.seconds)
+
     import context.dispatcher
 
     def receive: PartialFunction[Any, Unit] = {

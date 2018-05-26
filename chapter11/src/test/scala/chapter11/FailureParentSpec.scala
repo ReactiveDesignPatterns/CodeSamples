@@ -35,6 +35,7 @@ class FailureParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
     Await.ready(terminated, Duration.Inf)
   }
 }
+
 // #snip_11-26
 
 // #snip_11-25
@@ -44,10 +45,12 @@ class FailureParent(failures: ActorRef) extends Actor {
   override val supervisorStrategy: OneForOneStrategy = OneForOneStrategy() {
     case f ⇒ failures ! f; Stop
   }
+
   def receive: PartialFunction[Any, Unit] = {
     case msg ⇒ child forward msg
   }
 }
+
 // #snip_11-25
 
 class MyFailureParentActor extends Actor {

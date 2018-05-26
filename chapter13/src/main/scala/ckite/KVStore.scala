@@ -18,6 +18,7 @@ import ckite.util.Serializer
 import scala.collection.mutable.Map
 
 case class Get(key: String) extends ReadCommand[Option[String]]
+
 case class Put(key: String, value: String) extends WriteCommand[String]
 
 // #snip_13-8
@@ -46,6 +47,7 @@ class KVStore extends StateMachine {
   def takeSnapshot(): ByteBuffer = ByteBuffer.wrap(Serializer.serialize(map))
 
 }
+
 // #snip_13-8
 
 // #snip_13-9
@@ -60,6 +62,7 @@ object KVStoreBootstrap extends App {
 
   HttpServer(ckite).start()
 }
+
 // #snip_13-9
 
 object SnipCkiteAPI {

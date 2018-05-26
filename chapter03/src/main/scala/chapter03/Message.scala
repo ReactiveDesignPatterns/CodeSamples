@@ -13,4 +13,5 @@ package chapter03
 import java.util.Date
 
 case class Message(timestamp: Date, message: String)
+
 // #snip

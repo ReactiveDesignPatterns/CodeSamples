@@ -20,6 +20,7 @@ import scala.reflect.classTag
 object LatencyTestSupport {
 
   case class SingleResult[T](future: Future[T], expected: T)
+
   case class SummaryResult(timings: immutable.Seq[FiniteDuration], failures: immutable.Seq[Throwable]) {
     lazy val sorted: immutable.Seq[FiniteDuration] = timings.sorted
 
@@ -53,8 +54,11 @@ object LatencyTestSupport {
   private def runnerProps(r: RunMeasurement): Props = Props(new TestRunner(r.count, r.maxParallelism, r.f, r.replyTo)(r.ec))
 
   private sealed trait TestResult
+
   private case class TestSuccess(duration: FiniteDuration) extends TestResult
+
   private case class TestFailure(ex: Throwable) extends TestResult
+
   private object TestFailure extends PartialFunction[Throwable, TestFailure] {
     override def isDefinedAt(ex: Throwable) = true
   }
@@ -105,6 +109,7 @@ object LatencyTestSupport {
 }
 
 class LatencyTestSupport(system: ActorSystem) {
+
   import LatencyTestSupport._
 
   private val supervisor = system.actorOf(Props[Supervisor], "LatencyTestSupportSupervisor")

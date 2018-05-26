@@ -16,6 +16,7 @@ import akka.actor._
 object RequestResponseActors {
 
   case class Request(msg: String)
+
   case class Response(msg: String)
 
   class Responder extends Actor {
@@ -43,4 +44,5 @@ object RequestResponseActors {
   }
 
 }
+
 // #snip

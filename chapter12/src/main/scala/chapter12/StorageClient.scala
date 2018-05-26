@@ -12,7 +12,9 @@ import scala.concurrent.Future
 // 代码清单 12-3
 // Listing 12.3 Circuit breaker: limiting requests from a client
 class StorageClient {
+
   import scala.concurrent.duration._
+
   // #snip
   private val limiter = new RateLimiter(100, 2.seconds)
 
@@ -24,6 +26,7 @@ class StorageClient {
         case RateLimitExceeded ⇒ StorageStatus.Failed
       }
   }
+
   // #snip
   def persist(job: Job): Future[StorageStatus] = ??? // remote call
 }

@@ -22,18 +22,23 @@ import scala.io.StdIn
 import scala.util.Random
 
 object ActivePassive {
+
   import Persistence._
   import ReplicationProtocol._
 
   private case class Replicate(
     seq: Int, key: String, value: JsValue, replyTo: ActorRef)
+
   private case class Replicated(seq: Int)
+
   private case object Tick
 
   private case class TakeOver(replyTo: ActorRef)
+
   private case class InitialState(map: Map[String, JsValue], seq: Int)
 
   object Snip13_1 {
+
     // #snip_13-1
     class Active(
       localReplica:      ActorRef,
@@ -58,10 +63,12 @@ object ActivePassive {
 
       val running: Receive = ???
     }
+
     // #snip_13-1
   }
 
   object Snip13_2 {
+
     // #snip_13-2
     class Active(
       localReplica:      ActorRef,
@@ -144,14 +151,18 @@ object ActivePassive {
       private def replicaOn(addr: Address): ActorSelection =
         context.actorSelection(localReplica.path.toStringWithAddress(addr))
     }
+
     // #snip_13-2
   }
 
   private case class GetSingle(seq: Int, replyTo: ActorRef)
+
   private case class GetFull(replyTo: ActorRef)
+
   private case object DoConsolidate
 
   object Snip13_4 {
+
     // #snip_13-4
     class Passive(
       askAroundCount:    Int,
@@ -199,16 +210,19 @@ object ActivePassive {
       def fallBehind(
         expectedSeq: Int,
         _waiting:    TreeMap[Int, Replicate]): Unit = ???
+
       def missingSomeUpdates(
         theStore:        Map[String, JsValue],
         expectedSeq:     Int,
         prevOutstanding: Set[Int],
         waiting:         TreeMap[Int, Replicate]): Unit = ???
     }
+
     // #snip_13-4
   }
 
   object Snip13_5 {
+
     // #snip_13-5
     class Passive(
       askAroundCount:    Int,
@@ -224,6 +238,7 @@ object ActivePassive {
       val random = new Random
 
       private var tickTask = Option.empty[Cancellable]
+
       def scheduleTick(): Unit = {
         tickTask foreach (_.cancel())
         tickTask = Some(context.system.scheduler.scheduleOnce(
@@ -291,17 +306,21 @@ object ActivePassive {
         // using .iterator to avoid one intermediate collection to be created
         random.shuffle(cluster.state.members.iterator.map(_.address).toSeq).take(n)
       }
+
       private def askAroundFullState(): Unit = {
         log.info("asking for full data")
         getMembers(1).foreach(addr ⇒ replicaOn(addr) ! GetFull(self))
       }
+
       private def replicaOn(addr: Address): ActorSelection =
         context.actorSelection(self.path.toStringWithAddress(addr))
     }
+
     // #snip_13-5
   }
 
   object Snip13_6 {
+
     class Passive(
       askAroundCount:    Int,
       askAroundInterval: FiniteDuration,
@@ -316,6 +335,7 @@ object ActivePassive {
       val random = new Random
 
       private var tickTask = Option.empty[Cancellable]
+
       def scheduleTick(): Unit = {
         tickTask foreach (_.cancel())
         tickTask = Some(context.system.scheduler.scheduleOnce(
@@ -357,12 +377,15 @@ object ActivePassive {
           else missingSomeUpdates(nextStore, nextExpectedSeq, askedFor, nextWaiting)
         } else caughtUp(nextStore, nextExpectedSeq)
       }
+
       // #snip_13-6
 
       def caughtUp(theStore: Map[String, JsValue], expectedSeq: Int): Unit = ???
+
       def fallBehind(
         expectedSeq: Int,
         _waiting:    TreeMap[Int, Replicate]): Unit = ???
+
       def missingSomeUpdates(
         theStore:        Map[String, JsValue],
         expectedSeq:     Int,
@@ -370,9 +393,11 @@ object ActivePassive {
         waiting:         TreeMap[Int, Replicate]): Unit = ???
 
     }
+
   }
 
   object Snip13_7 {
+
     // #snip_13-7
     class Passive(
       askAroundCount:    Int,
@@ -446,11 +471,15 @@ object ActivePassive {
         expectedSeq: Int,
         askedFor:    Set[Int],
         waiting:     TreeMap[Int, Replicate]): Unit = ???
+
       private def getMembers(n: Int): Seq[Address] = ???
+
       private def replicaOn(addr: Address): ActorSelection = ???
+
       def scheduleTick(): Unit = ???
 
     }
+
     // #snip_13-7
   }
 
@@ -468,6 +497,7 @@ object ActivePassive {
     val random = new Random
 
     private var tickTask = Option.empty[Cancellable]
+
     def scheduleTick(): Unit = {
       tickTask foreach (_.cancel())
       tickTask = Some(context.system.scheduler.scheduleOnce(
@@ -612,20 +642,24 @@ object ActivePassive {
       // using .iterator to avoid one intermediate collection to be created
       random.shuffle(cluster.state.members.iterator.map(_.address).toSeq).take(n)
     }
+
     private def askAround(seq: Int): Unit = {
       log.info("asking around for sequence number {}", seq)
       getMembers(askAroundCount)
         .foreach(addr ⇒ replicaOn(addr) ! GetSingle(seq, self))
     }
+
     private def askAroundFullState(): Unit = {
       log.info("asking for full data")
       getMembers(1).foreach(addr ⇒ replicaOn(addr) ! GetFull(self))
     }
+
     private def replicaOn(addr: Address): ActorSelection =
       context.actorSelection(self.path.toStringWithAddress(addr))
   }
 
-  val commonConfig: Config = ConfigFactory.parseString("""
+  val commonConfig: Config = ConfigFactory.parseString(
+    """
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp {
       host = "127.0.0.1"
@@ -639,6 +673,7 @@ object ActivePassive {
       }
     }
     """)
+
   def roleConfig(name: String, port: Option[Int]): Config = {
     val roles = ConfigFactory.parseString(s"""akka.cluster.roles = ["$name"]""")
     port match {
@@ -727,7 +762,9 @@ object ActivePassive {
   }
 
   private case class Run(round: Int)
+
   private case object Stop
+
   @volatile private var terminate = false
 
   private class UseStorage(db: ActorRef) extends Actor with ActorLogging {
@@ -776,6 +813,7 @@ object ActivePassive {
         outstanding -= key
       case Stop ⇒ context.stop(self)
     }
+
     override def postStop(): Unit = terminate = true
   }
 

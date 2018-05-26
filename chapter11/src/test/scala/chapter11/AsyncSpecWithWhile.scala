@@ -6,6 +6,7 @@
  */
 
 package chapter11
+
 import scala.concurrent.Future
 
 // 代码清单11-4

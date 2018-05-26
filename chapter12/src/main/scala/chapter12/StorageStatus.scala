@@ -10,7 +10,11 @@ package chapter12
 sealed trait StorageStatus
 
 object StorageStatus {
+
   case object Failed extends StorageStatus
+
   case object Unknown extends StorageStatus
+
   case object Gated extends StorageStatus
+
 }

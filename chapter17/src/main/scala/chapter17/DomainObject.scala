@@ -11,7 +11,9 @@ import java.net.URI
 
 // #snip
 case class ItemRef(id: URI)
+
 case class CustomerRef(id: URI)
+
 case class ShoppingCartRef(id: URI)
 
 // #snip
@@ -43,11 +45,13 @@ case class ShoppingCart(items: Map[ItemRef, Int], owner: Option[CustomerRef]) {
     case ItemAdded(_, item, count)   ⇒ addItem(item, count)
     case ItemRemoved(_, item, count) ⇒ removeItem(item, count)
   }
+
   // 代码清单 17-6
 }
 
 object ShoppingCart {
   val empty = ShoppingCart(Map.empty, None)
 }
+
 // #snip_17-1
 

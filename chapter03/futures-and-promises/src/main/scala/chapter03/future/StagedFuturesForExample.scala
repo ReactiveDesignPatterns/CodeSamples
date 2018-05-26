@@ -52,5 +52,6 @@ class StagedFuturesForExample(inventoryService: InventoryService) {
       overall ← overallInventoryFutureByWarehouse
     } yield (local, overall)
   }
+
   // #snip
 }

@@ -18,11 +18,14 @@ import scala.concurrent.{ Await, ExecutionContext }
 import scala.util.Success
 
 object TranslationServiceSpec {
+
   import TranslationService._
 
   // #snip_11-20
   case object ExpectNominal
+
   case object ExpectError
+
   case class Unexpected(msg: Any)
 
   class MockV1(reporter: ActorRef) extends Actor {
@@ -49,6 +52,7 @@ object TranslationServiceSpec {
         context.become(initial)
     }
   }
+
   // #snip_11-20
 
   def mockV1props(reporter: ActorRef): Props = Props(new MockV1(reporter))
@@ -56,6 +60,7 @@ object TranslationServiceSpec {
 }
 
 class TranslationServiceSpec extends WordSpec with Matchers with Eventually with BeforeAndAfterAll {
+
   import TranslationServiceSpec._
 
   "A TranslationService" should {
@@ -108,6 +113,7 @@ class TranslationServiceSpec extends WordSpec with Matchers with Eventually with
   }
 
   implicit val system: ActorSystem = ActorSystem("TranslationServiceSpec")
+
   override def afterAll(): Unit = {
     val terminated = system.terminate()
     Await.ready(terminated, Duration.Inf)

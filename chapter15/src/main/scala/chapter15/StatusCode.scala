@@ -8,7 +8,11 @@
 package chapter15
 
 sealed trait StatusCode
+
 object StatusCode {
+
   case object OK extends StatusCode
+
   case object Failed extends StatusCode
+
 }

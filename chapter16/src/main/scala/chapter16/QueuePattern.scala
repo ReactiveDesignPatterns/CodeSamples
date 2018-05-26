@@ -20,10 +20,13 @@ import scala.concurrent.duration._
 object QueuePattern {
 
   case class Job(id: Long, input: Int, replyTo: ActorRef)
+
   case class JobRejected(id: Long)
+
   case class JobResult(id: Long, report: BigDecimal)
 
   case class WorkRequest(worker: ActorRef, items: Int)
+
   case class DummyWork(count: Int)
 
   // #snip_16-3
@@ -55,6 +58,7 @@ object QueuePattern {
         }
     }
   }
+
   // #snip_16-3
 
   val mc = new MathContext(100, RoundingMode.HALF_EVEN)
@@ -65,6 +69,7 @@ object QueuePattern {
     val minus = BigDecimal(-1, mc)
 
     var requested = 0
+
     def request(): Unit =
       if (requested < 5) {
         manager ! WorkRequest(self, 10)
@@ -85,14 +90,17 @@ object QueuePattern {
         request()
     }
   }
+
   // #snip
 
   case class Report(success: Int, failure: Int, value: BigDecimal) {
     def +(other: Report) =
       Report(success + other.success, failure + other.failure, value + other.value)
   }
+
   object Report {
     def success(v: BigDecimal) = Report(1, 0, v)
+
     val failure = Report(0, 1, BigDecimal(0, mc))
   }
 

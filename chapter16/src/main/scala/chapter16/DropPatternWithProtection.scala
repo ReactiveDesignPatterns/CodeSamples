@@ -53,6 +53,7 @@ object DropPatternWithProtection {
         }
     }
   }
+
   //#snip_1
 
   class Protector extends Actor {

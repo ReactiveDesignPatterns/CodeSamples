@@ -54,6 +54,7 @@ class PersistentObjectManager extends PersistentActor {
     case e: Event ⇒ shoppingCart = shoppingCart.applyEvent(e)
   }
 }
+
 // #snip_17-7
 
 /*
@@ -65,7 +66,8 @@ class PersistentObjectManager extends PersistentActor {
 object PersistentObjectManagerExample extends App {
   def mkURI(): URI = URI.create(UUID.randomUUID().toString)
 
-  val config = ConfigFactory.parseString("""
+  val config = ConfigFactory.parseString(
+    """
 akka.actor.warn-about-java-serializer-usage = off
 akka.persistence.journal {
   plugin = "akka.persistence.journal.leveldb"

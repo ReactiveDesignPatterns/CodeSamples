@@ -19,6 +19,7 @@ import scala.concurrent.duration._
 // 代码清单 11-14
 class AsyncAwaitSpec extends WordSpec with Matchers {
   private implicit lazy val system: ActorSystem = ActorSystem()
+
   import system.dispatcher
 
   val tr = new TranslationService

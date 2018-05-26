@@ -53,4 +53,5 @@ sealed trait Result extends ShoppingCartMessage
 case class GetItemsResult(
   shoppingCart: ShoppingCartRef,
   items:        Map[ItemRef, Int]) extends Result
+
 //#snip_17-2

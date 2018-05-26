@@ -9,5 +9,6 @@ package chapter03.future
 
 trait InventoryService {
   def currentInventoryInWarehouse(productSku: Long, postalCode: String): Long
+
   def currentInventoryOverallByWarehouse(productSku: Long): Map[String, Long]
 }
