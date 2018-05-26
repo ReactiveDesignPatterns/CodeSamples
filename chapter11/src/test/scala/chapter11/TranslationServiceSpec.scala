@@ -35,7 +35,7 @@ object TranslationServiceSpec {
       reporter ! Unexpected(msg)
     }
 
-    val initial: Receive = {
+    private val initial: Receive = {
       case ExpectNominal ⇒ context.become(expectingNominal)
       case ExpectError   ⇒ context.become(expectingError)
     }

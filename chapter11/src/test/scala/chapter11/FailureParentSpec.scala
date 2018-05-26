@@ -41,8 +41,8 @@ class FailureParentSpec extends WordSpec
 
 // #snip_11-25
 class FailureParent(failures: ActorRef) extends Actor {
-  val props: Props = Props[MyFailureParentActor]
-  val child: ActorRef = context.actorOf(props, "child")
+  private val props: Props = Props[MyFailureParentActor]
+  private val child: ActorRef = context.actorOf(props, "child")
   override val supervisorStrategy: OneForOneStrategy = OneForOneStrategy() {
     case f ⇒ failures ! f; Stop
   }

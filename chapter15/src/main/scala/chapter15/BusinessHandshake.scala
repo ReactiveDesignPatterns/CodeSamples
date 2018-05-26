@@ -66,8 +66,8 @@ object BusinessHandshake extends App {
   }
 
   class Alice extends Actor {
-    var budget: BigDecimal = 10
-    var alreadyDone: Set[ActorRef] = Set.empty
+    private var budget: BigDecimal = 10
+    private var alreadyDone: Set[ActorRef] = Set.empty
 
     def receive = LoggingReceive {
       case ChangeBudget(amount, replyTo) if alreadyDone(replyTo) ⇒
@@ -201,14 +201,14 @@ object PersistentBusinessHandshake extends App {
   class PersistentAlice extends PersistentActor with ActorLogging {
     def persistenceId: String = "Alice"
 
-    implicit val mat: ActorMaterializer = ActorMaterializer()
+    private implicit val mat: ActorMaterializer = ActorMaterializer()
 
     import context.dispatcher
 
-    var alreadyDone: Set[String] = Set.empty
-    var budget: BigDecimal = 10
+    private var alreadyDone: Set[String] = Set.empty
+    private var budget: BigDecimal = 10
 
-    val cleanupTimer: Cancellable = context.system.scheduler.
+    private val cleanupTimer: Cancellable = context.system.scheduler.
       schedule(1.hour, 1.hour, self, CleanupDoneList)
 
     def receiveCommand = LoggingReceive {

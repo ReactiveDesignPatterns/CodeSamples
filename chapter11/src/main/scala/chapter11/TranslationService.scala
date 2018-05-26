@@ -111,7 +111,7 @@ object TranslationService {
    * Implementation of the TranslateV2 protocol based on TranslatorV1.
    */
   private class TranslatorV2(v1: ActorRef) extends Actor {
-    implicit val timeout: Timeout = Timeout(5.seconds)
+    private implicit val timeout: Timeout = Timeout(5.seconds)
 
     import context.dispatcher
 

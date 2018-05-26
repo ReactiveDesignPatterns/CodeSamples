@@ -90,8 +90,8 @@ object MultiMasterCRDT {
 
   // #snip_13-12
   class ClientInterface extends Actor with ActorLogging {
-    val replicator: ActorRef = DistributedData(context.system).replicator
-    implicit val cluster: Cluster = Cluster(context.system)
+    private val replicator: ActorRef = DistributedData(context.system).replicator
+    private implicit val cluster: Cluster = Cluster(context.system)
 
     def receive: Receive = {
       case Submit(job) ⇒
@@ -123,10 +123,10 @@ object MultiMasterCRDT {
 
   // #snip_13-13
   class Executor extends Actor with ActorLogging {
-    val replicator: ActorRef = DistributedData(context.system).replicator
-    implicit val cluster: Cluster = Cluster(context.system)
+    private val replicator: ActorRef = DistributedData(context.system).replicator
+    private implicit val cluster: Cluster = Cluster(context.system)
 
-    var lastState = Map.empty[String, Status]
+    private var lastState = Map.empty[String, Status]
 
     replicator ! Replicator.Subscribe(StorageComponent, self)
 

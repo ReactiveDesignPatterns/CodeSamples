@@ -63,12 +63,16 @@ object LatencyTestSupport {
     override def isDefinedAt(ex: Throwable) = true
   }
 
-  private class TestRunner(count: Int, maxParallelism: Int, f: Int ⇒ SingleResult[_], replyTo: ActorRef)(implicit ec: ExecutionContext) extends Actor {
+  private class TestRunner(
+    count:          Int,
+    maxParallelism: Int,
+    f:              Int ⇒ SingleResult[_],
+    replyTo:        ActorRef)(implicit ec: ExecutionContext) extends Actor {
 
-    var sent = 0
-    var received = 0
-    var results = Vector.empty[FiniteDuration]
-    var failures = Vector.empty[Throwable]
+    private var sent = 0
+    private var received = 0
+    private var results = Vector.empty[FiniteDuration]
+    private var failures = Vector.empty[Throwable]
 
     override def preStart(): Unit = {
       val tryNow = Math.min(count, maxParallelism)

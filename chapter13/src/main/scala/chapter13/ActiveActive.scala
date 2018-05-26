@@ -32,7 +32,7 @@ object ActiveActive {
   private case class InitialData(map: Map[String, JsValue])
 
   class Replica extends Actor with Stash {
-    var map = Map.empty[String, JsValue]
+    private var map = Map.empty[String, JsValue]
 
     def receive: Receive = {
       case InitialData(m) ⇒

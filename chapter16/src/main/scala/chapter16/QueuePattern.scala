@@ -32,8 +32,8 @@ object QueuePattern {
   // #snip_16-3
   class Manager extends Actor {
 
-    var workQueue: Queue[Job] = Queue.empty[Job]
-    var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
+    private var workQueue: Queue[Job] = Queue.empty[Job]
+    private var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
     (1 to 8) foreach (_ ⇒ context.actorOf(Props(new Worker(self))))
 
@@ -70,10 +70,10 @@ object QueuePattern {
 
   // #snip
   class Worker(manager: ActorRef) extends Actor {
-    val plus = BigDecimal(1, mc)
-    val minus = BigDecimal(-1, mc)
+    private val plus = BigDecimal(1, mc)
+    private val minus = BigDecimal(-1, mc)
 
-    var requested = 0
+    private var requested = 0
 
     def request(): Unit =
       if (requested < 5) {

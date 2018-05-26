@@ -170,7 +170,7 @@ object ActivePassive {
 
       private val applied = mutable.Queue.empty[Replicate]
 
-      val name: String =
+      private val name: String =
         Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
 
       def receive: Receive = readPersisted(name) match {
@@ -231,10 +231,10 @@ object ActivePassive {
       private val applied = mutable.Queue.empty[Replicate]
       private var awaitingInitialState = Option.empty[ActorRef]
 
-      val name: String =
+      private val name: String =
         Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
-      val cluster = Cluster(context.system)
-      val random = new Random
+      private val cluster = Cluster(context.system)
+      private val random = new Random
 
       private var tickTask = Option.empty[Cancellable]
 
@@ -786,12 +786,12 @@ object ActivePassive {
   @volatile private var terminate = false
 
   private class UseStorage(db: ActorRef) extends Actor with ActorLogging {
-    val N = 200
-    var theStore = Map.empty[String, JsValue]
-    val keys: immutable.IndexedSeq[String] = (1 to N).map(i ⇒ f"$i%03d")
-    var outstanding = Set.empty[String]
-    val rnd = new Random
-    var lastOutstandingCount = 0
+    private val N = 200
+    private var theStore = Map.empty[String, JsValue]
+    private val keys: immutable.IndexedSeq[String] = (1 to N).map(i ⇒ f"$i%03d")
+    private var outstanding = Set.empty[String]
+    private val rnd = new Random
+    private var lastOutstandingCount = 0
 
     def receive: Receive = {
       case Run(0) ⇒

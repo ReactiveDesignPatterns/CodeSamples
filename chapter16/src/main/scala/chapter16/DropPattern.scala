@@ -33,12 +33,12 @@ object DropPattern {
 
   class Manager extends Actor {
 
-    var workQueue: Queue[Job] = Queue.empty[Job]
-    var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
+    private var workQueue: Queue[Job] = Queue.empty[Job]
+    private var requestQueue: Queue[WorkRequest] = Queue.empty[WorkRequest]
 
     // #snip_1
-    val queueThreshold = 1000
-    val dropThreshold = 1384
+    private val queueThreshold = 1000
+    private val dropThreshold = 1384
 
     def random: ThreadLocalRandom = ThreadLocalRandom.current
 
@@ -83,10 +83,10 @@ object DropPattern {
   val mc = new MathContext(100, RoundingMode.HALF_EVEN)
 
   class Worker(manager: ActorRef) extends Actor {
-    val plus = BigDecimal(1, mc)
-    val minus = BigDecimal(-1, mc)
+    private val plus = BigDecimal(1, mc)
+    private val minus = BigDecimal(-1, mc)
 
-    var requested = 0
+    private var requested = 0
 
     def request(): Unit =
       if (requested < 5) {

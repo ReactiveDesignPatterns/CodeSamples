@@ -36,7 +36,7 @@ class ShoppingCartTagging(system: ExtendedActorSystem)
 class ShoppingCartSimulator extends Actor with ActorLogging {
   def rnd: ThreadLocalRandom = ThreadLocalRandom.current
 
-  val items: Array[ItemRef] = Array(
+  private val items: Array[ItemRef] = Array(
     "apple",
     "banana",
     "plum",
@@ -45,7 +45,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
 
   def pickItem() = items(rnd.nextInt(items.length))
 
-  val customers: Array[CustomerRef] = Array(
+  private val customers: Array[CustomerRef] = Array(
     "alice",
     "bob",
     "charlie",
@@ -53,7 +53,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
 
   def pickCustomer() = customers(rnd.nextInt(customers.length))
 
-  val id: Iterator[Int] = Iterator from 0
+  private val id: Iterator[Int] = Iterator from 0
 
   def command(cmd: Command) = ManagerCommand(cmd, id.next, self)
 
@@ -122,7 +122,7 @@ class TopProductListener extends Actor with ActorLogging {
       self ! TopProducts(0, histogram.map(p ⇒ (p._1, p._2.value)))
     }
 
-  var topProducts = Map.empty[ItemRef, Int]
+  private var topProducts = Map.empty[ItemRef, Int]
 
   def receive: Receive = {
     case GetTopProducts(id, replyTo) ⇒
