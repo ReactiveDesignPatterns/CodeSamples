@@ -17,7 +17,9 @@ sealed trait MyCommands
 private case class MyEmailResult(correlationID: UUID, status: StatusCode, explanation: Option[String]) extends MyCommands
 
 // #snip
-case class StartVerificationProcess(userEmail: String, replyTo: ActorRef[VerificationProcessResponse]) extends MyCommands
+case class StartVerificationProcess(
+  userEmail: String,
+  replyTo:   ActorRef[VerificationProcessResponse]) extends MyCommands
 
 sealed trait VerificationProcessResponse
 

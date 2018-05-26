@@ -21,52 +21,6 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 object AskPattern {
-  // #snip_15-13
-  def withoutAskPattern(emailGateway: ActorRef[SendEmail]): Behavior[StartVerificationProcess] =
-    ContextAware[MyCommands] { ctx ⇒
-      val log = new BusLogging(
-        ctx.system.eventStream,
-        "VerificationProcessManager", getClass, ctx.system.logFilter)
-      var statusMap = Map.empty[UUID, (String, ActorRef[VerificationProcessResponse])]
-      val adapter = ctx.spawnAdapter((s: SendEmailResult) ⇒
-        MyEmailResult(s.correlationID, s.status, s.explanation))
-
-      Static {
-        case StartVerificationProcess(userEmail, replyTo) ⇒
-          val corrID = UUID.randomUUID()
-          val request = SendEmail(
-            "verification@example.com",
-            List(userEmail),
-            constructBody(userEmail, corrID), corrID, adapter)
-          emailGateway ! request
-          statusMap += corrID -> (userEmail, replyTo)
-          ctx.schedule(5.seconds, ctx.self,
-            MyEmailResult(corrID, StatusCode.Failed, Some("timeout")))
-        case MyEmailResult(corrID, status, expl) ⇒
-          statusMap.get(corrID) match {
-            case None ⇒
-              log.error(
-                "received SendEmailResult for unknown correlation ID {}",
-                corrID)
-            case Some((userEmail, replyTo)) ⇒
-              status match {
-                case StatusCode.OK ⇒
-                  log.debug(
-                    "successfully started the verification process for {}",
-                    userEmail)
-                  replyTo ! VerificationProcessStarted(userEmail)
-                case StatusCode.Failed ⇒
-                  log.info(
-                    "failed to start the verification process for {}: {}",
-                    userEmail, expl)
-                  replyTo ! VerificationProcessFailed(userEmail)
-              }
-              statusMap -= corrID
-          }
-      }
-    }.narrow[StartVerificationProcess]
-
-  // #snip_15-13
 
   // #snip_15-11
   def withChildActor(emailGateway: ActorRef[SendEmail]): Behavior[StartVerificationProcess] =
@@ -106,9 +60,7 @@ object AskPattern {
                 corrID)
               Same
           })
-          val request = SendEmail(
-            "verification@example.com",
-            List(userEmail),
+          val request = SendEmail("verification@example.com", List(userEmail),
             constructBody(userEmail, corrID), corrID, childActor)
           emailGateway ! request
       }
@@ -161,6 +113,51 @@ object AskPattern {
     }
 
   // #snip_15-12
+
+  // #snip_15-13
+  def withoutAskPattern(emailGateway: ActorRef[SendEmail]): Behavior[StartVerificationProcess] =
+    ContextAware[MyCommands] { ctx ⇒
+      val log = new BusLogging(
+        ctx.system.eventStream,
+        "VerificationProcessManager", getClass, ctx.system.logFilter)
+      var statusMap = Map.empty[UUID, (String, ActorRef[VerificationProcessResponse])]
+      val adapter = ctx.spawnAdapter((s: SendEmailResult) ⇒
+        MyEmailResult(s.correlationID, s.status, s.explanation))
+
+      Static {
+        case StartVerificationProcess(userEmail, replyTo) ⇒
+          val corrID = UUID.randomUUID()
+          val request = SendEmail("verification@example.com", List(userEmail),
+            constructBody(userEmail, corrID), corrID, adapter)
+          emailGateway ! request
+          statusMap += corrID -> (userEmail, replyTo)
+          ctx.schedule(5.seconds, ctx.self, MyEmailResult(
+            corrID, StatusCode.Failed, Some("timeout")))
+        case MyEmailResult(corrID, status, expl) ⇒
+          statusMap.get(corrID) match {
+            case None ⇒
+              log.error(
+                "received SendEmailResult for unknown correlation ID {}",
+                corrID)
+            case Some((userEmail, replyTo)) ⇒
+              status match {
+                case StatusCode.OK ⇒
+                  log.debug(
+                    "successfully started the verification process for {}",
+                    userEmail)
+                  replyTo ! VerificationProcessStarted(userEmail)
+                case StatusCode.Failed ⇒
+                  log.info(
+                    "failed to start the verification process for {}: {}",
+                    userEmail, expl)
+                  replyTo ! VerificationProcessFailed(userEmail)
+              }
+              statusMap -= corrID
+          }
+      }
+    }.narrow[StartVerificationProcess]
+
+  // #snip_15-13
 
   private def constructBody(userEmail: String, corrID: UUID): String = ???
 

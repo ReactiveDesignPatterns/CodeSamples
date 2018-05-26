@@ -146,7 +146,7 @@ object PersistentBusinessHandshake extends App {
     override val persistenceId: String)
     extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
 
-    def receiveCommand: Actor.emptyBehavior.type = Actor.emptyBehavior
+    def receiveCommand: Receive = Actor.emptyBehavior
 
     override def preStart(): Unit = {
       context.become(talkToAlice())
@@ -156,7 +156,7 @@ object PersistentBusinessHandshake extends App {
       log.debug("talking to Alice")
       var deliveryId: Long = 0
       deliver(alice)(id ⇒ {
-        deliveryId = id;
+        deliveryId = id
         ChangeBudget(-amount, self, persistenceId)
       })
 
@@ -174,7 +174,7 @@ object PersistentBusinessHandshake extends App {
       }: Receive)
     }
 
-    def talkToBob(): Actor.emptyBehavior.type = {
+    def talkToBob(): Receive = {
       context.system.terminate()
       Actor.emptyBehavior
     }

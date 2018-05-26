@@ -17,10 +17,12 @@ import chapter15.SendEmailResult
 // Listing 15.9 Enabling the body to be pulled by the recipient
 
 // #snip
-case class SendEmail(sender: String, recipients: List[String],
-                     bodyLocation:  URL,
-                     correlationID: UUID,
-                     replyTo:       ActorRef[SendEmailResult])
+case class SendEmail(
+  sender:        String,
+  recipients:    List[String],
+  bodyLocation:  URL,
+  correlationID: UUID,
+  replyTo:       ActorRef[SendEmailResult])
 
 // #snip
 

@@ -3,6 +3,7 @@
 
 // #snip
 var uuid = require('node-uuid');
+
 amqp.connect('amqp://localhost', function (err, conn) {
     conn.createChannel(function (err, ch) {
         ch.assertQueue('responses', {}, function (err, q) {

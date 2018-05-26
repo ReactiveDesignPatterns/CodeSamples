@@ -16,9 +16,10 @@ import akka.typed.ActorRef
 
 // #snip
 case class SendEmail(
-  sender:     String,
-  recipients: List[String],
-  body:       String, correlationID: UUID,
-  replyTo: ActorRef[SendEmailResult])
+  sender:        String,
+  recipients:    List[String],
+  body:          String,
+  correlationID: UUID,
+  replyTo:       ActorRef[SendEmailResult])
 
 // #snip
