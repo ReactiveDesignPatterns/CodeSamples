@@ -9,7 +9,7 @@ package chapter03.future
 
 import java.util.concurrent.ForkJoinPool
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
 // 代码清单 3-12
@@ -26,6 +26,8 @@ class StagedFuturesForExample(inventoryService: InventoryService) {
    * inventory is a Map of Warehouse ID to count.
    */
   // #snip
+  implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(ForkJoinPool.commonPool())
+
   def getProductInventoryByPostalCode(
     productSku: Long,
     postalCode: String): Future[(Long, Map[String, Long])] = {
@@ -33,7 +35,6 @@ class StagedFuturesForExample(inventoryService: InventoryService) {
     import scala.concurrent.duration._
 
     // Provide the thread pool and Future timeout value to be applied
-    implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool())
     implicit val timeout: FiniteDuration = 250 milliseconds
 
     // Define the futures so they can start doing their work
