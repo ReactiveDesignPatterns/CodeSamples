@@ -7,7 +7,7 @@ import scalariform.formatter.preferences._
 
 object Build {
   val akkaVersion = "2.4.20"
-  val akka25Version = "2.5.12"
+  val akka25Version = "2.5.13"
   val ckiteVersion = "0.2.1"
 
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
