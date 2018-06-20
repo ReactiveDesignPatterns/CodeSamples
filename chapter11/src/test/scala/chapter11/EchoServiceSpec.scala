@@ -270,7 +270,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
           count = 10000,
           maxParallelism = 500) { i ⇒
           val message = s"test$i"
-          SingleResult((echo ? (Request(message, _))), Response(message))
+          SingleResult(echo ? (Request(message, _)), Response(message))
         }
         val latencies = await(akka.pattern.after(
           20.seconds,

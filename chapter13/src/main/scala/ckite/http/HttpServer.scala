@@ -19,7 +19,7 @@ class HttpServer(ckite: CKite) {
   var closed = false
   var server: Closable = _
 
-  def start() = {
+  def start(): Unit = {
     val restServerPort =
       ConfigFactory.load()
         .getString("ckite.listen-address").split(":")(1).toInt + 1000
@@ -29,7 +29,7 @@ class HttpServer(ckite: CKite) {
       Http.serve(new InetSocketAddress(restServerPort), new HttpService(ckite))
   }
 
-  def stop() = synchronized {
+  def stop(): Unit = synchronized {
     if (!closed) {
       server.close()
       closed = true

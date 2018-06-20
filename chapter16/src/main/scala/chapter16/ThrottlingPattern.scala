@@ -133,7 +133,7 @@ object ThrottlingPattern {
       case JobRejected(id)       ⇒ registerReport(Report.failure)
     }
 
-    def registerReport(r: Report) = {
+    def registerReport(r: Report): Unit = {
       approximation += r
       outstandingWork -= 1
       if (outstandingWork == 0 && workStream.isEmpty) {

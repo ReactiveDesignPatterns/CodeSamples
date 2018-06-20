@@ -76,10 +76,9 @@ object Saga {
       var last: Event = null
 
       {
-        case t: TransferStarted ⇒ {
+        case t: TransferStarted ⇒
           start = t
           last = t
-        }
         case e: Event ⇒ last = e
         case RecoveryCompleted ⇒
           last match {

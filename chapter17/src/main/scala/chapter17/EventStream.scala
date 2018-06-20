@@ -98,7 +98,7 @@ class TopProductListener extends Actor with ActorLogging {
 
   import TopProductListener._
 
-  private implicit val materializer = ActorMaterializer()
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   private val readJournal: LeveldbReadJournal =
     PersistenceQuery(context.system)

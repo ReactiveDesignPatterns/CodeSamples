@@ -202,7 +202,7 @@ object Aggregator {
               val topSet = topNews.toSet
               val allNews = topNews ::: personalNews.filterNot(topSet.contains)
               replyTo ! FrontPageResult(user, css, allNews)
-            case other ⇒ // nothing to do here
+            case _ ⇒ // nothing to do here
           }
           for {
             ovr ← overrideFuture

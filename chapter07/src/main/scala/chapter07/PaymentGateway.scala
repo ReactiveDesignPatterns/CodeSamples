@@ -5,7 +5,7 @@
  *
  */
 
-package com.reactivedesignpatterns.chapter7
+package chapter07
 
 import akka.actor.ActorRef
 

@@ -41,7 +41,7 @@ class StepParentSpec extends WordSpec with Matchers with BeforeAndAfterAll {
 // #snip_11-23
 class StepParent extends Actor {
   override val supervisorStrategy: OneForOneStrategy = OneForOneStrategy() {
-    case thr ⇒ Restart
+    case ex ⇒ Restart
   }
 
   def receive: Receive = {

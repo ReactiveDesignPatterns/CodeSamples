@@ -35,9 +35,7 @@ public class AskActorWithJava8 {
     @Override
     public Receive createReceive() {
       return receiveBuilder()
-        .matchAny((msg) -> {
-          getSender().tell(new Response(), getSelf());
-        })
+        .matchAny((msg) -> getSender().tell(new Response(), getSelf()))
         .build();
     }
   }
@@ -57,7 +55,7 @@ public class AskActorWithJava8 {
     CompletionStage<Response> future =
       ask(actorRef, request, timeout)
         .thenApply(Response.class::cast);
-    future.thenAccept(response -> AskActorWithJava8.processIt(response));
+    future.thenAccept(AskActorWithJava8::processIt);
     // #snip
 
   }

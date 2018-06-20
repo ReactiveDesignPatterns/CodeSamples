@@ -56,42 +56,26 @@ public class ParallelRetrieverExampleTest {
     }
   };
 
-  final CacheRetriever workingCacheRetriever = new CacheRetriever() {
-    @Override
-    public Customer getCustomer(long customerId) {
-      return customer1;
+  final CacheRetriever workingCacheRetriever = customerId -> customer1;
+
+  final CacheRetriever delayedCacheRetriever = customerId -> {
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
+    return null;
   };
 
-  final CacheRetriever delayedCacheRetriever = new CacheRetriever() {
-    @Override
-    public Customer getCustomer(long customerId) {
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      return null;
-    }
-  };
+  final DBRetriever workingDbRetriever = customerId -> customer2;
 
-  final DBRetriever workingDbRetriever = new DBRetriever() {
-    @Override
-    public Customer getCustomer(long customerId) {
-      return customer2;
+  final DBRetriever delayedDbRetriever = customerId -> {
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
-  };
-
-  final DBRetriever delayedDbRetriever = new DBRetriever() {
-    @Override
-    public Customer getCustomer(long customerId) {
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      return null;
-    }
+    return null;
   };
 
   @Test

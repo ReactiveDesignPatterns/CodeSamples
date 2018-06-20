@@ -20,6 +20,7 @@ import com.twitter.util.{ Future, Promise }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ Future ⇒ ScalaFuture }
+import scala.language.implicitConversions
 import scala.util.{ Failure, Success }
 
 class HttpService(ckite: CKite) extends Service[Request, Response] {
@@ -30,34 +31,30 @@ class HttpService(ckite: CKite) extends Service[Request, Response] {
   printer.indentArraysWith(new DefaultIndenter)
   private val writer = mapper.writer(printer)
 
-  def apply(request: Request) = {
+  def apply(request: Request): Future[Response] = {
     request.method -> Path(request.path) match {
       case Method.Get -> Root / "status" ⇒ Future.value {
         response(writer.writeValueAsString(ckite.asInstanceOf[CKiteClient].stats()))
       }
-      case Method.Get -> Root / "kv" / key ⇒ {
+      case Method.Get -> Root / "kv" / key ⇒
         val localOption = request.params.getBoolean("local")
         val get = Get(key)
         val result = if (localOption.getOrElse(false))
           ScalaFuture.successful(ckite.asInstanceOf[CKiteClient].readLocal(get))
         else ckite.read(get)
         result.map { value ⇒ response(value) }
-      }
-      case Method.Post -> Root / "kv" / key / value ⇒ {
+      case Method.Post -> Root / "kv" / key / value ⇒
         ckite.write(Put(key, value)) map { value ⇒ response(value) }
-      }
-      case Method.Post -> Root / "members" / binding ⇒ {
+      case Method.Post -> Root / "members" / binding ⇒
         ckite.addMember(binding) map { value ⇒ response(value) }
-      }
-      case Method.Delete -> Root / "members" / binding ⇒ {
+      case Method.Delete -> Root / "members" / binding ⇒
         ckite.removeMember(binding) map { value ⇒ response(value) }
-      }
       case _ ⇒
         Future value Response(Http11, NotFound)
     }
   }
 
-  private def response[T](any: T) = {
+  private def response[T](any: T): Response = {
     val response = Response()
     response.contentString = s"$any\n"
     response

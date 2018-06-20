@@ -154,8 +154,8 @@ object MultiMasterCRDT {
         val current = ch.get(StorageComponent).entries
         for {
           (job, status) ← current.iterator
-          if (status == Aborted)
-          if (!lastState.get(job).contains(Aborted))
+          if status == Aborted
+          if !lastState.get(job).contains(Aborted)
         } {
           log.info("aborting job {}", job)
           lastState = current

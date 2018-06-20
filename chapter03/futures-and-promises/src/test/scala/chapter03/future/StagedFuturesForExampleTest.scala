@@ -19,10 +19,10 @@ import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor }
 @RunWith(classOf[JUnit4])
 class StagedFuturesForExampleTest {
   implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(new ForkJoinPool())
-  implicit val timeout: FiniteDuration = 250 milliseconds
+  implicit val timeout: FiniteDuration = 250.milliseconds
 
   @Test
-  def testInventoryCount: Unit = {
+  def testInventoryCount(): Unit = {
     val stagedFutures = new StagedFuturesForExample(new InventoryService() {
       def currentInventoryInWarehouse(productSku: Long, postalCode: String): Long = {
         5

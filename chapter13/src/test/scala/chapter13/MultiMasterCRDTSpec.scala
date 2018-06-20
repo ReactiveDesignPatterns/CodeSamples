@@ -7,10 +7,11 @@
 
 package chapter13
 
-import org.scalactic.ConversionCheckedTripleEquals
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalactic.TypeCheckedTripleEquals
+import org.scalatest.{Matchers, WordSpec}
 
-class MultiMasterCRDTSpec extends WordSpec with Matchers with ConversionCheckedTripleEquals {
+class MultiMasterCRDTSpec extends WordSpec with Matchers
+  with TypeCheckedTripleEquals {
 
   import MultiMasterCRDT._
 

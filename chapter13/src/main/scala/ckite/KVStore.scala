@@ -15,7 +15,8 @@ import ckite.rpc.{ FinagleThriftRpc, ReadCommand, WriteCommand }
 import ckite.statemachine.StateMachine
 import ckite.util.Serializer
 
-import scala.collection.mutable.Map
+import scala.collection.mutable
+import scala.concurrent.Future
 
 case class Get(key: String) extends ReadCommand[Option[String]]
 
@@ -23,25 +24,24 @@ case class Put(key: String, value: String) extends WriteCommand[String]
 
 // #snip_13-8
 class KVStore extends StateMachine {
-  private var map = Map[String, String]()
+  private var map = mutable.Map[String, String]()
   private var lastIndex: Long = 0
 
-  def applyWrite = {
-    case (index, Put(key: String, value: String)) ⇒ {
+  def applyWrite: PartialFunction[(Long, WriteCommand[_]), String] = {
+    case (index, Put(key: String, value: String)) ⇒
       map.put(key, value)
       lastIndex = index
       value
-    }
   }
 
-  def applyRead = {
+  def applyRead: PartialFunction[ReadCommand[_], Option[String]] = {
     case Get(key) ⇒ map.get(key)
   }
 
   def getLastAppliedIndex: Long = lastIndex
 
-  def restoreSnapshot(byteBuffer: ByteBuffer) = {
-    map = Serializer.deserialize[Map[String, String]](byteBuffer.array())
+  def restoreSnapshot(byteBuffer: ByteBuffer): Unit = {
+    map = Serializer.deserialize[mutable.Map[String, String]](byteBuffer.array())
   }
 
   def takeSnapshot(): ByteBuffer =
@@ -73,9 +73,9 @@ object SnipCkiteAPI {
   val value = "value"
 
   // #snip_ckite_api
-  val consistentRead = ckite.read(Get(key))
-  val possibleStaleRead = ckite.readLocal(Get(key))
-  val write = ckite.write(Put(key, value))
+  val consistentRead: Future[Option[String]] = ckite.read(Get(key))
+  val possibleStaleRead: Future[Option[String]] = ckite.readLocal(Get(key))
+  val write: Future[String] = ckite.write(Put(key, value))
   // #snip_ckite_api
 
 }

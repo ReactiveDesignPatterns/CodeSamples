@@ -7,7 +7,6 @@
 
 package chapter14;
 
-import akka.NotUsed;
 import akka.japi.Pair;
 import akka.japi.function.Function;
 import akka.japi.function.Function2;
@@ -28,7 +27,7 @@ import java.util.stream.Stream;
 
 public interface ComplexCommand {
 
-  public class DataElement {
+  class DataElement {
     public final int value;
 
     public DataElement(int value) {
@@ -36,14 +35,14 @@ public interface ComplexCommand {
     }
   }
 
-  public interface PartialResult {
+  interface PartialResult {
   }
 
-  public interface Result {
+  interface Result {
   }
 
   // #snip_14-8
-  public class PartSuccess implements PartialResult {
+  class PartSuccess implements PartialResult {
     public final int value;
 
     public PartSuccess(int value) {
@@ -56,7 +55,7 @@ public interface ComplexCommand {
     }
   }
 
-  public class PartFailure implements PartialResult {
+  class PartFailure implements PartialResult {
     public final Throwable failure;
 
     public PartFailure(Throwable failure) {
@@ -69,7 +68,7 @@ public interface ComplexCommand {
     }
   }
 
-  public class BatchJobJS {
+  class BatchJobJS {
     public final String dataSelector;
     public final String processingLogic;
     public final String mergeLogic;
@@ -87,7 +86,7 @@ public interface ComplexCommand {
     }
   }
 
-  public class WorkerJS {
+  class WorkerJS {
     private static final ScriptEngine engine =
       new ScriptEngineManager().getEngineByName("nashorn");
 
@@ -113,16 +112,16 @@ public interface ComplexCommand {
   // #snip_14-8
 
   // #snip_14-7
-  public interface ProcessingLogic {
-    public PartialResult process(Stream<DataElement> input);
+  interface ProcessingLogic {
+    PartialResult process(Stream<DataElement> input);
   }
 
   //
-  public interface MergeLogic {
-    public Result merge(Collection<PartialResult> partialResults);
+  interface MergeLogic {
+    Result merge(Collection<PartialResult> partialResults);
   }
 
-  public class BatchJob {
+  class BatchJob {
     public final String dataSelector;
     public final ProcessingLogic processingLogic;
     public final MergeLogic mergeLogic;
@@ -170,7 +169,7 @@ public interface ComplexCommand {
     }
 
     @Override
-    public T apply(T arg0, DataElement arg1) throws Exception {
+    public T apply(T arg0, DataElement arg1) {
       // TODO Auto-generated method stub
       return null;
     }
@@ -187,7 +186,7 @@ public interface ComplexCommand {
     }
 
     @Override
-    public DataElement apply(DataElement arg0) throws Exception {
+    public DataElement apply(DataElement arg0) {
       // TODO Auto-generated method stub
       return null;
     }
@@ -217,7 +216,7 @@ public interface ComplexCommand {
     }
 
     @Override
-    public Set<T> apply(Set<T> arg0, DataElement arg1) throws Exception {
+    public Set<T> apply(Set<T> arg0, DataElement arg1) {
       // TODO Auto-generated method stub
       return null;
     }
@@ -225,13 +224,13 @@ public interface ComplexCommand {
   }
 
   // #snip_14-10
-  public static void akkaStreamDSL() {
+  static void akkaStreamDSL() {
     RunnableGraph<CompletionStage<Long>> p =
       Source.<DataElement>empty()
         .filter(new InRange("year", 1950, 1960))
         .toMat(
           Sink.fold(0L, new Median<Long>("price")),
-          Keep.<NotUsed, CompletionStage<Long>>right());
+          Keep.right());
 
     Source.<DataElement>empty()
       .map(new Inject<Long>(p, "p"))
