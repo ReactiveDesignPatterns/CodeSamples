@@ -76,7 +76,7 @@ object MultiMasterCRDT {
 
   // #snip_13-11
 
-  object StorageComponent extends Key[ORMap[Status]]("StorageComponent")
+  object StorageComponent extends Key[ORMap[String, Status]]("StorageComponent")
 
   case class Submit(job: String)
 
@@ -98,14 +98,14 @@ object MultiMasterCRDT {
         log.info("submitting job {}", job)
         replicator ! Replicator.Update(
           StorageComponent,
-          ORMap.empty[Status],
+          ORMap.empty[String, Status],
           Replicator.WriteMajority(5.seconds),
           Some(s"submit $job"))(_ + (job -> New))
       case Cancel(job) ⇒
         log.info("cancelling job {}", job)
         replicator ! Replicator.Update(
           StorageComponent,
-          ORMap.empty[Status],
+          ORMap.empty[String, Status],
           Replicator.WriteMajority(5.seconds),
           Some(s"cancel $job"))(_ + (job -> Cancelled))
       case r: Replicator.UpdateResponse[_] ⇒
@@ -135,7 +135,7 @@ object MultiMasterCRDT {
         log.info("executing job {}", job)
         replicator ! Replicator.Update(
           StorageComponent,
-          ORMap.empty[Status],
+          ORMap.empty[String, Status],
           Replicator.WriteMajority(5.seconds), Some(job)) { map ⇒
             require(map.get(job).contains(New))
             map + (job -> Executing)
@@ -144,7 +144,7 @@ object MultiMasterCRDT {
         log.info("job {} finished", job)
         replicator ! Replicator.Update(
           StorageComponent,
-          ORMap.empty[Status],
+          ORMap.empty[String, Status],
           Replicator.WriteMajority(5.seconds))(_ + (job -> Finished))
       case Replicator.UpdateSuccess(StorageComponent, Some(job)) ⇒
         log.info("starting job {}", job)

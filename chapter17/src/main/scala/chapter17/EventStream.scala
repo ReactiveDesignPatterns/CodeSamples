@@ -104,7 +104,7 @@ class TopProductListener extends Actor with ActorLogging {
     PersistenceQuery(context.system)
       .readJournalFor[LeveldbReadJournal](LeveldbReadJournal.Identifier)
 
-  readJournal.eventsByTag("shoppingCart", 0)
+  readJournal.eventsByTag(tag = "shoppingCart", offset = Sequence(0L))
     .collect { case EventEnvelope(_, _, _, add: ItemAdded) ⇒ add }
     .groupedWithin(100000, 1.second)
     .addAttributes(Attributes.asyncBoundary)

@@ -3,12 +3,12 @@ import Build._
 resolvers += "twitter" at "http://maven.twttr.com/"
 
 libraryDependencies ++= Seq(
-  akkaContrib,
-  akkaDData,
+  akka25Contrib,
+  akka25DData,
   playJson,
   fasterxml,
   sbtIO,
-  akkaTestkit,
+  akka25Testkit,
   finagle,
   junit,
   scalatest) ++ ckites

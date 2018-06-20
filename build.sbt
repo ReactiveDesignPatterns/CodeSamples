@@ -9,7 +9,7 @@ version in ThisBuild := "1.0.0"
 
 scalaVersion := "2.12.6"
 
-scalafixSemanticdbVersion in ThisBuild := "4.0.0-M1"
+scalafixSemanticdbVersion in ThisBuild := "4.0.0-M3"
 
 scalacOptions in Compile ++= Seq("-encoding", "UTF-8", "-target:jvm-1.8", "-feature", "-unchecked", "-Xlog-reflective-calls", "-Xlint")
 
@@ -59,7 +59,7 @@ lazy val chapter11 = project.dependsOn(common)
   .settings(Build.sharedSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      Build.akkaTestkit,
+      Build.akka25Testkit,
       Build.scalatest,
       Build.scalaAsync
     )

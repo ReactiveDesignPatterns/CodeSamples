@@ -10,20 +10,29 @@ object Build {
   val akka25Version = "2.5.13"
   val ckiteVersion = "0.2.1"
 
-  val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akka25Actor = "com.typesafe.akka" %% "akka-actor" % akka25Version
-  val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akka25Version % "test"
-  val akkaContrib = "com.typesafe.akka" %% "akka-contrib" % akkaVersion
-  val akkaSharding = "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
-  val akkaDData = "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion
-  val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
+
+  val akka25Testkit = "com.typesafe.akka" %% "akka-testkit" % akka25Version % "test"
+
+  val akka25Contrib = "com.typesafe.akka" %% "akka-contrib" % akka25Version
+
+  val akka25Sharding = "com.typesafe.akka" %% "akka-cluster-sharding" % akka25Version
+
+  val akka25DData = "com.typesafe.akka" %% "akka-distributed-data" % akka25Version
+
+  val akka25Stream = "com.typesafe.akka" %% "akka-stream" % akka25Version
+
   val akkaTyped = "com.typesafe.akka" %% "akka-typed-experimental" % akkaVersion
-  val akkaPersistence = "com.typesafe.akka" %% "akka-persistence" % akkaVersion
-  val akkaPersistenceQuery = "com.typesafe.akka" %% "akka-persistence-query-experimental" % akkaVersion
+
+  val akka25Typed = "com.typesafe.akka" %% "akka-actor-typed" % akka25Version
+
+  val akka25Persistence = "com.typesafe.akka" %% "akka-persistence" % akka25Version
+
+  val akka25PersistenceQuery = "com.typesafe.akka" %% "akka-persistence-query" % akka25Version
 
   val levelDb = "org.iq80.leveldb" % "leveldb" % "0.10"
 
-  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.337"
+  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.350"
 
   val sbtIO = "org.scala-sbt" %% "io" % "1.1.10"
 
@@ -40,8 +49,8 @@ object Build {
 
   val guava = "com.google.guava" % "guava" % "23.0"
 
-  val finagle = "com.twitter" %% "finagle-http" % "18.5.0"
-  val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.5"
+  val finagle = "com.twitter" %% "finagle-http" % "18.6.0"
+  val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.6"
 
   val ckites = Seq(
     "io.ckite" % "ckite-core" % ckiteVersion exclude("org.apache.thrift", "libthrift"),
