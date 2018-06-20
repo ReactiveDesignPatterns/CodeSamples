@@ -8,7 +8,7 @@
 package chapter13
 
 import org.scalactic.TypeCheckedTripleEquals
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 class MultiMasterCRDTSpec extends WordSpec with Matchers
   with TypeCheckedTripleEquals {
