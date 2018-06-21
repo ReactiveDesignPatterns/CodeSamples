@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 public interface ComplexCommand {
 
-  class DataElement {
+  public class DataElement {
     public final int value;
 
     public DataElement(int value) {
@@ -35,14 +35,14 @@ public interface ComplexCommand {
     }
   }
 
-  interface PartialResult {
+  public interface PartialResult {
   }
 
-  interface Result {
+  public interface Result {
   }
 
   // #snip_14-8
-  class PartSuccess implements PartialResult {
+  public class PartSuccess implements PartialResult {
     public final int value;
 
     public PartSuccess(int value) {
@@ -55,7 +55,7 @@ public interface ComplexCommand {
     }
   }
 
-  class PartFailure implements PartialResult {
+  public class PartFailure implements PartialResult {
     public final Throwable failure;
 
     public PartFailure(Throwable failure) {
@@ -68,7 +68,7 @@ public interface ComplexCommand {
     }
   }
 
-  class BatchJobJS {
+  public class BatchJobJS {
     public final String dataSelector;
     public final String processingLogic;
     public final String mergeLogic;
@@ -86,7 +86,7 @@ public interface ComplexCommand {
     }
   }
 
-  class WorkerJS {
+  public class WorkerJS {
     private static final ScriptEngine engine =
       new ScriptEngineManager().getEngineByName("nashorn");
 
@@ -112,16 +112,16 @@ public interface ComplexCommand {
   // #snip_14-8
 
   // #snip_14-7
-  interface ProcessingLogic {
+  public interface ProcessingLogic {
     PartialResult process(Stream<DataElement> input);
   }
 
   //
-  interface MergeLogic {
+  public interface MergeLogic {
     Result merge(Collection<PartialResult> partialResults);
   }
 
-  class BatchJob {
+  public class BatchJob {
     public final String dataSelector;
     public final ProcessingLogic processingLogic;
     public final MergeLogic mergeLogic;
@@ -141,7 +141,7 @@ public interface ComplexCommand {
   // #snip_14-7
 
 
-  class InRange implements Predicate<DataElement> {
+  public class InRange implements Predicate<DataElement> {
     private static final long serialVersionUID = 1L;
     public final String fieldname;
     public final Number min;
@@ -160,7 +160,7 @@ public interface ComplexCommand {
     }
   }
 
-  class Median<T> implements Function2<T, DataElement, T> {
+  public class Median<T> implements Function2<T, DataElement, T> {
     private static final long serialVersionUID = 1L;
     public final String fieldname;
 
@@ -175,7 +175,7 @@ public interface ComplexCommand {
     }
   }
 
-  class Inject<T> implements Function<DataElement, DataElement> {
+  public class Inject<T> implements Function<DataElement, DataElement> {
     private static final long serialVersionUID = 1L;
     public final RunnableGraph<CompletionStage<T>> value;
     public final String fieldname;
@@ -192,7 +192,7 @@ public interface ComplexCommand {
     }
   }
 
-  class Filter implements Predicate<DataElement> {
+  public class Filter implements Predicate<DataElement> {
     private static final long serialVersionUID = 1L;
     public final String expression;
 
@@ -207,7 +207,7 @@ public interface ComplexCommand {
     }
   }
 
-  class DistinctValues<T> implements Function2<Set<T>, DataElement, Set<T>> {
+  public class DistinctValues<T> implements Function2<Set<T>, DataElement, Set<T>> {
     private static final long serialVersionUID = 1L;
     public final String[] fields;
 
@@ -224,7 +224,7 @@ public interface ComplexCommand {
   }
 
   // #snip_14-10
-  static void akkaStreamDSL() {
+  public static void akkaStreamDSL() {
     RunnableGraph<CompletionStage<Long>> p =
       Source.<DataElement>empty()
         .filter(new InRange("year", 1950, 1960))
