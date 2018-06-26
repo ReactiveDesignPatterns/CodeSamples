@@ -11,7 +11,7 @@
     * [第4章——消息传递](chapter-04/index.md)
     * [第5章——位置透明性](chapter-05/index.md)
     * [第6章——分而治之](chapter-06/index.md)
-    * [第7章——有规划的失败处理](chapter-07/index.md)
+    * [第7章——原则性失败处理](chapter-07/index.md)
     * [第8章——有界一致性](chapter-08/index.md)
     * [第9章——按需使用非确定性](chapter-09/index.md)
     * [第10章——消息流](chapter-10/index.md)
