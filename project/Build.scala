@@ -83,5 +83,10 @@ object Build {
           |""".stripMargin
     )
     )
+//    ,
+//    wartremoverErrors ++= Warts.allBut(
+//      Wart.Any,
+//      Wart.FinalCaseClass,
+//      Wart.Null)
   )
 }
