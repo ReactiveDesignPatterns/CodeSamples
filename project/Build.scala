@@ -32,14 +32,14 @@ object Build {
 
   val levelDb = "org.iq80.leveldb" % "leveldb" % "0.10"
 
-  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.350"
+  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.358"
 
   val sbtIO = "org.scala-sbt" %% "io" % "1.1.10"
 
   val scalaAsync = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
   val scalaJava8 = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
 
-  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.1.15"
+  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.1.16"
 
   val playJson = "com.typesafe.play" %% "play-json" % "2.6.9"
 
