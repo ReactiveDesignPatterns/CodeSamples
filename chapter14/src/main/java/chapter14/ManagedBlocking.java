@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
- * 
+ *
  * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
 
 package chapter14;
@@ -36,8 +37,8 @@ public interface ManagedBlocking {
     public final AccessRights[] rights;
     public final ActorRef replyTo;
 
-    public CheckAccess(String username, String credentials,
-        AccessRights[] rights, ActorRef replyTo) {
+    public CheckAccess(
+        String username, String credentials, AccessRights[] rights, ActorRef replyTo) {
       this.username = username;
       this.credentials = credentials;
       this.rights = rights;
@@ -63,25 +64,23 @@ public interface ManagedBlocking {
 
     public AccessService(DataSource db, int poolSize, int queueSize) {
       this.db = db;
-      pool = new ThreadPoolExecutor(
-          0, poolSize,
-          60, SECONDS,
-          new LinkedBlockingDeque<>(queueSize));
+      pool = new ThreadPoolExecutor(0, poolSize, 60, SECONDS, new LinkedBlockingDeque<>(queueSize));
     }
 
     @Override
     public Receive createReceive() {
       final ActorRef self = self();
       return ReceiveBuilder.create()
-        .match(CheckAccess.class, ca -> {
-          try {
-            pool.execute(() -> checkAccess(db, ca, self));
-          } catch (RejectedExecutionException e) {
-            ca.replyTo.tell(
-              new CheckAccessResult(ca, AccessRights.EMPTY), self);
-          }
-        })
-        .build();
+          .match(
+              CheckAccess.class,
+              ca -> {
+                try {
+                  pool.execute(() -> checkAccess(db, ca, self));
+                } catch (RejectedExecutionException e) {
+                  ca.replyTo.tell(new CheckAccessResult(ca, AccessRights.EMPTY), self);
+                }
+              })
+          .build();
     }
 
     @Override
@@ -89,19 +88,14 @@ public interface ManagedBlocking {
       pool.shutdownNow();
     }
 
-    private static void checkAccess(DataSource db,
-        CheckAccess ca, ActorRef self) {
+    private static void checkAccess(DataSource db, CheckAccess ca, ActorRef self) {
       try (Connection conn = db.getConnection()) {
-        final ResultSet result =
-            conn.createStatement().executeQuery("<get access rights>");
+        final ResultSet result = conn.createStatement().executeQuery("<get access rights>");
         final List<AccessRights> rights = new LinkedList<>();
         while (result.next()) {
           rights.add(AccessRights.valueOf(result.getString(0)));
         }
-        ca.replyTo.tell(
-            new CheckAccessResult(
-                ca, rights.toArray(AccessRights.EMPTY)),
-            self);
+        ca.replyTo.tell(new CheckAccessResult(ca, rights.toArray(AccessRights.EMPTY)), self);
       } catch (Exception e) {
         ca.replyTo.tell(new CheckAccessResult(ca, AccessRights.EMPTY), self);
       }

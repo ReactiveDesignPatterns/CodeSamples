@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
- * 
+ *
  * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
 
 import akka.actor.AbstractActor;
@@ -13,7 +14,6 @@ import akka.util.Timeout;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import static akka.pattern.PatternsCS.ask;
-
 
 public class AskActorWithJava8 {
   public static class Request {
@@ -28,15 +28,14 @@ public class AskActorWithJava8 {
     }
   }
 
-  public static class Response {
-  }
+  public static class Response {}
 
   public static class MyActor extends AbstractActor {
     @Override
     public Receive createReceive() {
       return receiveBuilder()
-        .matchAny((msg) -> getSender().tell(new Response(), getSelf()))
-        .build();
+          .matchAny((msg) -> getSender().tell(new Response(), getSelf()))
+          .build();
     }
   }
 
@@ -47,14 +46,14 @@ public class AskActorWithJava8 {
   private static final ActorSystem ACTOR_SYSTEM = ActorSystem.create();
 
   public static void main(String[] args) {
-    ActorRef actorRef = ACTOR_SYSTEM.actorOf(Props.create(MyActor.class, (Creator<MyActor>) MyActor::new));
+    ActorRef actorRef =
+        ACTOR_SYSTEM.actorOf(Props.create(MyActor.class, (Creator<MyActor>) MyActor::new));
     Request request = new Request(1);
     Timeout timeout = Timeout.apply(1, TimeUnit.SECONDS);
 
     // #snip
     CompletionStage<Response> future =
-      ask(actorRef, request, timeout)
-        .thenApply(Response.class::cast);
+        ask(actorRef, request, timeout).thenApply(Response.class::cast);
     future.thenAccept(AskActorWithJava8::processIt);
     // #snip
 

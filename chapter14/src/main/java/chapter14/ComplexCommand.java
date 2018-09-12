@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.reactivedesignpatterns.com/ 
+ * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
  *
  * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
  *
@@ -35,11 +35,9 @@ public interface ComplexCommand {
     }
   }
 
-  public interface PartialResult {
-  }
+  public interface PartialResult {}
 
-  public interface Result {
-  }
+  public interface Result {}
 
   // #snip_14-8
   public class PartSuccess implements PartialResult {
@@ -73,9 +71,7 @@ public interface ComplexCommand {
     public final String processingLogic;
     public final String mergeLogic;
 
-    public BatchJobJS(String dataSelector,
-                      String processingLogic,
-                      String mergeLogic) {
+    public BatchJobJS(String dataSelector, String processingLogic, String mergeLogic) {
       this.dataSelector = dataSelector;
       this.processingLogic = processingLogic;
       this.mergeLogic = mergeLogic;
@@ -87,8 +83,7 @@ public interface ComplexCommand {
   }
 
   public class WorkerJS {
-    private static final ScriptEngine engine =
-      new ScriptEngineManager().getEngineByName("nashorn");
+    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
     public PartialResult runJob(BatchJobJS job) {
       Invocable invocable = (Invocable) engine;
@@ -96,8 +91,7 @@ public interface ComplexCommand {
       try {
         engine.eval(job.processingLogic);
         final Stream<DataElement> input = provideData(job.dataSelector);
-        PartialResult result =
-          (PartialResult) invocable.invokeFunction("process", input);
+        PartialResult result = (PartialResult) invocable.invokeFunction("process", input);
         return result;
       } catch (Exception e) {
         return new PartFailure(e);
@@ -126,9 +120,7 @@ public interface ComplexCommand {
     public final ProcessingLogic processingLogic;
     public final MergeLogic mergeLogic;
 
-    public BatchJob(String dataSelector,
-                    ProcessingLogic processingLogic,
-                    MergeLogic mergeLogic) {
+    public BatchJob(String dataSelector, ProcessingLogic processingLogic, MergeLogic mergeLogic) {
       this.dataSelector = dataSelector;
       this.processingLogic = processingLogic;
       this.mergeLogic = mergeLogic;
@@ -139,7 +131,6 @@ public interface ComplexCommand {
     }
   }
   // #snip_14-7
-
 
   public class InRange implements Predicate<DataElement> {
     private static final long serialVersionUID = 1L;
@@ -220,24 +211,21 @@ public interface ComplexCommand {
       // TODO Auto-generated method stub
       return null;
     }
-
   }
 
   // #snip_14-10
   public static void akkaStreamDSL() {
     RunnableGraph<CompletionStage<Long>> p =
-      Source.<DataElement>empty()
-        .filter(new InRange("year", 1950, 1960))
-        .toMat(
-          Sink.fold(0L, new Median<Long>("price")),
-          Keep.right());
+        Source.<DataElement>empty()
+            .filter(new InRange("year", 1950, 1960))
+            .toMat(Sink.fold(0L, new Median<Long>("price")), Keep.right());
 
     Source.<DataElement>empty()
-      .map(new Inject<Long>(p, "p"))
-      .filter(new Filter("price > p"))
-      .to(Sink.fold(
-        Collections.emptySet(),
-        new DistinctValues<Pair<String, String>>("make", "model")));
+        .map(new Inject<Long>(p, "p"))
+        .filter(new Filter("price > p"))
+        .to(
+            Sink.fold(
+                Collections.emptySet(), new DistinctValues<Pair<String, String>>("make", "model")));
   }
   // #snip_14-10
 }

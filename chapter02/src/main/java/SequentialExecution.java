@@ -1,18 +1,16 @@
 /*
  * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
- * 
+ *
  * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
 
 public class SequentialExecution {
-  public static class ReplyA {
-  }
+  public static class ReplyA {}
 
-  public static class ReplyB {
-  }
+  public static class ReplyB {}
 
-  public static class ReplyC {
-  }
+  public static class ReplyC {}
 
   public static class Result {
     ReplyA replyA;
@@ -35,11 +33,11 @@ public class SequentialExecution {
   }
 
   public static ReplyB computeB() {
-    return new ReplyB(); //return from compute
+    return new ReplyB(); // return from compute
   }
 
   public static ReplyC computeC() {
-    return new ReplyC(); //return from compute
+    return new ReplyC(); // return from compute
   }
 
   public static void main(String[] args) {
@@ -53,5 +51,4 @@ public class SequentialExecution {
 
     System.out.println(r);
   }
-
 }

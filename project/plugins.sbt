@@ -4,9 +4,9 @@ addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.3.2")
 
-addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.3.5")
+addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.4.1")
 
-addSbtPlugin("com.lightbend.paradox" % "sbt-paradox-theme" % "0.3.5")
+addSbtPlugin("com.lightbend.paradox" % "sbt-paradox-theme" % "0.4.1")
 
 addSbtPlugin("io.github.jonas" % "sbt-paradox-material-theme" % "0.4.0")
 
@@ -24,7 +24,7 @@ addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")
 
 addSbtPlugin("com.dwijnand" % "sbt-reloadquick" % "1.0.0")
 
-addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.3.0")
+addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.4.1")
 
 addSbtPlugin("io.spray" % "sbt-boilerplate" % "0.6.1")
 

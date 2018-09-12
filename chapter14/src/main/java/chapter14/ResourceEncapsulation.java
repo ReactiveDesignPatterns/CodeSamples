@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
- * 
+ *
  * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
 
 package chapter14;
@@ -31,8 +32,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This is not a completely runnable example but only a fully compiled
- * collection of code snippets used in section 13.1.
+ * This is not a completely runnable example but only a fully compiled collection of code snippets
+ * used in section 13.1.
  */
 public class ResourceEncapsulation {
   // #snip_14-1
@@ -46,8 +47,7 @@ public class ResourceEncapsulation {
             .withMinCount(1)
             .withMaxCount(1);
 
-    RunInstancesResult runInstancesResult =
-        amazonEC2Client.runInstances(runInstancesRequest);
+    RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
 
     Reservation reservation = runInstancesResult.getReservation();
     List<Instance> instances = reservation.getInstances();
@@ -64,16 +64,17 @@ public class ResourceEncapsulation {
   private CircuitBreaker circuitBreaker; // value from somewhere
 
   public Future<Instance> startInstanceAsync(AWSCredentials credentials) {
-    Future<Instance> f = circuitBreaker.callWithCircuitBreaker(
-      () -> Futures.future(
-        () -> startInstance(credentials), executionContext));
+    Future<Instance> f =
+        circuitBreaker.callWithCircuitBreaker(
+            () -> Futures.future(() -> startInstance(credentials), executionContext));
 
     PartialFunction<Throwable, Future<Instance>> recovery =
-      new PFBuilder<Throwable, Future<Instance>>()
-        .match(AmazonClientException.class,
-          AmazonClientException::isRetryable,
-          ex -> startInstanceAsync(credentials))
-        .build();
+        new PFBuilder<Throwable, Future<Instance>>()
+            .match(
+                AmazonClientException.class,
+                AmazonClientException::isRetryable,
+                ex -> startInstanceAsync(credentials))
+            .build();
 
     return f.recoverWith(recovery, executionContext);
   }
@@ -82,8 +83,7 @@ public class ResourceEncapsulation {
 
   // #snip_14-3
   public Future<RunInstancesResult> runInstancesAsync(
-      RunInstancesRequest request,
-      AmazonEC2Async client) {
+      RunInstancesRequest request, AmazonEC2Async client) {
 
     Promise<RunInstancesResult> promise = Futures.promise();
     client.runInstancesAsync(
@@ -91,9 +91,7 @@ public class ResourceEncapsulation {
         new AsyncHandler<RunInstancesRequest, RunInstancesResult>() {
 
           @Override
-          public void onSuccess(
-              RunInstancesRequest request,
-              RunInstancesResult result) {
+          public void onSuccess(RunInstancesRequest request, RunInstancesResult result) {
             promise.success(result);
           }
 
@@ -109,25 +107,23 @@ public class ResourceEncapsulation {
 
   // #snip_14-4
   public Future<TerminateInstancesResult> terminateInstancesAsync(
-    AmazonEC2Client client, Instance... instances) {
+      AmazonEC2Client client, Instance... instances) {
 
-    List<String> ids = Arrays.stream(instances)
-      .map(Instance::getInstanceId)
-      .collect(Collectors.toList());
+    List<String> ids =
+        Arrays.stream(instances).map(Instance::getInstanceId).collect(Collectors.toList());
     TerminateInstancesRequest request = new TerminateInstancesRequest(ids);
 
     Future<TerminateInstancesResult> f =
-      circuitBreaker.callWithCircuitBreaker(
-        () -> Futures.future(() ->
-            client.terminateInstances(request),
-          executionContext));
+        circuitBreaker.callWithCircuitBreaker(
+            () -> Futures.future(() -> client.terminateInstances(request), executionContext));
 
     PartialFunction<Throwable, Future<TerminateInstancesResult>> recovery =
-      new PFBuilder<Throwable, Future<TerminateInstancesResult>>()
-        .match(AmazonClientException.class,
-          AmazonClientException::isRetryable,
-          ex -> terminateInstancesAsync(client, instances))
-        .build();
+        new PFBuilder<Throwable, Future<TerminateInstancesResult>>()
+            .match(
+                AmazonClientException.class,
+                AmazonClientException::isRetryable,
+                ex -> terminateInstancesAsync(client, instances))
+            .build();
 
     return f.recoverWith(recovery, executionContext);
   }
@@ -151,15 +147,15 @@ public class ResourceEncapsulation {
   }
 
   static class DoHealthCheck {
-    static public DoHealthCheck instance = new DoHealthCheck();
+    public static DoHealthCheck instance = new DoHealthCheck();
   }
 
   static class Shutdown {
-    static public Shutdown instance = new Shutdown();
+    public static Shutdown instance = new Shutdown();
   }
 
   static class WorkerNodeReady {
-    static public WorkerNodeReady instance = new WorkerNodeReady();
+    public static WorkerNodeReady instance = new WorkerNodeReady();
   }
 
   // #snip_14-5
@@ -171,33 +167,46 @@ public class ResourceEncapsulation {
           getContext()
               .system()
               .scheduler()
-              .schedule(checkInterval, checkInterval, self(),
+              .schedule(
+                  checkInterval,
+                  checkInterval,
+                  self(),
                   DoHealthCheck.instance,
-                  getContext().dispatcher(), self());
+                  getContext().dispatcher(),
+                  self());
     }
 
     @Override
     public Receive createReceive() {
       List<WorkerNodeMessage> msgs = new ArrayList<>();
       return receiveBuilder()
-        .match(WorkerNodeMessage.class, msgs::add)
-        .match(DoHealthCheck.class, dhc -> { /* perform check */ })
-        .match(Shutdown.class, s -> {
-          msgs.forEach(msg ->
-            msg.replyTo().tell(
-              new WorkerCommandFailed("shutting down", msg.id()), self()));
-          /* ask Resource Pool to shut down this instance */
-        })
-        .match(WorkerNodeReady.class, wnr -> {
-          /* send msgs to the worker */
-          getContext().become(initialized());
-        })
-        .build();
+          .match(WorkerNodeMessage.class, msgs::add)
+          .match(
+              DoHealthCheck.class,
+              dhc -> {
+                /* perform check */
+              })
+          .match(
+              Shutdown.class,
+              s -> {
+                msgs.forEach(
+                    msg ->
+                        msg.replyTo()
+                            .tell(new WorkerCommandFailed("shutting down", msg.id()), self()));
+                /* ask Resource Pool to shut down this instance */
+              })
+          .match(
+              WorkerNodeReady.class,
+              wnr -> {
+                /* send msgs to the worker */
+                getContext().become(initialized());
+              })
+          .build();
     }
 
     private PartialFunction<Object, BoxedUnit> initialized() {
       /* forward commands and deal with responses from worker node */
-      //...
+      // ...
       return null;
     }
 
