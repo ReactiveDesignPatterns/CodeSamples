@@ -50,7 +50,7 @@ object PullPattern {
   // #snip_16-2
   class Manager extends Actor {
 
-    private val workStream: Iterator[Job] =
+    private val works: Iterator[Job] =
       Iterator from 1 map (x ⇒ Job(x, x, self)) take 1000000
 
     private val aggregator: (BigDecimal, BigDecimal) ⇒ BigDecimal = (x: BigDecimal, y: BigDecimal) ⇒ x + y
@@ -63,14 +63,14 @@ object PullPattern {
 
     def receive: Receive = {
       case WorkRequest(worker, items) ⇒
-        workStream.take(items).foreach { job ⇒
+        works.toStream.take(items).foreach { job ⇒
           worker ! job
           outstandingWork += 1
         }
       case JobResult(id, report) ⇒
         approximation = aggregator(approximation, report)
         outstandingWork -= 1
-        if (outstandingWork == 0 && workStream.isEmpty) {
+        if (outstandingWork == 0 && works.isEmpty) {
           println("final result: " + approximation)
           context.system.terminate()
         }

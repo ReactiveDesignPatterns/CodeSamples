@@ -20,7 +20,7 @@
 
 >QueuePattern.scala
 
-@@snip[代码清单16-3](../../../../chapter16/src/main/scala/chapter16/QueuePattern.scala){ #snip_16-3 }
+@@snip[代码清单16-3](../../../../chapter16/src/main/scala/chapter16/QueuePattern.scala){ #snip }
 
 ## 16.3 丢弃模式
 
