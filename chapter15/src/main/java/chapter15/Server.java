@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
- * 
+ *
  * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
 
 package chapter15;
@@ -18,26 +19,22 @@ import java.net.SocketAddress;
 public class Server {
   static final int SERVER_PORT = 8888;
 
-  static public void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException {
     // bind a socket for receiving packets
-    try (final DatagramSocket socket =
-        new DatagramSocket(SERVER_PORT)) {
+    try (final DatagramSocket socket = new DatagramSocket(SERVER_PORT)) {
 
       // receive one packet
       final byte[] buffer = new byte[1500];
-      final DatagramPacket packet1 =
-          new DatagramPacket(buffer, buffer.length);
+      final DatagramPacket packet1 = new DatagramPacket(buffer, buffer.length);
       socket.receive(packet1);
 
       final SocketAddress sender = packet1.getSocketAddress();
-      System.out.println("server: received " +
-          new String(packet1.getData()));
+      System.out.println("server: received " + new String(packet1.getData()));
       System.out.println("server: sender was " + sender);
 
       // send response back
       final byte[] response = "got it!".getBytes();
-      final DatagramPacket packet2 =
-          new DatagramPacket(response, response.length, sender);
+      final DatagramPacket packet2 = new DatagramPacket(response, response.length, sender);
       socket.send(packet2);
     }
   }

@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
- * 
+ *
  * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
 
 // 代码清单3-15
@@ -17,4 +18,3 @@ public class RxJavaExampleDriver {
   }
 }
 // #snip
-

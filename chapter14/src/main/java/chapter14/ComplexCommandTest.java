@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2018 https://www.reactivedesignpatterns.com/
- * 
+ *
  * Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
+ *
  */
 
 package chapter14;
@@ -14,9 +15,7 @@ import java.util.Scanner;
 
 public class ComplexCommandTest {
   public static void main(String[] args) throws IOException {
-    try (InputStream js =
-        ComplexCommandTest.class
-            .getResourceAsStream("/chapter14/job.js");
+    try (InputStream js = ComplexCommandTest.class.getResourceAsStream("/chapter14/job.js");
         Scanner s = new Scanner(js, "UTF-8")) {
       s.useDelimiter("\\A");
       final BatchJobJS job = new BatchJobJS("", s.next(), "");
