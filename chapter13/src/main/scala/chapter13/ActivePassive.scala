@@ -619,7 +619,7 @@ object ActivePassive {
           log.info("received newer state at sequence {} (was at {})", s, expectedSeq)
           persist(name, s, m)
           waiting.to(s).valuesIterator foreach (r ⇒ r.replyTo ! Replicated(r.seq))
-          val nextWaiting = waiting.from(expectedSeq)
+          val nextWaiting = waiting.from(s + 1)
           consolidate(m, s + 1, Set.empty, nextWaiting)
         case DoConsolidate ⇒
           askAroundFullState()
