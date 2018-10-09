@@ -29,14 +29,11 @@ class StagedFuturesAsyncExample(inventoryService: InventoryService) {
     productSku: Long,
     postalCode: String): Future[(Long, Map[String, Long])] = {
     // Import the duration DSL to be used in the timeout
-    import scala.concurrent.duration._
 
-    // Provide the thread pool and Future timeout value to be applied
+    // Provide the thread pool to be applied
     implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool())
-    implicit val timeout: FiniteDuration = 250 milliseconds
 
     // Retrieve the values and return a future of the combined result
-
     // #snip
     import scala.async.Async.{ async, await }
     val resultFuture = async {

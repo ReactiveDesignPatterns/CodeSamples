@@ -26,17 +26,11 @@ class StagedFuturesForExample(inventoryService: InventoryService) {
    * inventory is a Map of Warehouse ID to count.
    */
   // #snip
-  implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(
-    ForkJoinPool.commonPool())
-
   def getProductInventoryByPostalCode(
     productSku: Long,
     postalCode: String): Future[(Long, Map[String, Long])] = {
-    // Import the duration DSL to be used in the timeout
-    import scala.concurrent.duration._
-
-    // Provide the thread pool and Future timeout value to be applied
-    implicit val timeout: FiniteDuration = 250 milliseconds
+    // Provide the thread pool to be applied
+    implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool())
 
     // Define the futures so they can start doing their work
     val localInventoryFuture = Future {
