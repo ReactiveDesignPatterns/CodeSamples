@@ -26,11 +26,13 @@ class StagedFuturesForExample(inventoryService: InventoryService) {
    * inventory is a Map of Warehouse ID to count.
    */
   // #snip
+  // Provide the thread pool to be applied
+  implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(
+    ForkJoinPool.commonPool())
+
   def getProductInventoryByPostalCode(
     productSku: Long,
     postalCode: String): Future[(Long, Map[String, Long])] = {
-    // Provide the thread pool to be applied
-    implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool())
 
     // Define the futures so they can start doing their work
     val localInventoryFuture = Future {

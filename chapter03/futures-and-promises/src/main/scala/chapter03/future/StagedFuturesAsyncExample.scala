@@ -25,13 +25,13 @@ class StagedFuturesAsyncExample(inventoryService: InventoryService) {
    * The local inventory will just be a count, but the overall
    * inventory is a Map of Warehouse ID to count.
    */
+  // Provide the thread pool to be applied
+  implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(
+    ForkJoinPool.commonPool())
+
   def getProductInventoryByPostalCode(
     productSku: Long,
     postalCode: String): Future[(Long, Map[String, Long])] = {
-    // Import the duration DSL to be used in the timeout
-
-    // Provide the thread pool to be applied
-    implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool())
 
     // Retrieve the values and return a future of the combined result
     // #snip
