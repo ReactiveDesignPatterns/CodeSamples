@@ -7,9 +7,9 @@ import scalariform.formatter.preferences._
 
 object Build {
   val akkaVersion = "2.4.20"
-  val akka25Version = "2.5.16"
+  val akka25Version = "2.5.18"
   val ckiteVersion = "0.2.1"
-  val scalaVersion = "2.12.6"
+  val scalaVersion = "2.12.7"
 
   val akka25Actor = "com.typesafe.akka" %% "akka-actor" % akka25Version
 
@@ -33,16 +33,16 @@ object Build {
 
   val levelDb = "org.iq80.leveldb" % "leveldb" % "0.10"
 
-  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.358"
+  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.446"
 
-  val sbtIO = "org.scala-sbt" %% "io" % "1.1.10"
+  val sbtIO = "org.scala-sbt" %% "io" % "1.2.2"
 
   val scalaAsync = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
   val scalaJava8 = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
 
-  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.1.16"
+  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.2.3"
 
-  val playJson = "com.typesafe.play" %% "play-json" % "2.6.9"
+  val playJson = "com.typesafe.play" %% "play-json" % "2.6.10"
 
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
@@ -50,8 +50,8 @@ object Build {
 
   val guava = "com.google.guava" % "guava" % "23.0"
 
-  val finagle = "com.twitter" %% "finagle-http" % "18.6.0"
-  val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.6"
+  val finagle = "com.twitter" %% "finagle-http" % "18.10.0"
+  val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.7"
 
   val ckites = Seq(
     "io.ckite" % "ckite-core" % ckiteVersion exclude("org.apache.thrift", "libthrift"),
