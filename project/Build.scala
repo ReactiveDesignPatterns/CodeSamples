@@ -40,9 +40,9 @@ object Build {
   val scalaAsync = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
   val scalaJava8 = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
 
-  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.2.3"
+  val rxJava = "io.reactivex.rxjava2" % "rxjava" % "2.2.4"
 
-  val playJson = "com.typesafe.play" %% "play-json" % "2.6.10"
+  val playJson = "com.typesafe.play" %% "play-json" % "2.6.11"
 
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
@@ -73,8 +73,15 @@ object Build {
     ScalariformKeys.preferences in Compile := setPreferences(ScalariformKeys.preferences.value),
     ScalariformKeys.preferences in Test := setPreferences(ScalariformKeys.preferences.value)
   )
-
-  private val fixes = scalafixSettings ++ scalafixConfigure(Compile)
+  
+  import sbt.Keys._
+  private val fixes = scalafixSettings ++ Seq(
+    addCompilerPlugin(scalafixSemanticdb),
+    scalacOptions ++= List(
+      "-Yrangepos",          // required by SemanticDB compiler plugin
+      "-Ywarn-unused-import" // required by `RemoveUnused` rule
+    )
+  )
 
   val sharedSettings: Seq[Def.Setting[_]] = formats ++ fixes ++ Seq(
     headerLicense := Some(HeaderLicense.Custom(
