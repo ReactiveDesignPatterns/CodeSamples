@@ -31,7 +31,10 @@ object Build {
     )
   )
 
-  final val DefaultScalacOptions = Seq("-encoding", "UTF-8", "-feature", "-unchecked", "-Xlog-reflective-calls", "-Xlint", "-Ywarn-unused")
+  final val DefaultScalacOptions = Seq("-encoding", "UTF-8", "-feature", "-unchecked", "-Xlog-reflective-calls", "-Xlint", "-Ywarn-unused", "-deprecation",
+    //    "-Xfatal-warnings"
+  )
+
   final val DefaultJavacOptions = Seq("-encoding", "UTF-8", "-Xlint:unchecked", "-XDignore.symbol.file")
 
   val sharedSettings: Seq[Def.Setting[_]] = formats ++ fixes ++ Seq(
@@ -43,6 +46,8 @@ object Build {
     )),
     scalaVersion := "2.12.8",
     conflictWarning := conflictWarning.value.copy(failOnConflict = false),
+    scalacOptions in Compile := DefaultScalacOptions,
+    scalacOptions in Test := DefaultScalacOptions,
     scalacOptions in Compile ++= (
       if (System.getProperty("java.version").startsWith("1."))
         Seq("-target:jvm-1.8")
@@ -51,7 +56,6 @@ object Build {
       else
       // -release 8 is not enough, for some reason we need the 8 rt.jar explicitly #25330
         Seq("-release", "8", "-javabootclasspath", CrossJava.Keys.fullJavaHomes.value("8") + "/jre/lib/rt.jar")),
-    scalacOptions in Compile ++= Seq("-deprecation", "-Ywarn-unused"),
     scalacOptions in Test := (scalacOptions in Test).value.filterNot(opt ⇒
       opt == "-Xlog-reflective-calls" || opt.contains("genjavadoc")) ++ Seq(
       "-Ywarn-unused"),
