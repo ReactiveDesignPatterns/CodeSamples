@@ -1,6 +1,4 @@
-import Build._
-
 libraryDependencies ++= Seq(
-  akka25Sharding,
-  akka25PersistenceQuery,
-  levelDb)
+  Dependencies.akka25Sharding,
+  Dependencies.akka25PersistenceQuery,
+  Dependencies.levelDb)

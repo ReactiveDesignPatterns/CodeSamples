@@ -1,6 +1,4 @@
-import Build._
-
 libraryDependencies ++= Seq(
-  akka25Actor,
-  akka25Stream
+  Dependencies.akka25Actor,
+  Dependencies.akka25Stream
 )
