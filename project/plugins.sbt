@@ -25,3 +25,5 @@ addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.4.1")
 addSbtPlugin("io.spray" % "sbt-boilerplate" % "0.6.1")
 
 addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.3.7")
+
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.2")

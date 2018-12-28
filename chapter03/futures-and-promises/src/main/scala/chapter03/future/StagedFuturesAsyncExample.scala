@@ -10,7 +10,6 @@ package chapter03.future
 import java.util.concurrent.ForkJoinPool
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.language.postfixOps
 
 // 代码清单 3-13
 // Listing 3.6 Aggregating a single result from two futures in Scala
