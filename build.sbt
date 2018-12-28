@@ -7,8 +7,6 @@ name := "ReactiveDesignPatterns"
 
 version in ThisBuild := "1.0.0"
 
-scalaVersion := Build.scalaVersion
-
 scalacOptions in Compile ++= Seq("-encoding", "UTF-8", "-target:jvm-1.8", "-feature", "-unchecked", "-Xlog-reflective-calls", "-Xlint")
 
 javacOptions in compile ++= Seq("-encoding", "UTF-8", "-source", "1.8", "-target", "1.8", "-Xlint:unchecked", "-XDignore.symbol.file")
@@ -39,8 +37,8 @@ lazy val chapter02 = project.dependsOn(common)
   .settings(Build.sharedSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      Build.akka25Actor,
-      Build.guava
+      Dependencies.akka25Actor,
+      Dependencies.guava
     )
   )
 
@@ -57,9 +55,9 @@ lazy val chapter11 = project.dependsOn(common)
   .settings(Build.sharedSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      Build.akka25Testkit,
-      Build.scalatest,
-      Build.scalaAsync
+      Dependencies.akka25Testkit,
+      Dependencies.scalatest,
+      Dependencies.scalaAsync
     )
   )
 
@@ -68,7 +66,7 @@ lazy val chapter12 = project.dependsOn(common)
   .settings(Build.sharedSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      Build.akka25Actor
+      Dependencies.akka25Actor
     )
   )
 
@@ -113,6 +111,7 @@ lazy val docs = project.aggregate(
   .enablePlugins(GhpagesPlugin)
   .enablePlugins(ParadoxSitePlugin)
   .enablePlugins(ParadoxMaterialThemePlugin)
+  .settings(Build.sharedSettings: _*)
   .settings(
     git.remoteRepo := "https://github.com/ReactivePlatform/reactive-design-patterns-cn.git",
 

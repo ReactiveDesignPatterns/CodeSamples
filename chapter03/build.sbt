@@ -25,8 +25,8 @@ lazy val `futures-and-promises` = project
   .settings(Build.sharedSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      Build.junit,
-      Build.scalaAsync
+      Dependencies.junit,
+      Dependencies.scalaAsync
     )
   )
 
@@ -35,8 +35,8 @@ lazy val `reactiveExtensions` = project
   .settings(Build.sharedSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      Build.rxJava,
-      Build.junit
+      Dependencies.rxJava,
+      Dependencies.junit
     )
   )
 
@@ -45,7 +45,7 @@ lazy val actor = project
   .settings(Build.sharedSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      Build.akka25Actor
+      Dependencies.akka25Actor
     )
   )
 
