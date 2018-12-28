@@ -5,7 +5,7 @@ import scalafix.sbt.ScalafixPlugin.autoImport._
 import scalariform.formatter.preferences._
 
 object Build {
-  
+
   private def setPreferences(preferences: IFormattingPreferences): IFormattingPreferences = preferences
     .setPreference(RewriteArrowSymbols, true)
     .setPreference(AlignParameters, true)
@@ -38,7 +38,8 @@ object Build {
           |
           |""".stripMargin
     )),
-    scalaVersion := "2.12.8"
+    scalaVersion := "2.12.8",
+    conflictWarning := conflictWarning.value.copy(failOnConflict = false)
 
     //    ,
     //    wartremoverErrors ++= Warts.allBut(
