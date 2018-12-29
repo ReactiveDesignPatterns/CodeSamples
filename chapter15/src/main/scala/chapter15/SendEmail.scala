@@ -15,7 +15,7 @@ import akka.typed.ActorRef
 // Listing 15.7 Encapsulated information needed for multiple SMTP exchanges
 
 // #snip
-case class SendEmail(
+final case class SendEmail(
   sender:        String,
   recipients:    List[String],
   body:          String,

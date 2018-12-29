@@ -12,6 +12,6 @@ package chapter03
 // #snip
 import java.util.Date
 
-case class Message(timestamp: Date, message: String)
+final case class Message(timestamp: Date, message: String)
 
 // #snip

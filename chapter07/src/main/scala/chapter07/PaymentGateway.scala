@@ -13,11 +13,11 @@ object PaymentGateway {
 
   object V1 {
 
-    case class CreditCard(name: String, number: String, expiry: String)
+    final case class CreditCard(name: String, number: String, expiry: String)
 
-    case class Amount(printed: String)
+    final case class Amount(printed: String)
 
-    case class Authorize(card: CreditCard, amount: Amount, replyTo: ActorRef)
+    final case class Authorize(card: CreditCard, amount: Amount, replyTo: ActorRef)
 
     trait AuthorizeResult {
       def isSuccessful: Boolean
@@ -27,7 +27,7 @@ object PaymentGateway {
       def failureMessage: String
     }
 
-    case class Capture(authorization: String, amount: Amount, replyTo: ActorRef)
+    final case class Capture(authorization: String, amount: Amount, replyTo: ActorRef)
 
     trait CaptureResult {
       def isSuccessful: Boolean
@@ -37,7 +37,7 @@ object PaymentGateway {
       def failureMessage: String
     }
 
-    case class Void(authorization: String, replyTo: ActorRef)
+    final case class Void(authorization: String, replyTo: ActorRef)
 
     trait VoidResult {
       def isSuccessful: Boolean
@@ -45,33 +45,33 @@ object PaymentGateway {
       def failureMessage: String
     }
 
-    case class Refund(card: CreditCard, amount: Amount, replyTo: ActorRef)
+    final case class Refund(card: CreditCard, amount: Amount, replyTo: ActorRef)
 
   }
 
   object V2 {
 
-    case class CreditCard(name: String, number: String, expiry: String)
+    final case class CreditCard(name: String, number: String, expiry: String)
 
-    case class Amount(printed: String)
+    final case class Amount(printed: String)
 
-    case class Authorize(card: CreditCard, amount: Amount, replyTo: ActorRef)
+    final case class Authorize(card: CreditCard, amount: Amount, replyTo: ActorRef)
 
     sealed trait AuthorizeResult
 
-    case class Authorized(authorization: String)
+    final case class Authorized(authorization: String)
 
-    case class NotAuthorized(message: String)
+    final case class NotAuthorized(message: String)
 
-    case class Capture(authorization: String, amount: Amount, replyTo: ActorRef)
+    final case class Capture(authorization: String, amount: Amount, replyTo: ActorRef)
 
     sealed trait CaptureResult
 
-    case class Captured(authorization: String, amount: Amount)
+    final case class Captured(authorization: String, amount: Amount)
 
-    case class NotCaptured(authorization: String, message: String)
+    final case class NotCaptured(authorization: String, message: String)
 
-    case class Void(authorization: String, replyTo: ActorRef)
+    final case class Void(authorization: String, replyTo: ActorRef)
 
   }
 

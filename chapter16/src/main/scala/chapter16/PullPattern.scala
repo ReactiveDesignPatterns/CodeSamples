@@ -13,11 +13,11 @@ import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 
 object PullPattern {
 
-  case class Job(id: Long, input: Int, replyTo: ActorRef)
+  final case class Job(id: Long, input: Int, replyTo: ActorRef)
 
-  case class JobResult(id: Long, report: BigDecimal)
+  final case class JobResult(id: Long, report: BigDecimal)
 
-  case class WorkRequest(worker: ActorRef, items: Int)
+  final case class WorkRequest(worker: ActorRef, items: Int)
 
   // #snip_16-1
   class Worker(manager: ActorRef) extends Actor {

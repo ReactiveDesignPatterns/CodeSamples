@@ -16,9 +16,9 @@ import akka.typed._
 // #snip
 object RequestResponseTypedActors {
 
-  case class Request(msg: String, replyTo: ActorRef[Response])
+  final case class Request(msg: String, replyTo: ActorRef[Response])
 
-  case class Response(msg: String)
+  final case class Response(msg: String)
 
   val responder: Behavior[Request] =
     Static {

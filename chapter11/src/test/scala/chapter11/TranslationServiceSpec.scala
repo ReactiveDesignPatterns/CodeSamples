@@ -26,7 +26,7 @@ object TranslationServiceSpec {
 
   case object ExpectError
 
-  case class Unexpected(msg: Any)
+  final case class Unexpected(msg: Any)
 
   class MockV1(reporter: ActorRef) extends Actor {
     def receive: Receive = initial

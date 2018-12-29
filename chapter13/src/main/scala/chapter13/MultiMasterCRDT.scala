@@ -78,13 +78,13 @@ object MultiMasterCRDT {
 
   object StorageComponent extends Key[ORMap[String, Status]]("StorageComponent")
 
-  case class Submit(job: String)
+  final case class Submit(job: String)
 
-  case class Cancel(job: String)
+  final case class Cancel(job: String)
 
-  case class Execute(job: String)
+  final case class Execute(job: String)
 
-  case class Finish(job: String)
+  final case class Finish(job: String)
 
   case object PrintStatus
 

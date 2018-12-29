@@ -21,11 +21,11 @@ object Saga {
     def deposit(amount: BigDecimal, id: Long): Future[Unit]
   }
 
-  case class Transfer(amount: BigDecimal, x: Account, y: Account)
+  final case class Transfer(amount: BigDecimal, x: Account, y: Account)
 
   sealed trait Event
 
-  case class TransferStarted(amount: BigDecimal, x: Account, y: Account) extends Event
+  final case class TransferStarted(amount: BigDecimal, x: Account, y: Account) extends Event
 
   case object MoneyWithdrawn extends Event
 

@@ -39,7 +39,7 @@ class TranslationService {
  */
 object TranslationService {
 
-  case class Translate(query: String, replyTo: ActorRef)
+  final case class Translate(query: String, replyTo: ActorRef)
 
   private class Translator extends Actor {
     def receive: Receive = {
@@ -58,7 +58,7 @@ object TranslationService {
    * Simplistic version 1 of the protocol: the reply will just be a String.
    */
   // #snip_11-17
-  case class TranslateV1(query: String, replyTo: ActorRef)
+  final case class TranslateV1(query: String, replyTo: ActorRef)
 
   // #snip_11-17
 
@@ -85,7 +85,7 @@ object TranslationService {
    * enumeration or based on runtime registration of values).
    */
   // #snip_11-18
-  case class TranslateV2(
+  final case class TranslateV2(
     phrase:         String,
     inputLanguage:  String,
     outputLanguage: String,
@@ -93,13 +93,13 @@ object TranslationService {
 
   sealed trait TranslationResponseV2
 
-  case class TranslationV2(
+  final case class TranslationV2(
     inputPhrase:    String,
     outputPhrase:   String,
     inputLanguage:  String,
     outputLanguage: String)
 
-  case class TranslationErrorV2(
+  final case class TranslationErrorV2(
     inputPhrase:    String,
     inputLanguage:  String,
     outputLanguage: String,

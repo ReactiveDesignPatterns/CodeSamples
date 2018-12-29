@@ -19,9 +19,9 @@ import scala.reflect.classTag
 
 object LatencyTestSupport {
 
-  case class SingleResult[T](future: Future[T], expected: T)
+  final case class SingleResult[T](future: Future[T], expected: T)
 
-  case class SummaryResult(timings: immutable.Seq[FiniteDuration], failures: immutable.Seq[Throwable]) {
+  final case class SummaryResult(timings: immutable.Seq[FiniteDuration], failures: immutable.Seq[Throwable]) {
     lazy val sorted: immutable.Seq[FiniteDuration] = timings.sorted
 
     lazy val failureCount: Int = failures.size
@@ -43,7 +43,7 @@ object LatencyTestSupport {
           |        maximum         = ${sorted.last}""".stripMargin
   }
 
-  private case class RunMeasurement(count: Int, maxParallelism: Int, ec: ExecutionContext, f: Int ⇒ SingleResult[_], replyTo: ActorRef)
+  private final case class RunMeasurement(count: Int, maxParallelism: Int, ec: ExecutionContext, f: Int ⇒ SingleResult[_], replyTo: ActorRef)
 
   private class Supervisor extends Actor {
     def receive: Receive = {
@@ -55,9 +55,9 @@ object LatencyTestSupport {
 
   private sealed trait TestResult
 
-  private case class TestSuccess(duration: FiniteDuration) extends TestResult
+  private final case class TestSuccess(duration: FiniteDuration) extends TestResult
 
-  private case class TestFailure(ex: Throwable) extends TestResult
+  private final case class TestFailure(ex: Throwable) extends TestResult
 
   private object TestFailure extends PartialFunction[Throwable, TestFailure] {
     override def isDefinedAt(ex: Throwable) = true

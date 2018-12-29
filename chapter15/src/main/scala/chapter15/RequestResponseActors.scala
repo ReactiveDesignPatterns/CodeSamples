@@ -15,9 +15,9 @@ import akka.actor._
 // #snip
 object RequestResponseActors {
 
-  case class Request(msg: String)
+  final case class Request(msg: String)
 
-  case class Response(msg: String)
+  final case class Response(msg: String)
 
   class Responder extends Actor {
     def receive: Receive = {

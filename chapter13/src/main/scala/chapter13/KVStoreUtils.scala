@@ -16,7 +16,7 @@ import sbt.io.IO
 
 object Persistence {
 
-  case class Database(seq: Int, kv: Map[String, JsValue])
+  final case class Database(seq: Int, kv: Map[String, JsValue])
 
   object Database {
     implicit val format: OFormat[Database] = Json.format[Database]
@@ -46,15 +46,15 @@ object ReplicationProtocol {
 
   sealed trait Result
 
-  case class Put(key: String, value: JsValue, replyTo: ActorRef) extends Command
+  final case class Put(key: String, value: JsValue, replyTo: ActorRef) extends Command
 
-  case class PutConfirmed(key: String, value: JsValue) extends Result
+  final case class PutConfirmed(key: String, value: JsValue) extends Result
 
-  case class PutRejected(key: String, value: JsValue) extends Result
+  final case class PutRejected(key: String, value: JsValue) extends Result
 
-  case class Get(key: String, replyTo: ActorRef) extends Command
+  final case class Get(key: String, replyTo: ActorRef) extends Command
 
-  case class GetResult(key: String, value: Option[JsValue]) extends Result
+  final case class GetResult(key: String, value: Option[JsValue]) extends Result
 
   // #snip_protocol
 }

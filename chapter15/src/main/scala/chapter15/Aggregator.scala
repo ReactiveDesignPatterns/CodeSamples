@@ -18,29 +18,29 @@ import scala.concurrent.duration._
 
 object Aggregator {
 
-  case class GetTheme(user: String, replyTo: ActorRef[ThemeResult])
+  final case class GetTheme(user: String, replyTo: ActorRef[ThemeResult])
 
-  case class ThemeResult(css: String)
+  final case class ThemeResult(css: String)
 
-  case class GetPersonalNews(user: String, replyTo: ActorRef[PersonalNewsResult])
+  final case class GetPersonalNews(user: String, replyTo: ActorRef[PersonalNewsResult])
 
-  case class PersonalNewsResult(news: List[String])
+  final case class PersonalNewsResult(news: List[String])
 
-  case class GetTopNews(replyTo: ActorRef[TopNewsResult])
+  final case class GetTopNews(replyTo: ActorRef[TopNewsResult])
 
-  case class TopNewsResult(news: List[String])
+  final case class TopNewsResult(news: List[String])
 
-  case class GetFrontPage(user: String, replyTo: ActorRef[FrontPageResult])
+  final case class GetFrontPage(user: String, replyTo: ActorRef[FrontPageResult])
 
-  case class FrontPageResult(user: String, css: String, news: List[String])
+  final case class FrontPageResult(user: String, css: String, news: List[String])
 
-  case class GetOverride(replyTo: ActorRef[OverrideResult])
+  final case class GetOverride(replyTo: ActorRef[OverrideResult])
 
   sealed trait OverrideResult
 
   case object NoOverride extends OverrideResult
 
-  case class Override(css: String, news: List[String]) extends OverrideResult
+  final case class Override(css: String, news: List[String]) extends OverrideResult
 
   //#snip_15-16
   class FrontPageResultBuilder(user: String) {
