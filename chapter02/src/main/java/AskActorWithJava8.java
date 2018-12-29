@@ -10,10 +10,10 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.japi.Creator;
-import akka.util.Timeout;
+
+import java.time.Duration;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeUnit;
-import static akka.pattern.PatternsCS.ask;
+import static akka.pattern.Patterns.ask;
 
 public class AskActorWithJava8 {
   public static class Request {
@@ -46,10 +46,10 @@ public class AskActorWithJava8 {
   private static final ActorSystem ACTOR_SYSTEM = ActorSystem.create();
 
   public static void main(String[] args) {
-    ActorRef actorRef =
+    final ActorRef actorRef =
         ACTOR_SYSTEM.actorOf(Props.create(MyActor.class, (Creator<MyActor>) MyActor::new));
-    Request request = new Request(1);
-    Timeout timeout = Timeout.apply(1, TimeUnit.SECONDS);
+    final Request request = new Request(1);
+    final Duration timeout = Duration.ofSeconds(1L);
 
     // #snip
     CompletionStage<Response> future =

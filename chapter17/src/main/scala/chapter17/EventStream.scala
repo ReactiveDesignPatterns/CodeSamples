@@ -43,7 +43,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
     "pear",
     "peach").map(f ⇒ ItemRef(new URI(f)))
 
-  def pickItem() = items(rnd.nextInt(items.length))
+  def pickItem(): ItemRef = items(rnd.nextInt(items.length))
 
   private val customers: Array[CustomerRef] = Array(
     "alice",
@@ -51,7 +51,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
     "charlie",
     "mallory").map(c ⇒ CustomerRef(new URI(c)))
 
-  def pickCustomer() = customers(rnd.nextInt(customers.length))
+  def pickCustomer(): CustomerRef = customers(rnd.nextInt(customers.length))
 
   private val id: Iterator[Int] = Iterator from 0
 

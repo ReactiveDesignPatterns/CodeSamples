@@ -133,12 +133,12 @@ object AskPattern {
           statusMap += corrID -> (userEmail, replyTo)
           ctx.schedule(5.seconds, ctx.self, MyEmailResult(
             corrID, StatusCode.Failed, Some("timeout")))
-        case MyEmailResult(corrID, status, expl) ⇒
-          statusMap.get(corrID) match {
+        case MyEmailResult(correlationID, status, explanation) ⇒
+          statusMap.get(correlationID) match {
             case None ⇒
               log.error(
                 "received SendEmailResult for unknown correlation ID {}",
-                corrID)
+                correlationID)
             case Some((userEmail, replyTo)) ⇒
               status match {
                 case StatusCode.OK ⇒
@@ -149,10 +149,10 @@ object AskPattern {
                 case StatusCode.Failed ⇒
                   log.info(
                     "failed to start the verification process for {}: {}",
-                    userEmail, expl)
+                    userEmail, explanation)
                   replyTo ! VerificationProcessFailed(userEmail)
               }
-              statusMap -= corrID
+              statusMap -= correlationID
           }
       }
     }.narrow[StartVerificationProcess]

@@ -18,14 +18,14 @@ object MultiMasterCRDT {
 
   // #snip_13-10
   final case class Status(name: String)(
-    _pred: ⇒ Set[Status], _succ: ⇒ Set[Status]) extends ReplicatedData {
+    _predecessor: ⇒ Set[Status], _successor: ⇒ Set[Status]) extends ReplicatedData {
 
     type T = Status
 
     def merge(that: Status): Status = mergeStatus(this, that)
 
-    @volatile lazy val predecessors: Set[Status] = _pred
-    @volatile lazy val successors: Set[Status] = _succ
+    @volatile lazy val predecessors: Set[Status] = _predecessor
+    @volatile lazy val successors: Set[Status] = _successor
 
   }
 
@@ -57,7 +57,7 @@ object MultiMasterCRDT {
       } else {
         val nextExclude = exclude + candidate
         val branches =
-          candidate.successors.map(succ ⇒ innerLoop(succ, nextExclude))
+          candidate.successors.map(successor ⇒ innerLoop(successor, nextExclude))
         branches.reduce((l, r) ⇒
           if (isSuccessor(l, r, nextExclude)) r else l)
       }

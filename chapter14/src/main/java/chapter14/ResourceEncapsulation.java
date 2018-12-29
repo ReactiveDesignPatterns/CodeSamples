@@ -15,9 +15,12 @@ import akka.japi.pf.PFBuilder;
 import akka.pattern.CircuitBreaker;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.handlers.AsyncHandler;
+import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Async;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
 import scala.PartialFunction;
 import scala.concurrent.ExecutionContext;
@@ -38,7 +41,10 @@ import java.util.stream.Collectors;
 public class ResourceEncapsulation {
   // #snip_14-1
   public Instance startInstance(AWSCredentials credentials) {
-    AmazonEC2Client amazonEC2Client = new AmazonEC2Client(credentials);
+    AmazonEC2 amazonEC2Client =
+        AmazonEC2ClientBuilder.standard()
+            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+            .build();
 
     RunInstancesRequest runInstancesRequest =
         new RunInstancesRequest()
@@ -147,7 +153,7 @@ public class ResourceEncapsulation {
   }
 
   static class DoHealthCheck {
-    public static DoHealthCheck instance = new DoHealthCheck();
+    public static final DoHealthCheck instance = new DoHealthCheck();
   }
 
   static class Shutdown {

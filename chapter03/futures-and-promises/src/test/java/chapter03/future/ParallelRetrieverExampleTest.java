@@ -27,7 +27,7 @@ public class ParallelRetrieverExampleTest {
 
         @Override
         public String getAddress() {
-          return "111 Somewhere St., Somewhereville, NY 10001";
+          return "111 Somewhere St., SomewhereVille, NY 10001";
         }
 
         @Override
@@ -36,7 +36,7 @@ public class ParallelRetrieverExampleTest {
         }
       };
 
-    private final Customer customer2 =
+  private final Customer customer2 =
       new Customer() {
         @Override
         public long getId() {
@@ -50,7 +50,7 @@ public class ParallelRetrieverExampleTest {
 
         @Override
         public String getAddress() {
-          return "555 Nowhere St., Nowhereville, NY 10001";
+          return "555 Nowhere St., NowhereVille, NY 10001";
         }
 
         @Override
@@ -59,9 +59,9 @@ public class ParallelRetrieverExampleTest {
         }
       };
 
-    private final CacheRetriever workingCacheRetriever = customerId -> customer1;
+  private final CacheRetriever workingCacheRetriever = customerId -> customer1;
 
-    private final CacheRetriever delayedCacheRetriever =
+  private final CacheRetriever delayedCacheRetriever =
       customerId -> {
         try {
           Thread.sleep(1000);
@@ -71,9 +71,9 @@ public class ParallelRetrieverExampleTest {
         return null;
       };
 
-    private final DBRetriever workingDbRetriever = customerId -> customer2;
+  private final DBRetriever workingDbRetriever = customerId -> customer2;
 
-    private final DBRetriever delayedDbRetriever =
+  private final DBRetriever delayedDbRetriever =
       customerId -> {
         try {
           Thread.sleep(1000);
@@ -85,18 +85,18 @@ public class ParallelRetrieverExampleTest {
 
   @Test
   public void testCacheReturn() {
-    ParallelRetrievalExample retreiver =
+    ParallelRetrievalExample retriever =
         new ParallelRetrievalExample(workingCacheRetriever, delayedDbRetriever);
-    Object retrievedCustomer = retreiver.retrieveCustomer(1234);
+    Object retrievedCustomer = retriever.retrieveCustomer(1234);
     org.junit.Assert.assertNotEquals(retrievedCustomer, null);
     // org.junit.Assert.assertEquals(retrievedCustomer.getId(), "1234");
   }
 
   @Test
   public void testDbReturn() {
-    ParallelRetrievalExample retreiver =
+    ParallelRetrievalExample retriever =
         new ParallelRetrievalExample(delayedCacheRetriever, workingDbRetriever);
-    Object retrievedCustomer = retreiver.retrieveCustomer(5678);
+    Object retrievedCustomer = retriever.retrieveCustomer(5678);
     org.junit.Assert.assertNotEquals(retrievedCustomer, null);
   }
 }

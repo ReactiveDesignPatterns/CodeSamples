@@ -328,10 +328,9 @@ object ActivePassive {
       private val applied = mutable.Queue.empty[Replicate]
       private var awaitingInitialState = Option.empty[ActorRef]
 
-      val name: String =
-        Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
-      val cluster = Cluster(context.system)
-      val random = new Random
+      private val name = Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
+      private val cluster = Cluster(context.system)
+      private val random = new Random
 
       private var tickTask = Option.empty[Cancellable]
 
@@ -509,10 +508,9 @@ object ActivePassive {
     private val applied = mutable.Queue.empty[Replicate]
     private var awaitingInitialState = Option.empty[ActorRef]
 
-    val name: String =
-      Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
-    val cluster = Cluster(context.system)
-    val random = new Random
+    private val name = Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
+    private val cluster = Cluster(context.system)
+    private val random = new Random
 
     private var tickTask = Option.empty[Cancellable]
 
@@ -753,14 +751,14 @@ object ActivePassive {
     val rnd = new Random
     while (!terminate) {
       Thread.sleep(5000)
-      val sysidx = rnd.nextInt(systems.length)
-      val oldsys = systems(sysidx)
-      val port = Cluster(oldsys).selfAddress.port
-      Await.ready(oldsys.terminate(), Duration.Inf)
-      val newsys = start(port)
-      val seed = Cluster(if (sysidx == 0) systems(1) else systems(0)).selfAddress
-      Cluster(newsys).join(seed)
-      systems(sysidx) = newsys
+      val sysIdx = rnd.nextInt(systems.length)
+      val oldSys = systems(sysIdx)
+      val port = Cluster(oldSys).selfAddress.port
+      Await.ready(oldSys.terminate(), Duration.Inf)
+      val newSys = start(port)
+      val seed = Cluster(if (sysIdx == 0) systems(1) else systems(0)).selfAddress
+      Cluster(newSys).join(seed)
+      systems(sysIdx) = newSys
       awaitMembers(sys, systems.length + 1)
     }
 

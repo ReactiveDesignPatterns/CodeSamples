@@ -38,11 +38,7 @@ public class ResourceLoan {
                       msg.replyTo().tell(failMsg, self());
                     });
               })
-          .match(
-              WorkerNodeReady.class,
-              wnr -> {
-                getContext().become(initialized());
-              })
+          .match(WorkerNodeReady.class, wnr -> getContext().become(initialized()))
           .build();
     }
 

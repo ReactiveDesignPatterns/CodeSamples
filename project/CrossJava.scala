@@ -55,7 +55,7 @@ object CrossJava {
   }
 
   def discoverJavaHomes: ListMap[String, File] = {
-    ListMap(JavaDiscoverConfig.configs flatMap { _.javaHomes } sortWith (versionOrder): _*)
+    ListMap(JavaDiscoverConfig.configs.flatMap{ _.javaHomes }.sortWith(versionOrder): _*)
   }
 
   sealed trait JavaDiscoverConf {

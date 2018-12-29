@@ -121,7 +121,7 @@ object QueuePattern {
             case JobResult(_, report) ⇒ Report.success(report)
             case _                    ⇒ Report.failure
           })
-    Future.reduce(futures)(_ + _)
+    Future.reduceLeft(futures)(_ + _)
       .map(x ⇒ println(s"final result: $x"))
       .recover {
         case ex ⇒
