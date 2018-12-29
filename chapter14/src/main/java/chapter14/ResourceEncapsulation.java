@@ -153,7 +153,7 @@ public class ResourceEncapsulation {
   }
 
   static class DoHealthCheck {
-    public static DoHealthCheck instance = new DoHealthCheck();
+    public static final DoHealthCheck instance = new DoHealthCheck();
   }
 
   static class Shutdown {

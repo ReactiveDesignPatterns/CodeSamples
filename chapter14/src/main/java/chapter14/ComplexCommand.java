@@ -218,10 +218,10 @@ public interface ComplexCommand {
     RunnableGraph<CompletionStage<Long>> p =
         Source.<DataElement>empty()
             .filter(new InRange("year", 1950, 1960))
-            .toMat(Sink.fold(0L, new Median<Long>("price")), Keep.right());
+            .toMat(Sink.fold(0L, new Median<>("price")), Keep.right());
 
     Source.<DataElement>empty()
-        .map(new Inject<Long>(p, "p"))
+        .map(new Inject<>(p, "p"))
         .filter(new Filter("price > p"))
         .to(
             Sink.fold(

@@ -13,9 +13,9 @@ public class SequentialExecution {
   public static class ReplyC {}
 
   public static class Result {
-    ReplyA replyA;
-    ReplyB replyB;
-    ReplyC replyC;
+    final ReplyA replyA;
+    final ReplyB replyB;
+    final ReplyC replyC;
 
     public Result(ReplyA replyA, ReplyB replyB, ReplyC replyC) {
       this.replyA = replyA;

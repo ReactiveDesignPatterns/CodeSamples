@@ -57,7 +57,7 @@ object MultiMasterCRDT {
       } else {
         val nextExclude = exclude + candidate
         val branches =
-          candidate.successors.map(succ ⇒ innerLoop(succ, nextExclude))
+          candidate.successors.map(successor ⇒ innerLoop(successor, nextExclude))
         branches.reduce((l, r) ⇒
           if (isSuccessor(l, r, nextExclude)) r else l)
       }

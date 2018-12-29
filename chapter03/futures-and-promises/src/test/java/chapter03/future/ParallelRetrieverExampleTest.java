@@ -36,7 +36,7 @@ public class ParallelRetrieverExampleTest {
         }
       };
 
-    private final Customer customer2 =
+  private final Customer customer2 =
       new Customer() {
         @Override
         public long getId() {
@@ -59,9 +59,9 @@ public class ParallelRetrieverExampleTest {
         }
       };
 
-    private final CacheRetriever workingCacheRetriever = customerId -> customer1;
+  private final CacheRetriever workingCacheRetriever = customerId -> customer1;
 
-    private final CacheRetriever delayedCacheRetriever =
+  private final CacheRetriever delayedCacheRetriever =
       customerId -> {
         try {
           Thread.sleep(1000);
@@ -71,9 +71,9 @@ public class ParallelRetrieverExampleTest {
         return null;
       };
 
-    private final DBRetriever workingDbRetriever = customerId -> customer2;
+  private final DBRetriever workingDbRetriever = customerId -> customer2;
 
-    private final DBRetriever delayedDbRetriever =
+  private final DBRetriever delayedDbRetriever =
       customerId -> {
         try {
           Thread.sleep(1000);
