@@ -44,7 +44,7 @@ object ActiveActive {
 
     def initialized: Receive = {
       case SeqCommand(seq, cmd, replyTo) ⇒
-        // tracking of sequence numbers and resends is elided here
+        // tracking of sequence numbers and resents is elided here
         cmd match {
           case Put(key, value, r) ⇒
             map += key -> value

@@ -134,12 +134,12 @@ public interface ComplexCommand {
 
   public class InRange implements Predicate<DataElement> {
     private static final long serialVersionUID = 1L;
-    public final String fieldname;
+    public final String fieldName;
     public final Number min;
     public final Number max;
 
-    public InRange(String fieldname, Number min, Number max) {
-      this.fieldname = fieldname;
+    public InRange(String fieldName, Number min, Number max) {
+      this.fieldName = fieldName;
       this.min = min;
       this.max = max;
     }
@@ -153,10 +153,10 @@ public interface ComplexCommand {
 
   public class Median<T> implements Function2<T, DataElement, T> {
     private static final long serialVersionUID = 1L;
-    public final String fieldname;
+    public final String fieldName;
 
-    public Median(String fieldname) {
-      this.fieldname = fieldname;
+    public Median(String fieldName) {
+      this.fieldName = fieldName;
     }
 
     @Override
@@ -169,11 +169,11 @@ public interface ComplexCommand {
   public class Inject<T> implements Function<DataElement, DataElement> {
     private static final long serialVersionUID = 1L;
     public final RunnableGraph<CompletionStage<T>> value;
-    public final String fieldname;
+    public final String fieldName;
 
-    public Inject(RunnableGraph<CompletionStage<T>> value, String fieldname) {
+    public Inject(RunnableGraph<CompletionStage<T>> value, String fieldName) {
       this.value = value;
-      this.fieldname = fieldname;
+      this.fieldName = fieldName;
     }
 
     @Override

@@ -27,7 +27,7 @@ public class ParallelRetrieverExampleTest {
 
         @Override
         public String getAddress() {
-          return "111 Somewhere St., Somewhereville, NY 10001";
+          return "111 Somewhere St., SomewhereVille, NY 10001";
         }
 
         @Override
@@ -50,7 +50,7 @@ public class ParallelRetrieverExampleTest {
 
         @Override
         public String getAddress() {
-          return "555 Nowhere St., Nowhereville, NY 10001";
+          return "555 Nowhere St., NowhereVille, NY 10001";
         }
 
         @Override
@@ -85,18 +85,18 @@ public class ParallelRetrieverExampleTest {
 
   @Test
   public void testCacheReturn() {
-    ParallelRetrievalExample retreiver =
+    ParallelRetrievalExample retriever =
         new ParallelRetrievalExample(workingCacheRetriever, delayedDbRetriever);
-    Object retrievedCustomer = retreiver.retrieveCustomer(1234);
+    Object retrievedCustomer = retriever.retrieveCustomer(1234);
     org.junit.Assert.assertNotEquals(retrievedCustomer, null);
     // org.junit.Assert.assertEquals(retrievedCustomer.getId(), "1234");
   }
 
   @Test
   public void testDbReturn() {
-    ParallelRetrievalExample retreiver =
+    ParallelRetrievalExample retriever =
         new ParallelRetrievalExample(delayedCacheRetriever, workingDbRetriever);
-    Object retrievedCustomer = retreiver.retrieveCustomer(5678);
+    Object retrievedCustomer = retriever.retrieveCustomer(5678);
     org.junit.Assert.assertNotEquals(retrievedCustomer, null);
   }
 }

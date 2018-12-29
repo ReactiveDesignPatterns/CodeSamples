@@ -1,11 +1,11 @@
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
-import sbt._
+import sbt.{Def, _}
 
 object Formatting {
 
   import scalariform.formatter.preferences._
 
-  lazy val formatSettings = Seq(
+  lazy val formatSettings: Seq[Def.Setting[IFormattingPreferences]] = Seq(
     ScalariformKeys.preferences := setPreferences(ScalariformKeys.preferences.value),
     ScalariformKeys.preferences in Compile := setPreferences(ScalariformKeys.preferences.value),
     ScalariformKeys.preferences in Test := setPreferences(ScalariformKeys.preferences.value)
