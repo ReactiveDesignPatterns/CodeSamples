@@ -92,7 +92,7 @@ object ActiveActive {
         if (answer.isDefined) {
           val right = answer.get
           val wrong = replies.collect {
-            case SeqResult(_, res, replica, _) if res != right ⇒ replica
+            case SeqResult(_, result, replica, _) if res != right ⇒ replica
           }
           Known(deadline, right, wrong, nextMissing)
         } else if (nextMissing.isEmpty) {

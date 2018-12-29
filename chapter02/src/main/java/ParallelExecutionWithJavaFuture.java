@@ -5,10 +5,9 @@
  *
  */
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import reactivedesignpatterns.NamedPoolThreadFactory;
+
+import java.util.concurrent.*;
 
 public class ParallelExecutionWithJavaFuture {
   public static class ReplyA {}
@@ -33,7 +32,15 @@ public class ParallelExecutionWithJavaFuture {
     return new Result(replyA, replyB, replyC);
   }
 
-  private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(3);
+  private static final ExecutorService EXECUTOR_SERVICE =
+      new ThreadPoolExecutor(
+          3,
+          3,
+          60,
+          TimeUnit.SECONDS,
+          new LinkedBlockingDeque<>(),
+          new NamedPoolThreadFactory("Parallelism", true),
+          new ThreadPoolExecutor.CallerRunsPolicy());
 
   public static Future<ReplyA> taskA() {
     return EXECUTOR_SERVICE.submit(ReplyA::new); // return from compute

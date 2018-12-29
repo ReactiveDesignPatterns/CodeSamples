@@ -61,7 +61,7 @@ public class ResourceLoan {
                   checkInterval,
                   checkInterval,
                   self(),
-                  DoHealthCheck.instance,
+                  DoHealthCheck.INSTANCE,
                   getContext().dispatcher(),
                   self());
     }

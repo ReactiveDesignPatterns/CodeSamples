@@ -8,10 +8,11 @@
 
 import java.io.File
 
-import sbt._
+import sbt.{Def, _}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.ListMap
+import scala.util.matching.Regex
 
 /*
  * Tools for discovering different Java versions,
@@ -29,7 +30,7 @@ object CrossJava {
 
   import Keys._
 
-  val crossJavaSettings = Seq(
+  val crossJavaSettings: Seq[Def.Setting[Map[String, File]]] = Seq(
     discoveredJavaHomes := CrossJava.discoverJavaHomes,
     javaHomes := ListMap.empty,
     fullJavaHomes := CrossJava.expandJavaHomes(discoveredJavaHomes.value ++ javaHomes.value),
@@ -119,7 +120,7 @@ object CrossJava {
     // See https://github.com/shyiko/jabba
     class JabbaDiscoverConfig extends JavaDiscoverConf {
       val base: File = Path.userHome / ".jabba" / "jdk"
-      val JavaHomeDir = """([\w\-]+)\@(1\.)?([0-9]+).*""".r
+      val JavaHomeDir: Regex = """([\w\-]+)\@(1\.)?([0-9]+).*""".r
 
       def javaHomes: Vector[(String, File)] =
         wrapNull(base.list())
@@ -146,7 +147,7 @@ object CrossJava {
           .toVector
     }
 
-    val configs = Vector(
+    val configs: Vector[JavaDiscoverConf] = Vector(
       new JabbaDiscoverConfig,
       new LinuxDiscoverConfig(file("/usr") / "java"),
       new LinuxDiscoverConfig(file("/usr") / "lib" / "jvm"),

@@ -10,11 +10,11 @@ import java.awt.image.BufferedImage;
 
 // Listing 2.1 Excerpt from a simple controller for an image service
 public class ImageServiceController {
-  private static final Image fallback = new BufferedImage(100, 100, BufferedImage.TYPE_INT_BGR);
+  private static final Image FALLBACK = new BufferedImage(100, 100, BufferedImage.TYPE_INT_BGR);
 
   // #snip
   public interface Images {
-    Image get(String Key);
+    Image get(String key);
 
     void add(String key, Image image);
   }
@@ -32,7 +32,7 @@ public class ImageServiceController {
         cache.add(key, result);
         return result;
       } else {
-        return fallback;
+        return FALLBACK;
       }
     }
   }

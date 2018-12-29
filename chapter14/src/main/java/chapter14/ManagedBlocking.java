@@ -10,6 +10,8 @@ package chapter14;
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.japi.pf.ReceiveBuilder;
+import reactivedesignpatterns.NamedPoolThreadFactory;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -64,7 +66,14 @@ public interface ManagedBlocking {
 
     public AccessService(DataSource db, int poolSize, int queueSize) {
       this.db = db;
-      pool = new ThreadPoolExecutor(0, poolSize, 60, SECONDS, new LinkedBlockingDeque<>(queueSize));
+      pool =
+          new ThreadPoolExecutor(
+              0,
+              poolSize,
+              60,
+              SECONDS,
+              new LinkedBlockingDeque<>(queueSize),
+              new NamedPoolThreadFactory("ManagedBlocking-" + getSelf().path().name(), true));
     }
 
     @Override

@@ -58,7 +58,7 @@ public class ResourceEncapsulation {
     Reservation reservation = runInstancesResult.getReservation();
     List<Instance> instances = reservation.getInstances();
 
-    // there will be exactly one instance in this list, otherwise
+    // there will be exactly one INSTANCE in this list, otherwise
     // runInstances() would have thrown an exception
     return instances.get(0);
   }
@@ -153,7 +153,7 @@ public class ResourceEncapsulation {
   }
 
   static class DoHealthCheck {
-    public static final DoHealthCheck instance = new DoHealthCheck();
+    public static final DoHealthCheck INSTANCE = new DoHealthCheck();
   }
 
   static class Shutdown {
@@ -177,7 +177,7 @@ public class ResourceEncapsulation {
                   checkInterval,
                   checkInterval,
                   self(),
-                  DoHealthCheck.instance,
+                  DoHealthCheck.INSTANCE,
                   getContext().dispatcher(),
                   self());
     }
@@ -199,7 +199,7 @@ public class ResourceEncapsulation {
                     msg ->
                         msg.replyTo()
                             .tell(new WorkerCommandFailed("shutting down", msg.id()), self()));
-                /* ask Resource Pool to shut down this instance */
+                /* ask Resource Pool to shut down this INSTANCE */
               })
           .match(
               WorkerNodeReady.class,
