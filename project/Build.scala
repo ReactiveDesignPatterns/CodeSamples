@@ -23,21 +23,16 @@ object Build {
 
   import sbt.Keys._
 
-  private val fixes = scalafixSettings ++ Seq(
-    addCompilerPlugin(scalafixSemanticdb),
-    scalacOptions ++= List(
-      "-Yrangepos", // required by SemanticDB compiler plugin
-      "-Ywarn-unused-import" // required by `RemoveUnused` rule
-    )
-  )
-
   final val DefaultScalacOptions = Seq("-encoding", "UTF-8", "-feature", "-unchecked", "-Xlog-reflective-calls", "-Xlint", "-Ywarn-unused", "-deprecation",
     //    "-Xfatal-warnings"
+    "-Yrangepos", // required by SemanticDB compiler plugin
+    "-Ywarn-unused-import" // required by `RemoveUnused` rule
   )
 
   final val DefaultJavacOptions = Seq("-encoding", "UTF-8", "-Xlint:unchecked", "-XDignore.symbol.file")
 
-  val sharedSettings: Seq[Def.Setting[_]] = formats ++ fixes ++ Seq(
+  val sharedSettings: Seq[Def.Setting[_]] = formats ++ Seq(
+    addCompilerPlugin(scalafixSemanticdb),
     headerLicense := Some(HeaderLicense.Custom(
       s"""|Copyright (c) 2018 https://www.reactivedesignpatterns.com/ ${"\n"}
           |Copyright (c) 2018 https://rdp.reactiveplatform.xyz/
