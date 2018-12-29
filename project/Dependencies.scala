@@ -47,7 +47,7 @@ object Dependencies {
   val finagle = "com.twitter" %% "finagle-http" % "18.12.0"
   val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.8"
 
-  val ckites = Seq(
+  val ckites: Seq[ModuleID] = Seq(
     "io.ckite" % "ckite-core" % ckiteVersion exclude("org.apache.thrift", "libthrift"),
     "io.ckite" % "ckite-finagle" % ckiteVersion exclude("org.apache.thrift", "libthrift"),
     "io.ckite" % "ckite-mapdb" % ckiteVersion exclude("org.apache.thrift", "libthrift")

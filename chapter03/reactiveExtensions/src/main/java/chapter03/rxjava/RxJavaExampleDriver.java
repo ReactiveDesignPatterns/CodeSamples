@@ -10,11 +10,11 @@
 package chapter03.rxjava;
 
 public class RxJavaExampleDriver {
-  private static final RxJavaExample rxJavaExample = new RxJavaExample();
+  private static final RxJavaExample RX_JAVA_EXAMPLE = new RxJavaExample();
 
   public static void main(String[] args) {
     String[] strings = {"a", "b", "c"};
-    rxJavaExample.observe(strings);
+    RX_JAVA_EXAMPLE.observe(strings);
   }
 }
 // #snip
