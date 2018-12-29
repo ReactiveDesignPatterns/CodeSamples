@@ -11,9 +11,9 @@ import akka.actor.{ Actor, ActorRef }
 
 object EchoService {
 
-  case class Request(tag: String, client: ActorRef)
+  final case class Request(tag: String, client: ActorRef)
 
-  case class Response(tag: String)
+  final case class Response(tag: String)
 
 }
 

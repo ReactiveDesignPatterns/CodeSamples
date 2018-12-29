@@ -24,11 +24,11 @@ object EchoServiceSpec {
 
   import EchoService._
 
-  case class TestSLA(echo: ActorRef, n: Int, maxParallelism: Int, reportTo: ActorRef)
+  final case class TestSLA(echo: ActorRef, n: Int, maxParallelism: Int, reportTo: ActorRef)
 
   case object AbortSLATest
 
-  case class SLAResponse(timings: Seq[FiniteDuration], outstanding: Map[String, Timestamp])
+  final case class SLAResponse(timings: Seq[FiniteDuration], outstanding: Map[String, Timestamp])
 
   class ParallelSLATester extends Actor {
 
@@ -88,7 +88,7 @@ object EchoServiceSpec {
 
   private def receiverProps(controller: ActorRef) = Props(new ParallelSLATestReceiver(controller))
 
-  private case class TimedResponse(r: Response, d: Timestamp)
+  private final case class TimedResponse(r: Response, d: Timestamp)
 
   // timestamp received replies in a dedicated actor to keep timing distortions low
   private class ParallelSLATestReceiver(controller: ActorRef) extends Actor {

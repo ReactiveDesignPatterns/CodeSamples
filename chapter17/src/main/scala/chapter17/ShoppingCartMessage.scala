@@ -14,43 +14,43 @@ trait ShoppingCartMessage {
 
 sealed trait Command extends ShoppingCartMessage
 
-case class SetOwner(
+final case class SetOwner(
   shoppingCart: ShoppingCartRef,
   owner:        CustomerRef) extends Command
 
-case class AddItem(
+final case class AddItem(
   shoppingCart: ShoppingCartRef,
   item:         ItemRef,
   count:        Int) extends Command
 
-case class RemoveItem(
+final case class RemoveItem(
   shoppingCart: ShoppingCartRef,
   item:         ItemRef,
   count:        Int) extends Command
 
 sealed trait Query extends ShoppingCartMessage
 
-case class GetItems(shoppingCart: ShoppingCartRef) extends Query
+final case class GetItems(shoppingCart: ShoppingCartRef) extends Query
 
 sealed trait Event extends ShoppingCartMessage
 
-case class OwnerChanged(
+final case class OwnerChanged(
   shoppingCart: ShoppingCartRef,
   owner:        CustomerRef) extends Event
 
-case class ItemAdded(
+final case class ItemAdded(
   shoppingCart: ShoppingCartRef,
   item:         ItemRef,
   count:        Int) extends Event
 
-case class ItemRemoved(
+final case class ItemRemoved(
   shoppingCart: ShoppingCartRef,
   item:         ItemRef,
   count:        Int) extends Event
 
 sealed trait Result extends ShoppingCartMessage
 
-case class GetItemsResult(
+final case class GetItemsResult(
   shoppingCart: ShoppingCartRef,
   items:        Map[ItemRef, Int]) extends Result
 

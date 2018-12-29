@@ -36,11 +36,11 @@ object BusinessHandshake extends App {
   val sam = sys.actorOf(Props(new Sam(alice, bob, 1)), "sam")
 
   // #snip_15-18
-  case class ChangeBudget(amount: BigDecimal, replyTo: ActorRef)
+  final case class ChangeBudget(amount: BigDecimal, replyTo: ActorRef)
 
   case object ChangeBudgetDone
 
-  case class CannotChangeBudget(reason: String)
+  final case class CannotChangeBudget(reason: String)
 
   class Sam(
     alice:  ActorRef,
@@ -128,16 +128,16 @@ object PersistentBusinessHandshake extends App {
     }
   }
 
-  case class ChangeBudget(amount: BigDecimal, replyTo: ActorRef, id: String)
+  final case class ChangeBudget(amount: BigDecimal, replyTo: ActorRef, id: String)
 
   case object ChangeBudgetDone
 
-  case class CannotChangeBudget(reason: String)
+  final case class CannotChangeBudget(reason: String)
 
   // #snip_15-19
-  case class AliceConfirmedChange(deliveryId: Long)
+  final case class AliceConfirmedChange(deliveryId: Long)
 
-  case class AliceDeniedChange(deliveryId: Long)
+  final case class AliceDeniedChange(deliveryId: Long)
 
   class PersistentSam(
     alice:                      ActorPath,
@@ -192,11 +192,11 @@ object PersistentBusinessHandshake extends App {
   // #snip_15-19
 
   // #snip_15-20
-  case class BudgetChanged(amount: BigDecimal, persistenceId: String)
+  final case class BudgetChanged(amount: BigDecimal, persistenceId: String)
 
   case object CleanupDoneList
 
-  case class ChangeDone(persistenceId: String)
+  final case class ChangeDone(persistenceId: String)
 
   class PersistentAlice extends PersistentActor with ActorLogging {
     def persistenceId: String = "Alice"

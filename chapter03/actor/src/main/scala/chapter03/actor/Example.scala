@@ -17,9 +17,9 @@ import akka.event.LoggingReceive
 
 case object Start
 
-case class CounterMessage(counterValue: Int)
+final case class CounterMessage(counterValue: Int)
 
-case class CounterTooLargeException(message: String) extends Exception(message)
+final case class CounterTooLargeException(message: String) extends Exception(message)
 
 class SupervisorActor extends Actor with ActorLogging {
   override val supervisorStrategy: OneForOneStrategy = OneForOneStrategy() {

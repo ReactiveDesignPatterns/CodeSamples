@@ -21,15 +21,15 @@ import scala.concurrent.duration._
 
 object DropPattern {
 
-  case class Job(id: Long, input: Int, replyTo: ActorRef)
+  final case class Job(id: Long, input: Int, replyTo: ActorRef)
 
-  case class JobRejected(id: Long)
+  final case class JobRejected(id: Long)
 
-  case class JobResult(id: Long, report: BigDecimal)
+  final case class JobResult(id: Long, report: BigDecimal)
 
-  case class WorkRequest(worker: ActorRef, items: Int)
+  final case class WorkRequest(worker: ActorRef, items: Int)
 
-  case class DummyWork(count: Int)
+  final case class DummyWork(count: Int)
 
   class Manager extends Actor {
 
@@ -109,7 +109,7 @@ object DropPattern {
     }
   }
 
-  case class Report(success: Int, failure: Int, dropped: Int, value: BigDecimal) {
+  final case class Report(success: Int, failure: Int, dropped: Int, value: BigDecimal) {
     def +(other: Report) =
       Report(success + other.success, failure + other.failure, dropped + other.dropped, value + other.value)
   }

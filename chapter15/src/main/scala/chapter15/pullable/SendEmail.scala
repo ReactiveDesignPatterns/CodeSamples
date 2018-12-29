@@ -17,7 +17,7 @@ import chapter15.SendEmailResult
 // Listing 15.9 Enabling the body to be pulled by the recipient
 
 // #snip
-case class SendEmail(
+final case class SendEmail(
   sender:        String,
   recipients:    List[String],
   bodyLocation:  URL,

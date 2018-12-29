@@ -70,7 +70,7 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
     manager ! ManagerQuery(GetItems(cartRef), num, self)
   }
 
-  case class Cont(id: Int)
+  final case class Cont(id: Int)
 
   self ! Cont(0)
 
@@ -83,9 +83,9 @@ class ShoppingCartSimulator extends Actor with ActorLogging {
   }
 }
 
-case class GetTopProducts(id: Long, replyTo: ActorRef)
+final case class GetTopProducts(id: Long, replyTo: ActorRef)
 
-case class TopProducts(id: Long, products: Map[ItemRef, Int])
+final case class TopProducts(id: Long, products: Map[ItemRef, Int])
 
 //#snip_17-9
 object TopProductListener {

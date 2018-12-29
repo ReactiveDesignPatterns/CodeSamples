@@ -19,17 +19,17 @@ object ActiveActive {
   import ReplicationProtocol._
 
   // #snip_13-14
-  private case class SeqCommand(seq: Int, cmd: Command, replyTo: ActorRef)
+  private final case class SeqCommand(seq: Int, cmd: Command, replyTo: ActorRef)
 
-  private case class SeqResult(
+  private final case class SeqResult(
     seq:     Int,
     res:     Result,
     replica: ActorRef,
     replyTo: ActorRef)
 
-  private case class SendInitialData(toReplica: ActorRef)
+  private final case class SendInitialData(toReplica: ActorRef)
 
-  private case class InitialData(map: Map[String, JsValue])
+  private final case class InitialData(map: Map[String, JsValue])
 
   class Replica extends Actor with Stash {
     private var map = Map.empty[String, JsValue]
@@ -73,7 +73,7 @@ object ActiveActive {
     def isFinished: Boolean = missing.isEmpty
   }
 
-  private case class Unknown(
+  private final case class Unknown(
     deadline: Deadline,
     replies:  Set[SeqResult],
     missing:  Set[ActorRef],
@@ -102,7 +102,7 @@ object ActiveActive {
     }
   }
 
-  private case class Known(
+  private final case class Known(
     deadline: Deadline, reply: SeqResult,
     wrong: Set[ActorRef], missing: Set[ActorRef]) extends ReplyState {
 

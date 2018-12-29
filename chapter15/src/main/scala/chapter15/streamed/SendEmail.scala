@@ -16,7 +16,7 @@ import chapter15.SendEmailResult
 // Listing 15.8 Separating the body so it can be delivered on demand
 
 // #snip
-case class SendEmail(
+final case class SendEmail(
   sender:        String,
   recipients:    List[String],
   correlationID: UUID,

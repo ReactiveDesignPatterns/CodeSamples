@@ -13,15 +13,15 @@ import java.util.UUID
 import akka.actor._
 
 //#snip_17-3
-case class ManagerCommand(cmd: Command, id: Long, replyTo: ActorRef)
+final case class ManagerCommand(cmd: Command, id: Long, replyTo: ActorRef)
 
-case class ManagerEvent(id: Long, event: Event)
+final case class ManagerEvent(id: Long, event: Event)
 
-case class ManagerQuery(cmd: Query, id: Long, replyTo: ActorRef)
+final case class ManagerQuery(cmd: Query, id: Long, replyTo: ActorRef)
 
-case class ManagerResult(id: Long, result: Result)
+final case class ManagerResult(id: Long, result: Result)
 
-case class ManagerRejection(id: Long, reason: String)
+final case class ManagerRejection(id: Long, reason: String)
 
 class Manager(var shoppingCart: ShoppingCart) extends Actor {
   /*

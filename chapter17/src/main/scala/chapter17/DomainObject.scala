@@ -10,16 +10,16 @@ package chapter17
 import java.net.URI
 
 // #snip
-case class ItemRef(id: URI)
+final case class ItemRef(id: URI)
 
-case class CustomerRef(id: URI)
+final case class CustomerRef(id: URI)
 
-case class ShoppingCartRef(id: URI)
+final case class ShoppingCartRef(id: URI)
 
 // #snip
 
 // #snip_17-1
-case class ShoppingCart(
+final case class ShoppingCart(
   items: Map[ItemRef, Int],
   owner: Option[CustomerRef]) {
   def setOwner(customer: CustomerRef): ShoppingCart = {

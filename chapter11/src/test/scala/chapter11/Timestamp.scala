@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 import scala.concurrent.duration.FiniteDuration
 
-case class Timestamp(time: Long) {
+final case class Timestamp(time: Long) {
   def -(that: Timestamp): Timestamp = new Timestamp(time - that.time)
 }
 

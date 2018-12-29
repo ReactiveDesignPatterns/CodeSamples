@@ -25,16 +25,16 @@ object ActivePassive {
   import Persistence._
   import ReplicationProtocol._
 
-  private case class Replicate(
+  private final case class Replicate(
     seq: Int, key: String, value: JsValue, replyTo: ActorRef)
 
-  private case class Replicated(seq: Int)
+  private final case class Replicated(seq: Int)
 
   private case object Tick
 
-  private case class TakeOver(replyTo: ActorRef)
+  private final case class TakeOver(replyTo: ActorRef)
 
-  private case class InitialState(map: Map[String, JsValue], seq: Int)
+  private final case class InitialState(map: Map[String, JsValue], seq: Int)
 
   object Snip13_1 {
 
@@ -154,9 +154,9 @@ object ActivePassive {
     // #snip_13-2
   }
 
-  private case class GetSingle(seq: Int, replyTo: ActorRef)
+  private final case class GetSingle(seq: Int, replyTo: ActorRef)
 
-  private case class GetFull(replyTo: ActorRef)
+  private final case class GetFull(replyTo: ActorRef)
 
   private case object DoConsolidate
 
@@ -777,7 +777,7 @@ object ActivePassive {
     println("cluster started")
   }
 
-  private case class Run(round: Int)
+  private final case class Run(round: Int)
 
   private case object Stop
 
