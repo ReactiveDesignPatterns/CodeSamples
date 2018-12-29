@@ -508,10 +508,9 @@ object ActivePassive {
     private val applied = mutable.Queue.empty[Replicate]
     private var awaitingInitialState = Option.empty[ActorRef]
 
-    val name: String =
-      Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
-    val cluster = Cluster(context.system)
-    val random = new Random
+    private val name = Cluster(context.system).selfAddress.toString.replaceAll("[:/]", "_")
+    private val cluster = Cluster(context.system)
+    private val random = new Random
 
     private var tickTask = Option.empty[Cancellable]
 
