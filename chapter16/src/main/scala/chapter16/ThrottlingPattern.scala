@@ -62,7 +62,9 @@ object ThrottlingPattern {
       case wr @ WorkRequest(worker, items) ⇒
         if (Debug) println(s"${System.nanoTime}: received WorkRequest($items)")
         if (workQueue.isEmpty) {
-          if (!requestQueue.contains(worker)) requestQueue :+= wr
+          if (!requestQueue.view.map(_.worker).contains(worker)) {
+            requestQueue :+= wr
+          }
         } else {
           workQueue.iterator.take(items).foreach(job ⇒ worker ! job)
           if (workQueue.size < items) worker ! DummyWork(items - workQueue.size)
