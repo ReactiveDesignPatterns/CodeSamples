@@ -105,8 +105,10 @@ class EchoServiceSpec extends WordSpec with Matchers with BeforeAndAfterAll {
   import EchoServiceSpec._
 
   // implicitly picked up to create TestProbes, lazy to only start when used
-  implicit lazy val system: ActorSystem = ActorSystem("EchoServiceSpec", ConfigFactory.parseString(
-    """
+  implicit lazy val system: ActorSystem = ActorSystem(
+    "EchoServiceSpec",
+    ConfigFactory.parseString(
+      """
 akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
 """))
 
@@ -163,7 +165,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
       val SLA = if (Helpers.isCiTest) 25.milliseconds else 1.millisecond
-
+      //sometimes below assertion will fail with SLA not matched.
       ninetyfifthPercentile.toFiniteDuration should be <= SLA
       // #snip_11-5
     }
@@ -202,14 +204,14 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
     //TODO sync with 11.7
     "keep its SLA when used in parallel" in {
       // #snip_11-7
-      val echo = echoService("keepSLAparallel")
+      val echo = echoService("keepSLAInParallel")
       val probe = TestProbe()
 
       val N = 10000
       val maxParallelism = 500
       val controller = system.actorOf(
         Props[ParallelSLATester],
-        "keepSLAparallelController")
+        "keepSLAInParallelController")
       controller ! TestSLA(echo, N, maxParallelism, probe.ref)
 
       val result = Try(probe.expectMsgType[SLAResponse]).recover {
@@ -239,8 +241,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val maxParallelism = 500
       val controller = system.actorOf(
         Props[ParallelSLATester],
-        "keepSLAparallelController")
-
+        "keepSLAInParallelAndAsyncController")
       val future = controller ? (TestSLA(echo, N, maxParallelism, _))
       for (SLAResponse(timings, outstanding) ← future) yield {
 
