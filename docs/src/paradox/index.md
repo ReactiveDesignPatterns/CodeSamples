@@ -1,10 +1,14 @@
+**《反应式设计模式》**
+
+Roland Kuhn with Brian Hanafee and Jamie Allen 著
+
+何品 邱嘉和 王石冲 译
+
+林炜翔 校审
+
+定义未来十年的软件架构！
+
 @@toc { depth=3 }
-
-《反应式设计模式》
-
-> 原书名《Reactive Design Patterns》
-
-一本有关反应式（Reactive）系统设计的模式书。
 
 @@@ index
 
