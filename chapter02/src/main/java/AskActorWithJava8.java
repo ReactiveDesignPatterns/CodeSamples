@@ -52,7 +52,7 @@ public class AskActorWithJava8 {
     final Duration timeout = Duration.ofSeconds(1L);
 
     // #snip
-    CompletionStage<Response> future =
+    final CompletionStage<Response> future =
         ask(actorRef, request, timeout).thenApply(Response.class::cast);
     future.thenAccept(AskActorWithJava8::processIt);
     // #snip

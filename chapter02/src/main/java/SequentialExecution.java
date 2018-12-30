@@ -42,11 +42,11 @@ public class SequentialExecution {
 
   public static void main(String[] args) {
     // #snip
-    ReplyA a = computeA();
-    ReplyB b = computeB();
-    ReplyC c = computeC();
+    final ReplyA a = computeA();
+    final ReplyB b = computeB();
+    final ReplyC c = computeC();
 
-    Result r = aggregate(a, b, c);
+    final Result r = aggregate(a, b, c);
     // #snip
 
     System.out.println(r);

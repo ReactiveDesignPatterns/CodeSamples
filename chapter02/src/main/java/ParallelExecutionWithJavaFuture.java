@@ -56,11 +56,11 @@ public class ParallelExecutionWithJavaFuture {
 
   public static void main(String[] args) throws ExecutionException, InterruptedException {
     // #snip
-    Future<ReplyA> a = taskA();
-    Future<ReplyB> b = taskB();
-    Future<ReplyC> c = taskC();
+    final Future<ReplyA> a = taskA();
+    final Future<ReplyB> b = taskB();
+    final Future<ReplyC> c = taskC();
 
-    Result r = aggregate(a.get(), b.get(), c.get());
+    final Result r = aggregate(a.get(), b.get(), c.get());
     // #snip
 
     System.out.println(r);

@@ -49,5 +49,94 @@ final case class
 
 ----
 
+### 第二章
 
+#### 第一次印刷
+
+#### 页码
+
+19
+
+#### 原文
+
+```java
+    ReplyA a = computeA();
+    ReplyB b = computeB();
+    ReplyC c = computeC();
+
+    Result r = aggregate(a, b, c);
+```
+
+#### 修正
+
+```java
+    final ReplyA a = computeA();
+    final ReplyB b = computeB();
+    final ReplyC c = computeC();
+
+    final Result r = aggregate(a, b, c);
+```
+#### 说明
+
+在反应式编程中，我们应该尽可能地利用不可变，类似于在 Scala 中，我们需要尽可能地使用 `val` 而不是 `var`,并且保持和 2.2.2 小节的 Scala 
+代码清单对齐（其中使用的是`val`）。
+
+---
+
+#### 第一次印刷
+
+#### 页码
+
+20
+
+#### 原文
+
+```java
+    Future<ReplyA> a = taskA();
+    Future<ReplyB> b = taskB();
+    Future<ReplyC> c = taskC();
+
+    Result r = aggregate(a.get(), b.get(), c.get());
+```
+
+#### 修正
+
+```java
+    final Future<ReplyA> a = taskA();
+    final Future<ReplyB> b = taskB();
+    final Future<ReplyC> c = taskC();
+
+    final Result r = aggregate(a.get(), b.get(), c.get());
+```
+#### 说明
+
+在反应式编程中，我们应该尽可能地利用不可变，类似于在 Scala 中，我们需要尽可能地使用 `val` 而不是 `var`,并且保持和 2.2.2 小节的 Scala 
+代码清单对齐（其中使用的是`val`）。
+
+---
+
+#### 第一次印刷
+
+#### 页码
+
+23
+
+#### 原文
+
+```java
+    CompletionStage<Response> future =
+        ask(actorRef, request, timeout).thenApply(Response.class::cast);
+    future.thenAccept(AskActorWithJava8::processIt);
+```
+
+#### 修正
+
+```java
+    final CompletionStage<Response> future =
+        ask(actorRef, request, timeout).thenApply(Response.class::cast);
+    future.thenAccept(AskActorWithJava8::processIt);
+```
+#### 说明
+
+在反应式编程中，我们应该尽可能地利用不可变，类似于在 Scala 中，我们需要尽可能地使用 `val` 而不是 `var`。
 
