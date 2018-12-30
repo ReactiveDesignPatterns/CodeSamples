@@ -85,13 +85,13 @@ public interface ComplexCommand {
   public class WorkerJS {
     private static final ScriptEngine ENGINE = new ScriptEngineManager().getEngineByName("nashorn");
 
-    public PartialResult runJob(BatchJobJS job) {
-      Invocable invocable = (Invocable) ENGINE;
+    public PartialResult runJob(final BatchJobJS job) {
+      final Invocable invocable = (Invocable) ENGINE;
 
       try {
         ENGINE.eval(job.processingLogic);
         final Stream<DataElement> input = provideData(job.dataSelector);
-        PartialResult result = (PartialResult) invocable.invokeFunction("process", input);
+        final PartialResult result = (PartialResult) invocable.invokeFunction("process", input);
         return result;
       } catch (Exception e) {
         return new PartFailure(e);

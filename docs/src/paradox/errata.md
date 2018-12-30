@@ -475,3 +475,28 @@ typo
 切换到新版本 Akka 中更加 Java native 的写法。更加直接地是用 `AbstractActor` 提供的基础设施。
 
 ---
+
+#### 第一次印刷
+
+#### 页码
+
+247
+
+#### 原文
+
+代码清单 14-8：
+
+```java
+    private static final ScriptEngine engine = 
+```
+    
+#### 修正
+
+```java
+    private static final ScriptEngine ENGINE = 
+```
+#### 说明
+
+对于类的静态成员，切换为使用全大写的格式。其他包含一些`final`关键字的增加。
+
+---
