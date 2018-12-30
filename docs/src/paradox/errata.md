@@ -476,6 +476,27 @@ typo
 
 ---
 
+240
+
+#### 原文
+
+代码清单 14-5：
+
+```java
+    private PartialFunction<Object, BoxedUnit> initialized()
+```
+    
+#### 修正
+
+```java
+    private Receive initialized()
+```
+#### 说明
+
+切换到新版本 Akka 中更加 Java native 的写法。更加直接地是用 `AbstractActor` 提供的基础设施。
+
+---
+
 #### 第一次印刷
 
 #### 页码

@@ -11,9 +11,7 @@ import akka.actor.AbstractActor;
 import akka.actor.Cancellable;
 import chapter14.ResourceEncapsulation.*;
 import chapter14.ResourceEncapsulation.Shutdown;
-import scala.PartialFunction;
 import scala.concurrent.duration.FiniteDuration;
-import scala.runtime.BoxedUnit;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +40,7 @@ public class ResourceLoan {
           .build();
     }
 
-    private PartialFunction<Object, BoxedUnit> initialized() {
+    private Receive initialized() {
       /* forward commands and deal with responses from worker node */
       // ...
       return null;
