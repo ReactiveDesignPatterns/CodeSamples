@@ -40,29 +40,28 @@ import java.util.stream.Collectors;
  */
 public class ResourceEncapsulation {
   // #snip_14-1
-  public Instance startInstance(AWSCredentials credentials) {
-    AmazonEC2 amazonEC2Client =
+  public Instance startInstance(final AWSCredentials credentials) {
+    final AmazonEC2 amazonEC2Client =
         AmazonEC2ClientBuilder.standard()
             .withCredentials(new AWSStaticCredentialsProvider(credentials))
             .build();
 
-    RunInstancesRequest runInstancesRequest =
+    final RunInstancesRequest runInstancesRequest =
         new RunInstancesRequest()
             .withImageId("")
             .withInstanceType("m1.small")
             .withMinCount(1)
             .withMaxCount(1);
 
-    RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
+    final RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
 
-    Reservation reservation = runInstancesResult.getReservation();
-    List<Instance> instances = reservation.getInstances();
+    final Reservation reservation = runInstancesResult.getReservation();
+    final List<Instance> instances = reservation.getInstances();
 
     // there will be exactly one INSTANCE in this list, otherwise
     // runInstances() would have thrown an exception
     return instances.get(0);
   }
-
   // #snip_14-1
 
   // #snip_14-2
@@ -70,11 +69,11 @@ public class ResourceEncapsulation {
   private CircuitBreaker circuitBreaker; // value from somewhere
 
   public Future<Instance> startInstanceAsync(AWSCredentials credentials) {
-    Future<Instance> f =
+    final Future<Instance> f =
         circuitBreaker.callWithCircuitBreaker(
             () -> Futures.future(() -> startInstance(credentials), executionContext));
 
-    PartialFunction<Throwable, Future<Instance>> recovery =
+    final PartialFunction<Throwable, Future<Instance>> recovery =
         new PFBuilder<Throwable, Future<Instance>>()
             .match(
                 AmazonClientException.class,
@@ -89,9 +88,9 @@ public class ResourceEncapsulation {
 
   // #snip_14-3
   public Future<RunInstancesResult> runInstancesAsync(
-      RunInstancesRequest request, AmazonEC2Async client) {
+      final RunInstancesRequest request, final AmazonEC2Async client) {
 
-    Promise<RunInstancesResult> promise = Futures.promise();
+    final Promise<RunInstancesResult> promise = Futures.promise();
     client.runInstancesAsync(
         request,
         new AsyncHandler<RunInstancesRequest, RunInstancesResult>() {
@@ -113,17 +112,17 @@ public class ResourceEncapsulation {
 
   // #snip_14-4
   public Future<TerminateInstancesResult> terminateInstancesAsync(
-      AmazonEC2Client client, Instance... instances) {
+      final AmazonEC2Client client, final Instance... instances) {
 
-    List<String> ids =
+    final List<String> ids =
         Arrays.stream(instances).map(Instance::getInstanceId).collect(Collectors.toList());
-    TerminateInstancesRequest request = new TerminateInstancesRequest(ids);
+    final TerminateInstancesRequest request = new TerminateInstancesRequest(ids);
 
-    Future<TerminateInstancesResult> f =
+    final Future<TerminateInstancesResult> f =
         circuitBreaker.callWithCircuitBreaker(
             () -> Futures.future(() -> client.terminateInstances(request), executionContext));
 
-    PartialFunction<Throwable, Future<TerminateInstancesResult>> recovery =
+    final PartialFunction<Throwable, Future<TerminateInstancesResult>> recovery =
         new PFBuilder<Throwable, Future<TerminateInstancesResult>>()
             .match(
                 AmazonClientException.class,
@@ -168,7 +167,7 @@ public class ResourceEncapsulation {
   class WorkerNode extends AbstractActor {
     private final Cancellable checkTimer;
 
-    public WorkerNode(InetAddress address, FiniteDuration checkInterval) {
+    public WorkerNode(final InetAddress address, final FiniteDuration checkInterval) {
       checkTimer =
           getContext()
               .system()
@@ -184,7 +183,7 @@ public class ResourceEncapsulation {
 
     @Override
     public Receive createReceive() {
-      List<WorkerNodeMessage> msgs = new ArrayList<>();
+      final List<WorkerNodeMessage> msgs = new ArrayList<>();
       return receiveBuilder()
           .match(WorkerNodeMessage.class, msgs::add)
           .match(

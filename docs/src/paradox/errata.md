@@ -370,3 +370,35 @@ typo
 
 代码清单中的这个部分，因为`res` shallow 了外面的 `add`方法中的`res`参数，所以
 实际上比较的类型是不相关的，会造成状态无法收敛到`Known`。通过重新命名解决了这个问题。
+
+---
+
+### 第十四章
+
+#### 第一次印刷
+
+#### 页码
+
+231
+
+#### 原文
+
+代码清单 14-1：
+
+```java
+    AmazonEC2 amazonEC2Client = new AmazonEC2Client(credentials);
+```
+#### 修正
+
+```java
+    final AmazonEC2 amazonEC2Client =
+        AmazonEC2ClientBuilder.standard()
+            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+            .build();
+```
+#### 说明
+
+切换到新版本客户端的推荐写法，旧版本写法已经废弃。其他包括代码清单中添加了`final`关键字。
+
+---
+
