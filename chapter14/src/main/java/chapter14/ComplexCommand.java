@@ -215,7 +215,7 @@ public interface ComplexCommand {
 
   // #snip_14-10
   public static void akkaStreamDSL() {
-    RunnableGraph<CompletionStage<Long>> p =
+    final RunnableGraph<CompletionStage<Long>> p =
         Source.<DataElement>empty()
             .filter(new InRange("year", 1950, 1960))
             .toMat(Sink.fold(0L, new Median<>("price")), Keep.right());
