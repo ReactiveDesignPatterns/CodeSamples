@@ -6,7 +6,7 @@ Roland Kuhn with Brian Hanafee and Jamie Allen 著
 
 林炜翔 校审
 
-定义未来十年的分布式软件架构！
+定义未来十年的分布式系统架构！
 
 @@toc { depth=3 }
 
