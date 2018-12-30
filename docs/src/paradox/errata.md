@@ -241,6 +241,110 @@ Java 8 并未内置类名类似于“Promise”的实现，不过在 Netty 等�
 静态的成员变量，应该推荐使用大写加下划线的形式。
 
 ---
+### 第十一章
+
+#### 第一次印刷
+
+#### 页码
+
+143
+
+#### 原文
+
+```scala
+  val echo = echoService("keepSLAfuture")
+```
+#### 修正
+
+```scala
+  val echo = echoService("keepSLAWithFuture")
+```
+#### 说明
+
+typo
+
+---
+
+#### 第一次印刷
+
+#### 页码
+
+144
+
+#### 原文
+
+```scala
+  val echo = echoService("keepSLAparallel")
+```
+
+和
+```scala
+      val controller = system.actorOf(
+        Props[ParallelSLATester],
+        "keepSLAparallelController")
+```
+#### 修正
+
+```scala
+  val echo = echoService("keepSLAInParallel")
+```
+和
+```scala
+      val controller = system.actorOf(
+        Props[ParallelSLATester],
+        "keepSLAInParallelController")
+```
+#### 说明
+
+typo
+
+---
+
+#### 第一次印刷
+
+#### 页码
+
+149
+
+#### 原文
+
+```scala
+      val controller = system.actorOf(
+        Props[ParallelSLATester],
+        "keepSLAparallelController")
+```
+#### 修正
+
+```scala
+      val controller = system.actorOf(
+        Props[ParallelSLATester],
+        "keepSLAInParallelAndAsyncController")
+```
+#### 说明
+
+1. typo
+2. 因为在 `ParallelSLATester` 中，对应的`context.stop(self)`是一个异步动作，所以在快速运行多个测试的时候，
+会出现偶发的：`akka.actor.InvalidActorNameException`，所以进行改名对当前的用例来说是比较直接安全的一种做法。
+感兴趣的读者可以看下下面的错误信息：
+
+```
+[info] - must keep its SLA when used in parallel and handling responses asynchronously *** FAILED ***
+[info]   akka.actor.InvalidActorNameException: actor name [keepSLAparallelController] is not unique!
+[info]   at akka.actor.dungeon.ChildrenContainer$NormalChildrenContainer.reserve(ChildrenContainer.scala:129)
+[info]   at akka.actor.dungeon.Children.reserveChild(Children.scala:134)
+[info]   at akka.actor.dungeon.Children.reserveChild$(Children.scala:132)
+[info]   at akka.actor.ActorCell.reserveChild(ActorCell.scala:431)
+[info]   at akka.actor.dungeon.Children.makeChild(Children.scala:272)
+[info]   at akka.actor.dungeon.Children.attachChild(Children.scala:48)
+[info]   at akka.actor.dungeon.Children.attachChild$(Children.scala:47)
+[info]   at akka.actor.ActorCell.attachChild(ActorCell.scala:431)
+[info]   at akka.actor.ActorSystemImpl.actorOf(ActorSystem.scala:753)
+[info]   at chapter11.EchoServiceSpec.$anonfun$new$10(EchoServiceSpec.scala:242)
+```
+
+[原始链接](https://github.com/ReactivePlatform/Reactive-Design-Patterns/pull/45#issuecomment-450505641)
+
+---
 
 ### 第十三章
 

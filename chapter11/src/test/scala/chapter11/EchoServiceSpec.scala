@@ -165,7 +165,6 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       val ninetyfifthPercentile = sorted.dropRight(N * 5 / 100).last
       info(s"SLA min=${sorted.head} max=${sorted.last} 95th=$ninetyfifthPercentile")
       val SLA = if (Helpers.isCiTest) 25.milliseconds else 1.millisecond
-      //sometimes below assertion will fail with SLA not matched.
       ninetyfifthPercentile.toFiniteDuration should be <= SLA
       // #snip_11-5
     }
@@ -176,7 +175,7 @@ akka.actor.default-dispatcher.fork-join-executor.parallelism-max = 3
       implicit val timeout: Timeout = Timeout(500.millis)
       import system.dispatcher
       // #snip_11-6
-      val echo = echoService("keepSLAfuture")
+      val echo = echoService("keepSLAWithFuture")
 
       val N = 10000
       val timingFutures = for (i ← 1 to N) yield {
