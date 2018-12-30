@@ -1,18 +1,33 @@
-[![Build Status](https://travis-ci.org/ReactiveDesignPatterns/CodeSamples.svg?branch=master)](https://travis-ci.org/ReactiveDesignPatterns/CodeSamples)
+# 《反应式设计模式》代码清单
 
-# Reactive Design Patterns Code Samples
+本代码库包含的是《Reactive-Design-Patterns》一书的中文版《反应式设计模式》的代码清单。对原书的代码清单感兴趣的同学，可以直接点击本仓库的上游代码库进行查阅，本仓库提供的是本书中文版译者维护的版本，相对于上游的代码库有以下的不同：
 
-This repository hosts the code samples that are used in [Reactive Design Patterns](https://www.manning.com/books/reactive-design-patterns) for illustration. We aim at full test coverage to make sure that the code that we present actually works. While we tend to start out with writing Scala or Java code, we want this repository to also hold samples in other languages (like JavaScript, Ruby, Python, etc.). Contributions, corrections, wishes and all kind of help is appreciated, please don’t hesitate to use the issue tracker.
+ 1. 组织上以多模块，基于章节的形式进行。
+ 2. 相关的依赖更新到了最新的版本，基于scala-stew进行。
+ 3. 代码的写法部分更新到了最新的依赖推荐的方式
+ 4. 修复了上游缺失、或者有纰漏的代码例子
+ 5. 代码通过scalfix进行了检查和改写
+ 6. 代码通过相关插件进行了对应的自动格式化
+ 7. 基于paradox提供了在线的代码清单版本，方便对照。
+ 
+ 本代码清单的在线版本地址：https://rdp.reactiveplatform.xyz/
+ 
+ 本书会日常更新相关的勘误：https://rdp.reactiveplatform.xyz/errata.html
 
-## Legal
+## 勘误和贡献
 
-The code in this repository is offered royalty-free under the Apache License version 2, see the LICENSE file in the root directory. 
+本书的相关勘误、疑问读者可以通过issue进行，对于代码清单本生的一些修改，请通过Pull Request进行。
 
-## Contributing
+## 相关资源
 
-see [CONTRIBUTING.md](CONTRIBUTING.md)
-# NOTE
+本书的译者之一王石冲提供了本书的导读：
 
-This repo is only for tracing the translation ,the actualy translation will not happening here
+## 免责声明
 
-这个代码库主要用来追踪进度,具体的翻译并不发生在这里
+由于本书出版、印刷的固有流程，所以您手上的图书可能不包含有最新的代码清单，但是我们你可以持续访问最新的在线版本的代码清单。
+
+
+## 其他
+
+本书具备微信的读者群，不过现在超过了100人，需要手动拉人，比较麻烦。。。
+
