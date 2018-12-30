@@ -209,3 +209,30 @@ Java 8 并未内置类名类似于“Promise”的实现，不过在 Netty 等�
 #### 说明
 
 这里的`RxJava` 的第二个 `x` 需要小写，属于 typo。
+
+---
+
+### 第十三章
+
+#### 第一次印刷
+
+#### 页码
+
+220
+
+#### 原文
+
+代码清单 13-15：
+
+```scala
+  case SeqResult(_, res, replica, _) if res != right ⇒ replica
+```
+#### 修正
+
+```scala
+  case SeqResult(_, result, replica, _) if res != right ⇒ replica
+```
+#### 说明
+
+代码清单中的这个部分，因为`res` shallow 了外面的 `add`方法中的`res`参数，所以
+实际上比较的类型是不相关的，会造成状态无法收敛到`Known`。通过重新命名解决了这个问题。
