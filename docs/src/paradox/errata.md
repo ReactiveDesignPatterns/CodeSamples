@@ -212,6 +212,36 @@ Java 8 并未内置类名类似于“Promise”的实现，不过在 Netty 等�
 
 ---
 
+#### 第一次印刷
+
+#### 页码
+
+59
+
+#### 原文
+```java
+  private static final RxJavaExample rxJavaExample = new RxJavaExample();
+```
+和
+```java
+  rxJavaExample.observe(strings);
+```
+
+#### 修正
+
+```java
+  private static final RxJavaExample RX_JAVA_EXAMPLE = new RxJavaExample();
+```
+和
+```java
+  RX_JAVA_EXAMPLE.observe(strings);
+```
+#### 说明
+
+静态的成员变量，应该推荐使用大写加下划线的形式。
+
+---
+
 ### 第十三章
 
 #### 第一次印刷
