@@ -1,6 +1,7 @@
 # 勘误
 
->本书的勘误将第一时间在这个页面进行同步。并按照章节和页码的升序进行排列。
+>本书的勘误将第一时间在这个页面进行同步。并按照章节和页码的升序进行排列。本书原著的勘误也会进行第一时间的合并，
+在本书中文版出版时，我们已经合并了原著到2018年三月份的勘误。[外版勘误地址](https://manning-content.s3.amazonaws.com/download/5/7e201ec-e305-4493-817c-954eb5a3803c/Kuhn_ReactiveDesignPatterns_err2.html)
 
 勘误的模板为
 ```
@@ -50,6 +51,31 @@ final case class
 ----
 
 ### 第二章
+
+#### 第一次印刷
+
+#### 页码
+
+15
+
+#### 原文
+
+```java
+  public Images cache;
+  public Images database;
+```
+
+#### 修正
+
+```java
+  private Images cache;
+  private Images database;
+```
+#### 说明
+
+这里暴露了`ImageServiceController`的内部成员，需要将可见性设置为`private`.
+
+---
 
 #### 第一次印刷
 

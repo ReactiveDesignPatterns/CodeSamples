@@ -19,8 +19,8 @@ public class ImageServiceController {
     void add(String key, Image image);
   }
 
-  public Images cache;
-  public Images database;
+  private Images cache;
+  private Images database;
 
   public Image retrieveImages(String key) {
     Image result = cache.get(key);
