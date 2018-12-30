@@ -26,9 +26,8 @@ import scala.PartialFunction;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 import scala.concurrent.Promise;
-import scala.concurrent.duration.FiniteDuration;
-import scala.runtime.BoxedUnit;
 import java.net.InetAddress;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -167,11 +166,11 @@ public class ResourceEncapsulation {
   class WorkerNode extends AbstractActor {
     private final Cancellable checkTimer;
 
-    public WorkerNode(final InetAddress address, final FiniteDuration checkInterval) {
+    public WorkerNode(final InetAddress address, final Duration checkInterval) {
       checkTimer =
           getContext()
-              .system()
-              .scheduler()
+              .getSystem()
+              .getScheduler()
               .schedule(
                   checkInterval,
                   checkInterval,
@@ -209,7 +208,7 @@ public class ResourceEncapsulation {
           .build();
     }
 
-    private PartialFunction<Object, BoxedUnit> initialized() {
+    private Receive initialized() {
       /* forward commands and deal with responses from worker node */
       // ...
       return null;
