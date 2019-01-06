@@ -27,7 +27,7 @@ object Dependencies {
 
   val levelDb = "org.iq80.leveldb" % "leveldb" % "0.10"
 
-  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.476"
+  val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.477"
 
   val sbtIO = "org.scala-sbt" %% "io" % "1.2.2"
 
