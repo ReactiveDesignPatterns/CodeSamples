@@ -216,6 +216,48 @@ final case class
 
 #### 页码
 
+27
+
+#### 原文
+
+成为昂贵的门挡。
+
+#### 修正
+
+这里需要添加一个译者注：
+这里的`门挡`即`门碰`，作者这里指的是硬盘坏了，废物利用用来挡门。可以理解为使用不再感兴趣的书本来垫显示器。
+
+#### 说明
+
+在反应式编程中，我们应该尽可能地利用不可变，类似于在 Scala 中，我们需要尽可能地使用 `val` 而不是 `var`。
+
+---
+
+#### 第一次印刷
+
+#### 页码
+
+32
+
+#### 原文
+
+传统的数据存储是......
+
+#### 修正
+
+传统的数据存储是......
+//TODO 老王
+
+#### 说明
+
+这里原文的倒装比较严重，中间夹了一句，我们重新调整下翻译的结构使得原文的表意更加突出。
+
+---
+
+#### 第一次印刷
+
+#### 页码
+
 33
 
 #### 原文
@@ -229,6 +271,94 @@ final case class
 #### 说明
 
 这里讲的是狭义相对论。
+
+---
+
+### 第三章
+
+#### 第一次印刷
+
+#### 页码
+
+48
+
+#### 原文
+
+STM
+
+#### 修正
+
+应该是：`STW`
+
+#### 说明
+
+翻译的时候想着`软件事务内存`了，Typo。
+
+---
+
+### 第三章
+
+#### 第一次印刷
+
+#### 页码
+
+48
+
+#### 原文
+
+吞吐量从而提升为将近原来的3倍
+
+#### 修正
+
+从而将吞吐量提升为将近原来的3倍
+
+#### 说明
+
+翻译的时候想着`软件事务内存`了，Typo。
+
+---
+
+### 第三章
+
+#### 第一次印刷
+
+#### 页码
+
+49
+
+#### 原文
+
+我们都将会评估它是如何...的。
+
+#### 修正
+
+删除掉最后的`的`字。
+
+我们都将会评估它是....的原则。
+
+#### 说明
+
+---
+
+### 第三章
+
+#### 第一次印刷
+
+#### 页码
+
+49
+
+#### 原文
+
+所以它们`的`在容错性方面比较欠缺。
+
+#### 修正
+
+删除掉中间的`的`字。
+
+所以它们在容错性方面比较欠缺。
+
+#### 说明
 
 ---
 
@@ -253,6 +383,43 @@ Java 8 并未内置类名类似于“Promise”的实现，不过在 Netty 等�
 在本书出版的时候，译者使用的是 vavr 的`0.9.2`版本,在这个版本中的确有 `Promise` 的定义和对应的实现，见：
 `io.vavr.concurrent.Promise`，不过在目前的主干和接下来的1.0.0版本中，vavr的作者已经删除对应的实现，
 所以这里的描述已经过时。
+
+---
+#### 第一次印刷
+
+#### 页码
+
+55
+
+#### 原文
+
+代码清单3-5 `supplyAsync`后面少了括号
+
+#### 修正
+
+```java
+public class ParallelRetrievalExample {
+  private final CacheRetriever cacheRetriever;
+  private final DBRetriever dbRetriever;
+
+  ParallelRetrievalExample(CacheRetriever cacheRetriever, DBRetriever dbRetriever) {
+    this.cacheRetriever = cacheRetriever;
+    this.dbRetriever = dbRetriever;
+  }
+
+  public Object retrieveCustomer(final long id) {
+    final CompletableFuture<Object> cacheFuture =
+        CompletableFuture.supplyAsync(() -> cacheRetriever.getCustomer(id));
+    final CompletableFuture<Object> dbFuture =
+        CompletableFuture.supplyAsync(() -> dbRetriever.getCustomer(id));
+
+    return CompletableFuture.anyOf(cacheFuture, dbFuture);
+  }
+}
+```
+#### 说明
+
+排版过程中引入错误，typo。
 
 ---
 
@@ -305,6 +472,36 @@ Java 8 并未内置类名类似于“Promise”的实现，不过在 Netty 等�
 静态的成员变量，应该推荐使用大写加下划线的形式。
 
 ---
+
+#### 第一次印刷
+
+#### 页码
+
+59
+
+#### 原文
+
+代码清单中 `Observable.fromArray(strings).subscribe(s)` 少了括号
+
+#### 修正
+
+```java
+package chapter03.rxjava;
+
+import io.reactivex.Observable;
+
+public class RxJavaExample {
+  public void observe(String[] strings) {
+    Observable.fromArray(strings).subscribe((s) -> System.out.println("Received " + s));
+  }
+}
+```
+#### 说明
+
+排版过程中引入错误，typo。
+
+---
+
 ### 第十一章
 
 #### 第一次印刷
