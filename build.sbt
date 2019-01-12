@@ -11,8 +11,6 @@ scalacOptions in Compile ++= Seq("-encoding", "UTF-8", "-target:jvm-1.8", "-feat
 
 javacOptions in compile ++= Seq("-encoding", "UTF-8", "-source", "1.8", "-target", "1.8", "-Xlint:unchecked", "-XDignore.symbol.file")
 
-resolvers += "akka" at "https://dl.bintray.com/akka/maven/"
-
 conflictWarning := conflictWarning.value.copy(failOnConflict = false)
 
 //javaFormattingSettingsFilename in ThisBuild := "formatting-java.xml"
@@ -76,7 +74,6 @@ lazy val chapter13 = project.dependsOn(common)
   .enablePlugins(AutomateHeaderPlugin)
   .settings(Build.sharedSettings: _*)
   .settings(
-    resolvers += "twitter" at "http://maven.twttr.com/",
     libraryDependencies ++= Seq(
       Dependencies.akka25Contrib,
       Dependencies.akka25DData,
