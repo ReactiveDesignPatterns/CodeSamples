@@ -1,6 +1,6 @@
 # 《反应式设计模式》代码清单
 
-购买地址：
+在线购买：
 
 [京东](https://u.jd.com/7yHAr6)
 [当当](http://product.m.dangdang.com/26482900.html?&unionid=P-111740240m)
