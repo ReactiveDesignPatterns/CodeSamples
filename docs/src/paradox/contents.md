@@ -11,6 +11,9 @@ Roland Kuhn with Brian Hanafee and Jamie Allen 著
 
 定义未来十年的分布式系统架构！
 
+[京东](https://u.jd.com/7yHAr6)
+[当当](http://product.m.dangdang.com/26482900.html?&unionid=P-111740240m)
+
 @@@ index
 * [内容提要](abstract.md)
 * [第一部分 简介](part1.md)
