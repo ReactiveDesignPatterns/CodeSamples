@@ -12,7 +12,7 @@ addSbtPlugin("io.github.jonas" % "sbt-paradox-material-theme" % "0.6.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3")
 
-addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.0.0")
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.1.0")
 
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
 
