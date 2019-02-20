@@ -18,7 +18,7 @@ addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
 
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.1")
 
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.4.0")
 
 addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.4.3")
 
