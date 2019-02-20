@@ -60,5 +60,5 @@ lazy val chapter03 = (project in file("."))
   .settings(Build.sharedSettings: _*)
 
 libraryDependencies ++= Seq(
-  "org.slf4j" % "slf4j-api" % "1.7.25"
+  "org.slf4j" % "slf4j-api" % "1.7.26"
 )
