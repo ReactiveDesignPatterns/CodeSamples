@@ -25,7 +25,7 @@ object Dependencies {
 
   val akka25PersistenceQuery = "com.typesafe.akka" %% "akka-persistence-query" % akka25Version
 
-  val levelDb = "org.iq80.leveldb" % "leveldb" % "0.10"
+  val levelDb = "org.iq80.leveldb" % "leveldb" % "0.11"
 
   val amazonAWS = "com.amazonaws" % "aws-java-sdk" % "1.11.487"
 
