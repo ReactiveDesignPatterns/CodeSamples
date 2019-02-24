@@ -20,7 +20,7 @@ addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.1")
 
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.4.0")
 
-addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.4.3")
+addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.4.4")
 
 addSbtPlugin("io.spray" % "sbt-boilerplate" % "0.6.1")
 
