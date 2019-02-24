@@ -44,7 +44,7 @@ object Dependencies {
 
   val guava = "com.google.guava" % "guava" % "23.0"
 
-  val finagle = "com.twitter" %% "finagle-http" % "19.1.0"
+  val finagle = "com.twitter" %% "finagle-http" % "19.2.0"
   val fasterxml = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.8"
 
   val ckites: Seq[ModuleID] = Seq(
